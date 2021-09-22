@@ -8,15 +8,17 @@ import Metrics from '../../../utils/metrics';
 import EventManager from '../../../utils/events';
 import TokenListManager from '../../../utils/tokenList';
 import TokenIconImg from './../TokenIconImg';
+import {switchToDarkMode, switchToLightMode} from "../../../stores/darkModeSlice";
+import {connect} from "react-redux";
 
-export default class SwapNetworkToggle extends Component {
+class SwapNetworkToggle extends Component {
   constructor(props) {
     super(props);
 
     this.handleDropdownClick = this.handleDropdownClick.bind(this);
-
     this.NETWORKS = window.NETWORK_CONFIGS;
     this.state = {
+      isDarkMode:false,
       selected: TokenListManager.getCurrentNetworkConfig(),
       active: false,
       hoverable: true,
@@ -59,6 +61,12 @@ export default class SwapNetworkToggle extends Component {
     }.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.isDarkMode !== this.props.isDarkMode) {
+      this.setState({ isDarkMode: nextProps.isDarkMode });
+    }
+  }
+
   render() {
     var networkList = _.map(this.NETWORKS, function(v, i) {
       return (
@@ -82,12 +90,12 @@ export default class SwapNetworkToggle extends Component {
     }.bind(this));
 
     return (
-      <div className="swap-network-toggle box notification">
+      <div className={"swap-network-toggle box notification ".concat( this.state.isDarkMode ? "dark-bg": "")}>
         <div className="level is-mobile option">
           <div className="level-left">
             <div className="level-item">
               <span>
-                <span className="option-title">Network</span>
+                <span className={"option-title ".concat(this.state.isDarkMode ? "text-white-color" : "")}>Network</span>
                 <span
                   className="is-hidden hint-icon hint--top hint--medium"
                   aria-label="Change Network"
@@ -102,7 +110,7 @@ export default class SwapNetworkToggle extends Component {
                   "is-hoverable": this.state.hoverable
               })}>
                 <div className="dropdown-trigger">
-                  <button className="button is-info is-light" aria-haspopup="true" aria-controls="dropdown-menu">
+                  <button className={"button is-info is-light ".concat(this.state.isDarkMode ? "dark-dropdown" : "")} aria-haspopup="true" aria-controls="dropdown-menu">
                     <span className="level">
                       <span className="level-left my-2">
                         <span className="level-item">
@@ -122,7 +130,7 @@ export default class SwapNetworkToggle extends Component {
                     className="dropdown-menu"
                     id="dropdown-menu"
                     role="menu">
-                  <div className="dropdown-content">
+                  <div className={"dropdown-content ".concat(this.state.isDarkMode ? "dropdown-content-dark" : "")} >
                     {networkList}
                   </div>
                 </div>
@@ -136,3 +144,10 @@ export default class SwapNetworkToggle extends Component {
   }
 }
 
+const mapStateToProps = (state) => ({
+  isDarkMode: state.darkMode.isDarkMode
+});
+
+const mapDispatchToProps = { switchToLightMode, switchToDarkMode };
+
+export default connect(mapStateToProps, mapDispatchToProps)(SwapNetworkToggle);

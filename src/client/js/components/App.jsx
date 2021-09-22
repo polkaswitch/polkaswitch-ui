@@ -12,16 +12,24 @@ import SwapHome from './pages/SwapHome';
 import TokenClaimHome from './pages/TokenClaimHome';
 import Footer from './partials/Footer';
 import classnames from 'classnames';
+import {switchToDarkMode, switchToLightMode} from "../stores/darkModeSlice";
+import {connect} from "react-redux";
 
 require('../../css/index.scss');
 
-export default class App extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
     this.state = { fullscreen: false };
   }
 
   componentDidMount() {
+    const isDarkMode = localStorage.getItem("isDarkMode");
+    if(isDarkMode === "true"){
+      this.props.switchToDarkMode();
+    }else{
+      this.props.switchToLightMode();
+    }
     this.handleFullScreenOn = this.handleFullScreenOn.bind(this);
     this.handleFullScreenOff = this.handleFullScreenOff.bind(this);
     window.document.addEventListener('fullScreenOn', this.handleFullScreenOn);
@@ -70,3 +78,9 @@ export default class App extends Component {
   }
 }
 
+const mapStateToProps = (state) => ({
+});
+
+const mapDispatchToProps = { switchToLightMode, switchToDarkMode };
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

@@ -11,6 +11,8 @@ import { ethers } from 'ethers';
 import BN from 'bignumber.js';
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
+import {Provider} from 'react-redux'
+import store from './stores';
 
 const IS_MAIN_NETWORK = (process.env.IS_MAIN_NETWORK === "true");
 
@@ -58,4 +60,9 @@ if (Wallet.isMetamaskSupported()) {
   console.error('Metamask not installed!');
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+      <Provider store={store}>
+          <App />
+      </Provider>,
+    document.getElementById("root")
+);

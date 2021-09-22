@@ -11,6 +11,7 @@
   },
   "author": "polkaswitch",
   "dependencies": {
+    "@reduxjs/toolkit": "^1.6.1",
     "@sentry/node": "6.11.0",
     "compression": "1.7.4",
     "connect-flash": "^0.1.1",
@@ -23,6 +24,8 @@
     "morgan": "^1.10.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
+    "react-redux": "^7.2.5",
+    "react-toggle": "^4.1.2",
     "redis": "^3.1.2",
     "underscore": "1.12.1",
     "vhost": "^3.0.2"

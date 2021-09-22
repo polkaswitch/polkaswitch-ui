@@ -11,15 +11,50 @@ import ConnectWalletButton from './ConnectWalletButton';
 import NotificationButton from './NotificationButton';
 import BridgeButton from './BridgeButton';
 import TokenSearchBar from './TokenSearchBar';
+import Toggle from 'react-toggle';
+import 'react-toggle/style.css';
+import '../../../css/custom/switch.scss';
+import { connect } from "react-redux";
+import { switchToDarkMode, switchToLightMode } from "../../stores/darkModeSlice";
 
-export default class Navbar extends Component {
+
+class Navbar extends Component {
+  state = {
+    isDarkMode:false,
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.isDarkMode !== this.props.isDarkMode) {
+      this.setState({ isDarkMode: nextProps.isDarkMode });
+    }
+  }
+
+  changeColor = (color) => {
+    document.body.style.backgroundColor = color;
+    const bodyElt = document.querySelector("html");
+    bodyElt.style.backgroundColor = color;
+  }
+
+  switchThemeMode = () => {
+    if(this.state.isDarkMode){
+      this.props.switchToLightMode();
+      this.changeColor("#f2f7f9");
+      localStorage.setItem("isDarkMode",false);
+    }else{
+      this.props.switchToDarkMode();
+      this.changeColor("#201923");
+      localStorage.setItem("isDarkMode",true);
+    }
+    this.setState({isDarkMode:!this.state.isDarkMode});
+  }
+
   render() {
     return (
       <nav id="nav" className="level is-mobile" style={{ display: "flex" }}>
         <div className="level-left is-flex-grow-1">
           <div className="level-item is-narrow">
             <span className="logo-icon icon is-left is-hidden-mobile">
-              <img src="/images/logo_dark.svg" />
+              <img src={this.state.isDarkMode ? "/images/logo.svg" : "/images/logo_dark.svg"} />
             </span>
             <span className="logo-icon icon is-left is-hidden-tablet">
               <img src="/images/logo_only.svg" />
@@ -31,6 +66,12 @@ export default class Navbar extends Component {
         </div>
 
         <div className="level-right">
+          <Toggle
+              className="custom-classname mr-3"
+              icons={false}
+              checked={this.state.isDarkMode}
+              onChange={this.switchThemeMode}
+          />
           <div className="level-item is-narrow"><BridgeButton /></div>
           <div className="level-item is-narrow"><NotificationButton /></div>
           <div className="level-item is-narrow"><ConnectWalletButton /></div>
@@ -40,3 +81,10 @@ export default class Navbar extends Component {
   }
 }
 
+const mapStateToProps = (state) => ({
+  isDarkMode: state.darkMode.isDarkMode
+});
+
+const mapDispatchToProps = { switchToLightMode, switchToDarkMode };
+
+export default connect(mapStateToProps, mapDispatchToProps)(Navbar);
