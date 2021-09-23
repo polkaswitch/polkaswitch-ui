@@ -72,3 +72,11 @@
     }
   }
 }
+
+.dark-token-top-list{
+  .dropdown-item,.top-item{
+    &:hover{
+      background: #1E1721 !important;
+    }
+  }
+}

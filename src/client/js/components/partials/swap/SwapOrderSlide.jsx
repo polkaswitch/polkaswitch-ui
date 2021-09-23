@@ -12,7 +12,6 @@ import Wallet from '../../../utils/wallet';
 import Metrics from '../../../utils/metrics';
 import EventManager from '../../../utils/events';
 import SwapFn from '../../../utils/swapFn';
-import {switchToDarkMode, switchToLightMode} from "../../../stores/darkModeSlice";
 import {connect} from "react-redux";
 
 class SwapOrderSlide extends Component {
@@ -323,7 +322,7 @@ class SwapOrderSlide extends Component {
 
   render() {
     return (
-      <div className={"page page-view-order ".concat(this.state.isDarkMode ? "dark-bg" : "")} >
+      <div className={classnames("page page-view-order", { "dark-bg": this.state.isDarkMode})}>
         <div className="page-inner">
           <div className="level is-mobile">
             <div className="level-left is-flex-grow-1">
@@ -341,7 +340,7 @@ class SwapOrderSlide extends Component {
             </div>
           </div>
 
-          <div className={"notification is-white my-0 ".concat(this.state.isDarkMode ? "notification-dark" : "")}>
+          <div className={classnames("notification is-white my-0", { "notification-dark": this.state.isDarkMode})}>
             <div className="text-gray-stylized">
               <span>You Pay</span>
             </div>
@@ -358,7 +357,8 @@ class SwapOrderSlide extends Component {
               <i className="fas fa-long-arrow-alt-down"></i>
             </div>
           </div>
-          <div className={"notification is-white bottom ".concat(this.state.isDarkMode ? "notification-dark" : "")}>
+          <div className={classnames("notification is-white bottom", { "notification-dark": this.state.isDarkMode})}
+          >
             <div className="text-gray-stylized">
               <span>You Receive</span>
             </div>
@@ -383,7 +383,7 @@ class SwapOrderSlide extends Component {
           <div>
             <button
               disabled={Wallet.isConnected() && !this.validateOrderForm()}
-              className={"button is-primary is-fullwidth is-medium ".concat(this.state.isDarkMode ? "dark-button": "")}
+              className={classnames("button is-primary is-fullwidth is-medium", { "dark-button": this.state.isDarkMode})}
               onClick={this.handleSubmit}
             >
               {Wallet.isConnected() ? "Review Order" : "Connect Wallet"}
@@ -400,6 +400,6 @@ const mapStateToProps = (state) => ({
   isDarkMode: state.darkMode.isDarkMode
 });
 
-const mapDispatchToProps = { switchToLightMode, switchToDarkMode };
+const mapDispatchToProps = { };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SwapOrderSlide);

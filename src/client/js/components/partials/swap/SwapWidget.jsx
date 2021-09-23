@@ -13,8 +13,9 @@ import TokenListManager from '../../../utils/tokenList';
 import Metrics from '../../../utils/metrics';
 import EventManager from '../../../utils/events';
 import { ApprovalState } from "../../../constants/Status";
+import {connect} from "react-redux";
 
-export default class SwapOrderWidget extends Component {
+class SwapOrderWidget extends Component {
   constructor(props) {
     super(props);
 
@@ -269,7 +270,7 @@ export default class SwapOrderWidget extends Component {
     );
 
     return (
-      <div ref={this.box} className="box swap-widget">
+      <div ref={this.box} className={classnames("box swap-widget", { "dark-bg": this.props.isDarkMode })}>
         <div className={classnames("loader-wrapper", { "is-active": this.state.loading })}>
           <div className="loader is-loading"></div>
         </div>
@@ -360,3 +361,10 @@ export default class SwapOrderWidget extends Component {
   }
 }
 
+const mapStateToProps = (state) => ({
+  isDarkMode: state.darkMode.isDarkMode
+});
+
+const mapDispatchToProps = { };
+
+export default connect(mapStateToProps, mapDispatchToProps)(SwapOrderWidget);

@@ -20,8 +20,7 @@ export default class MarketLimitToggle extends Component {
         className="switcher hint--bottom hint--medium"
         aria-label="Limit orders are coming soon to Polkaswitch! Currently only Market orders are available"
       >
-        <input
-            className={this.props.isDarkMode? "dark-switch" : ""}
+        <input className={this.props.isDarkMode? "dark-switch" : ""}
           id="order-type-switcher"
           type="checkbox"
           checked={true || this.state.checked}

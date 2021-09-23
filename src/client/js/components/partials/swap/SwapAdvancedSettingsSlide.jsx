@@ -4,10 +4,11 @@ import SwapSlippageControl from './SwapSlippageControl';
 import GasPriceControl from './GasPriceControl';
 import SwapFn from '../../../utils/swapFn';
 import EventManager from '../../../utils/events';
-
 import * as ethers from 'ethers';
+import {connect} from "react-redux";
+import classnames from "classnames";
 
-export default class SwapAdvancedSettingsSlide extends Component {
+class SwapAdvancedSettingsSlide extends Component {
   constructor(props) {
     super(props);
     this.state = { refresh: Date.now() };
@@ -38,7 +39,7 @@ export default class SwapAdvancedSettingsSlide extends Component {
 
   render() {
     return (
-      <div className="page page-stack page-view-settings">
+      <div className={classnames("page page-stack page-view-settings",{"dark-bg":this.props.isDarkMode})}>
         <div className="page-inner">
           <div className="level is-mobile">
             <div className="level-left">
@@ -49,7 +50,7 @@ export default class SwapAdvancedSettingsSlide extends Component {
                 </span>
               </div>
               <div className="level-item">
-                <b className="widget-title">Advanced Settings</b>
+                <b className={classnames("widget-title",{"text-white-color":this.props.isDarkMode})}>Advanced Settings</b>
               </div>
             </div>
           </div>
@@ -59,7 +60,7 @@ export default class SwapAdvancedSettingsSlide extends Component {
           <div className="option">
             <div>
               <span>
-                <b>Gas Price</b>
+                <b className={classnames({"text-white-color":this.props.isDarkMode})}>Gas Price</b>
                 <span
                     className="hint-icon hint--bottom hint--medium"
                     aria-label="You can expedite your transaction by paying more Gas Fees. You can choose between either faster transactions or cheaper fees (in GWei)"
@@ -73,7 +74,7 @@ export default class SwapAdvancedSettingsSlide extends Component {
           <div className="option">
             <div>
               <span>
-                <b>Slippage Tolerance</b>
+                <b className={classnames({"text-white-color":this.props.isDarkMode})}>Slippage Tolerance</b>
                 <span
                   className="hint-icon hint--bottom hint--medium"
                   aria-label="Your transaction will revert if the price changes unfavorably by more than this percentage"
@@ -88,7 +89,7 @@ export default class SwapAdvancedSettingsSlide extends Component {
             <div className="level-left">
               <div className="level-item">
                 <span>
-                  <b>Liquidity Sources</b>
+                  <b className={classnames({"text-white-color":this.props.isDarkMode})}>Liquidity Sources</b>
                   <span
                     className="hint-icon hint--bottom hint--medium"
                     aria-label="Coming Soon! Customize which sources to route your swap through"
@@ -138,3 +139,10 @@ export default class SwapAdvancedSettingsSlide extends Component {
 
 }
 
+const mapStateToProps = (state) => ({
+  isDarkMode: state.darkMode.isDarkMode
+});
+
+const mapDispatchToProps = { };
+
+export default connect(mapStateToProps, mapDispatchToProps)(SwapAdvancedSettingsSlide);

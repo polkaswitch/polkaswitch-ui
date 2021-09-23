@@ -10,8 +10,9 @@ import CustomTokenModal from "./CustomTokenModal";
 import TokenSearchItem from "./swap/TokenSearchItem";
 import numeral from 'numeral';
 import {filterCircle} from "ionicons/icons";
+import {connect} from "react-redux";
 
-export default class TokenSearchBar extends Component {
+class TokenSearchBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -220,7 +221,7 @@ export default class TokenSearchBar extends Component {
                 token={v} />
             </span>
             <div className="token-symbol-balance-wrapper">
-              <span className="has-text-grey">{v.symbol}</span>
+              <span className={classnames("has-text-grey",{"text-white-color":this.props.isDarkMode})} >{v.symbol}</span>
               <span className="has-text-grey">{this.getBalanceNumber(v)}</span>
             </div>
           </span>
@@ -229,9 +230,9 @@ export default class TokenSearchBar extends Component {
     }.bind(this));
 
     return (
-      <div className="token-top-list">
+      <div className={classnames("token-top-list",{"dark-token-top-list":this.props.isDarkMode})}>
         <div className="text-gray-stylized">
-          <span>Popular</span>
+          <span className={this.props.isDarkMode? "text-white-color" : ""}>Popular</span>
         </div>
         <div className="columns is-mobile">
           {top3Content}
@@ -264,11 +265,11 @@ export default class TokenSearchBar extends Component {
     return (
       <div className="empty-state">
         <div>
-          <div className="empty-text-bold">Token could not be found</div>
-          <div className="empty-text">Unable to locate the input token. Add a custom token below.</div>
+          <div className={classnames("empty-text-bold",{"text-white-color":this.props.isDarkMode})}>Token could not be found</div>
+          <div className={classnames("empty-text",{"text-white-color":this.props.isDarkMode})}>Unable to locate the input token. Add a custom token below.</div>
           <div>
             <button
-                className="button is-primary is-fullwidth is-medium"
+                className={classnames("button is-primary is-fullwidth is-medium",{"dark-button":this.props.isDarkMode})}
                 onClick={this.handleCustomModal.bind(this)}
             >
               Add Custom Token
@@ -303,7 +304,7 @@ export default class TokenSearchBar extends Component {
           <CustomScroll heightRelativeToParent="100%">
             {dropContent}
           </CustomScroll>
-          <div className="token-inline-list-bottom">&nbsp;</div>
+          <div className={classnames({"token-inline-list-bottom":!this.props.isDarkMode})}>&nbsp;</div>
         </div>
       );
     } else {
@@ -357,3 +358,10 @@ export default class TokenSearchBar extends Component {
   }
 }
 
+const mapStateToProps = (state) => ({
+  isDarkMode: state.darkMode.isDarkMode
+});
+
+const mapDispatchToProps = {};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TokenSearchBar);

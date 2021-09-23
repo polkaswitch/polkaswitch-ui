@@ -5,8 +5,10 @@ import classnames from 'classnames';
 import Wallet from '../../utils/wallet';
 import Metrics from '../../utils/metrics';
 import EventManager from '../../utils/events';
+import {switchToDarkMode, switchToLightMode} from "../../stores/darkModeSlice";
+import {connect} from "react-redux";
 
-export default class ConnectWalletButton extends Component {
+class ConnectWalletButton extends Component {
   constructor(props) {
     super(props);
     this.state = { refresh: Date.now() };
@@ -72,7 +74,8 @@ export default class ConnectWalletButton extends Component {
         <button
           className={classnames("button", {
             "is-white is-medium connected": isConnected,
-            "is-primary": !isConnected
+            "is-primary": !isConnected,
+            "dark-button": this.props.isDarkMode
           })}
           onClick={this.handleConnection.bind(this)}
           aria-haspopup="true" aria-controls="dropdown-menu6">
@@ -83,3 +86,10 @@ export default class ConnectWalletButton extends Component {
   }
 }
 
+const mapStateToProps = (state) => ({
+  isDarkMode: state.darkMode.isDarkMode
+});
+
+const mapDispatchToProps = { switchToLightMode, switchToDarkMode };
+
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectWalletButton);

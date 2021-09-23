@@ -90,12 +90,12 @@ class SwapNetworkToggle extends Component {
     }.bind(this));
 
     return (
-      <div className={"swap-network-toggle box notification ".concat( this.state.isDarkMode ? "dark-bg": "")}>
+      <div className={classnames("swap-network-toggle box notification", { "dark-bg": this.state.isDarkMode})}>
         <div className="level is-mobile option">
           <div className="level-left">
             <div className="level-item">
               <span>
-                <span className={"option-title ".concat(this.state.isDarkMode ? "text-white-color" : "")}>Network</span>
+                <span className={classnames("option-title", { "text-white-color": this.state.isDarkMode})}>Network</span>
                 <span
                   className="is-hidden hint-icon hint--top hint--medium"
                   aria-label="Change Network"
@@ -110,7 +110,8 @@ class SwapNetworkToggle extends Component {
                   "is-hoverable": this.state.hoverable
               })}>
                 <div className="dropdown-trigger">
-                  <button className={"button is-info is-light ".concat(this.state.isDarkMode ? "dark-dropdown" : "")} aria-haspopup="true" aria-controls="dropdown-menu">
+                  <button className={classnames("button is-info is-light", { "dark-dropdown": this.state.isDarkMode})}
+                      aria-haspopup="true" aria-controls="dropdown-menu">
                     <span className="level">
                       <span className="level-left my-2">
                         <span className="level-item">
@@ -130,7 +131,7 @@ class SwapNetworkToggle extends Component {
                     className="dropdown-menu"
                     id="dropdown-menu"
                     role="menu">
-                  <div className={"dropdown-content ".concat(this.state.isDarkMode ? "dropdown-content-dark" : "")} >
+                  <div className={classnames("dropdown-content", { "dropdown-content-dark": this.state.isDarkMode})}>
                     {networkList}
                   </div>
                 </div>
