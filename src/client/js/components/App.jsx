@@ -12,6 +12,7 @@ import SwapHome from './pages/SwapHome';
 import TokenClaimHome from './pages/TokenClaimHome';
 import Footer from './partials/Footer';
 import classnames from 'classnames';
+import { keepTheme } from '../utils/theme';
 
 require('../../css/index.scss');
 
@@ -22,7 +23,8 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    this.handleFullScreenOn = this.handleFullScreenOn.bind(this);
+  keepTheme();
+  this.handleFullScreenOn = this.handleFullScreenOn.bind(this);
     this.handleFullScreenOff = this.handleFullScreenOff.bind(this);
     window.document.addEventListener('fullScreenOn', this.handleFullScreenOn);
     window.document.addEventListener('fullScreenOff', this.handleFullScreenOff);

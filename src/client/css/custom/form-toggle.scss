@@ -29,7 +29,7 @@ $switcher-radius: 10px;
     height: $switcher-height;
     border-radius: $switcher-radius;
 
-    background-color: $switcher-background;
+    background-color: var(--bg-element);
     outline:none;
     user-select: none;
 
@@ -63,9 +63,9 @@ $switcher-radius: 10px;
     position: absolute;
     top: $switcher-toggle-padding;
     bottom: $switcher-toggle-padding;
-    background:$white;
+    background:var(--dialogue-bg);
     border-radius: $switcher-radius - $switcher-toggle-padding;
-    box-shadow: 0px 0px 10px #f1f1f1;
+    box-shadow: 0px 0px 10px var(--switch-shadow);
   }
 
   input {
@@ -73,7 +73,7 @@ $switcher-radius: 10px;
 
     &:checked {
       &:before {
-        color:$switcher-on-color;
+        color:var(--toggle-text);
         transition: color .5s .2s;
       }
       &:after {

@@ -70,7 +70,7 @@ export default class ConnectWalletButton extends Component {
     return (
       <div className="wallet-status">
         <button
-          className={classnames("button", {
+          className={classnames("button custom-btn", {
             "is-white is-medium connected": isConnected,
             "is-primary": !isConnected
           })}

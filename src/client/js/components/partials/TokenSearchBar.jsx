@@ -298,7 +298,7 @@ export default class TokenSearchBar extends Component {
           <div className="empty-text">Unable to locate the input token. Add a custom token below.</div>
           <div>
             <button
-                className="button is-primary is-fullwidth is-medium"
+                className="button is-primary is-fullwidth is-medium custom-btn"
                 onClick={this.handleCustomModal.bind(this)}
             >
               Add Custom Token

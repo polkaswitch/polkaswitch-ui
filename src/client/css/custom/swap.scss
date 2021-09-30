@@ -12,7 +12,7 @@
 }
 
 .swap-network-toggle {
-  background: white;
+  background: var(--dialogue-bg);
   padding: 13px 1em;
   margin-bottom: 12px !important;
   border-radius: 20px;
@@ -26,6 +26,9 @@
 }
 
 .network-dropdown {
+  .dropdown-content{
+    background-color: var(--dropdown-bg) !important;
+  }
   &.dropdown {
     &.compact {
       .button {
@@ -34,11 +37,11 @@
     }
 
     .button {
-      background-color: $light-blue !important;
-      color: #666 !important;
+      background-color: var(--bg-element) !important;
+      color: var(--toggle-text) !important;
 
       &:hover {
-        background-color: darken($light-blue, 5%) !important;
+        background-color: var(--dropdown-hover-color) !important;
       }
     }
 
@@ -47,7 +50,11 @@
     }
 
     .dropdown-item {
+      color: var(--dropdown-text-color) !important;
       padding: 0.375rem 1rem;
+      &:hover{
+        background: var(--dropdown-hover-color) !important;
+      }
     }
 
     .disabled {
@@ -55,7 +62,7 @@
     }
 
     .icon {
-      color: #666;
+      color: var(--toggle-text) !important;
     }
   }
 }
@@ -171,6 +178,7 @@
 $swap-widget-anim-timing: 300ms;
 
 .swap-widget {
+  background: var(--dialogue-bg) !important;
   padding: 0px;
   overflow: hidden;
   position: relative;
@@ -183,7 +191,7 @@ $swap-widget-anim-timing: 300ms;
       opacity $swap-widget-anim-timing ease-in-out,
       transform $swap-widget-anim-timing ease-in-out;
     min-height: 330px;
-    background: white;
+    background: var(--dialogue-bg) !important;
     position: relative;
     z-index: 10;
     top: 0;
@@ -273,6 +281,7 @@ $swap-widget-anim-timing: 300ms;
   // END OF TRANSITIONS
 
   .widget-title {
+    color: var(--dropdown-text-color) !important;
     font-size: 1.10rem;
   }
 
@@ -295,6 +304,7 @@ $swap-widget-anim-timing: 300ms;
   .page-view-order {
 
     .text-gray-stylized {
+
       font-size: 16px;
       margin-bottom: 6px;
     }
@@ -337,7 +347,7 @@ $swap-widget-anim-timing: 300ms;
     }
 
     .swap-icon-v2 {
-      color: $primary;
+      color: var(--swap-icon);
       text-align: center;
       font-size: 20px;
       position: absolute;
@@ -346,9 +356,9 @@ $swap-widget-anim-timing: 300ms;
       height: $swap-icon-width;
       margin-left: - ($swap-icon-width / 2);
       margin-top: - ($swap-icon-width / 2);
-      background: white;
+      background: var(--dialogue-bg);
       border-radius: 40px;
-      border: 1px solid #eee;
+      border: 1px solid var(--notification-border-color);
       z-index: 10;
       cursor: pointer;
     }
@@ -367,23 +377,24 @@ $swap-widget-anim-timing: 300ms;
     }
 
     .icon-down {
-      color: #666;
+      color: var(--toggle-text) !important;
       width: 16px;
       height: 16px;
     }
 
     .input {
       box-shadow: none;
-      border-color: #eee;
+      border-color: var(--input-color);
       font-size: 22px;
       line-height: 1rem;
       height: 55px;
-      color: #666;
+      color: var(--toggle-text);
       transition: transform 200ms;
-
+      background: var(--input-color);
       &.is-to {
-        background-color: $light-blue;
-        border-color: $light-blue;
+        background-color: var(--input-color);
+        border-color: var(--input-color);
+        color: var(--toggle-text) !important;
       }
 
       &.is-from {
@@ -392,8 +403,8 @@ $swap-widget-anim-timing: 300ms;
 
       &:hover, &:focus {
         transform: scale(1.05);
-        box-shadow: 0 0px 10px 0 #efefef;
-        border: 1px solid $link;
+        box-shadow: 0 0px 10px 0 var(--input-box-shadow);
+        border: 1px solid var(--input-border);
       }
 
       &.is-danger {
@@ -417,21 +428,22 @@ $swap-widget-anim-timing: 300ms;
         right: 8px;
         height: 35px;
         line-height: 35px;
-        background: $light-blue;
+        background: var(--background);
         border-radius: 10px;
-        color: $primary;
+        color: var(--btn-color);
         padding: 0 10px;
         font-size: 14px;
         text-transform: uppercase;
         cursor: pointer;
 
         &:hover {
-          background: $danger-light;
+          background: var(--max-bg);
         }
       }
     }
 
     .notification {
+      background: var(--dialogue-bg) !important;
       padding: 20px 5px;
       border-radius: 0;
 
@@ -448,8 +460,8 @@ $swap-widget-anim-timing: 300ms;
       }
 
       &.bottom {
-        border-top: 1px solid #eee;
-        border-bottom: 1px solid #eee;
+        border-top: 1px solid var(--notification-border-color);
+        border-bottom: 1px solid var(--notification-border-color);
         padding-top: 15px;
         padding-bottom: 20px;
       }
@@ -476,11 +488,11 @@ $swap-widget-anim-timing: 300ms;
       border: 1px solid transparent;
       border-radius: 8px;
       cursor: pointer;
-      background-color: $light-blue;
+      background-color: var(--dialogue-bg) !important;
       padding: 0 10px;
 
       &:hover {
-        background-color: darken($light-blue, 5%);
+        background-color: var(--dropdown-hover-color) !important;
       }
     }
   }
@@ -536,6 +548,9 @@ $swap-widget-anim-timing: 300ms;
 
   /* Firefox */
   input[type=number] {
+    background-color: var(--bg-element);
+    color: var(--symbol-color);
+    border-color: var(--input-border);
     -moz-appearance: textfield;
   }
 
@@ -578,6 +593,9 @@ $swap-widget-anim-timing: 300ms;
       display: flex;
 
       .button {
+        background-color: var(--bg-element);
+        color: var(--symbol-color);
+        border-color: var(--input-border);
         margin-right: 5px;
         padding-left: 1.2em;
         padding-right: 1.2em;
@@ -640,7 +658,10 @@ $swap-widget-anim-timing: 300ms;
   .page-view-search {
     .token-search-bar {
       input {
+        background: var(--input-color) !important;
         border-radius: 16px;
+        border-color: var(--input-border);
+        color: var(--toggle-text);
       }
 
       .token-top-list {
@@ -659,7 +680,7 @@ $swap-widget-anim-timing: 300ms;
           margin-bottom: 10px;
 
           &:hover {
-            background: $light-blue;
+            background: var(--bg-element);
           }
 
           .level-item {
@@ -693,7 +714,7 @@ $swap-widget-anim-timing: 300ms;
         height: 30px;
         bottom: 0;
         width: 100%;
-        box-shadow: inset 0px -8px 12px 6px #fff;
+        box-shadow: inset 0px -8px 12px 6px var(--dialogue-bg);
         z-index: 15;
       }
 
@@ -711,10 +732,11 @@ $swap-widget-anim-timing: 300ms;
         }
 
         &:hover {
-          background: $light-blue;
+          background: var(--bg-element);
         }
 
         .level-item {
+          color: var(--toggle-text) !important;
           font-size: 1rem;
         }
       }

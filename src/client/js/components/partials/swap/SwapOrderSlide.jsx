@@ -472,7 +472,7 @@ export default class SwapOrderSlide extends Component {
           <div>
             <button
               disabled={Wallet.isConnected() && !this.validateOrderForm()}
-              className="button is-primary is-fullwidth is-medium"
+              className="button is-primary is-fullwidth is-medium custom-btn"
               onClick={this.handleSubmit}
             >
               {Wallet.isConnected() ? "Review Order" : "Connect Wallet"}
