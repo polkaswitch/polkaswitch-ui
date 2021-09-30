@@ -28,7 +28,12 @@
       "0xba100000625a3754423978a60c9317c58a424e3D",
       "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
       "0xd26114cd6EE289AccF82350c8d8487fedB8A0C07"
-    ]
+    ],
+    "tradeView": {
+      "platform": "ethereum",
+      "lineUrl": "https://api.coingecko.com/api/v3/coins/ethereum",
+      "candleStickUrl": "https://api.coingecko.com/api/v3/coins"
+    }
   },
   {
     "enabled": true,
@@ -62,7 +67,12 @@
       "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
       "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
       "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
-    ]
+    ],
+    "tradeView": {
+      "platform": "polygon-pos",
+      "lineUrl": "https://api.coingecko.com/api/v3/coins/polygon-pos",
+      "candleStickUrl": "https://api.coingecko.com/api/v3/coins"
+    }
   },
   {
     "enabled": false,
@@ -96,7 +106,12 @@
       "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
       "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
       "0x4BD17003473389A42DAF6a0a729f6Fdb328BbBd7"
-    ]
+    ],
+    "tradeView": {
+      "platform": "binance-smart-chain",
+      "lineUrl": "https://api.coingecko.com/api/v3/coins/binance-smart-chain",
+      "candleStickUrl": "https://api.coingecko.com/api/v3/coins"
+    }
   },
   {
     "enabled": true,
@@ -132,6 +147,11 @@
       "0x8cE2Dee54bB9921a2AE0A63dBb2DF8eD88B91dD9",
       "0x60781C2586D68229fde47564546784ab3fACA982",
       "0xaEb044650278731Ef3DC244692AB9F64C78FfaEA"
-    ]
+    ],
+    "tradeView": {
+      "platform": "avalanche",
+      "lineUrl": "https://api.coingecko.com/api/v3/coins/avalanche",
+      "candleStickUrl": "https://api.coingecko.com/api/v3/coins"
+    }
   }
 ]

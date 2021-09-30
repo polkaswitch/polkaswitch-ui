@@ -5,11 +5,8 @@ import * as ethers from 'ethers';
 import TokenListManager from './tokenList';
 import BN from 'bignumber.js';
 import * as Sentry from "@sentry/react";
-
 import WalletConnectProvider from "@walletconnect/web3-provider";
-
 const BigNumber = ethers.BigNumber;
-const Utils = ethers.utils;
 const Contract = ethers.Contract;
 
 window.WalletJS = {

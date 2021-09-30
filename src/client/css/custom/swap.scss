@@ -15,7 +15,7 @@
   background: var(--dialogue-bg);
   padding: 13px 1em;
   margin-bottom: 12px !important;
-  border-radius: 20px;
+  border-radius: 16px;
   color: #666;
 
   .box-title {
@@ -183,7 +183,7 @@ $swap-widget-anim-timing: 300ms;
   overflow: hidden;
   position: relative;
   max-height: 800px;
-  border-radius: 20px;
+  border-radius: 16px;
   transition: height $swap-widget-anim-timing;
 
   .page {
@@ -282,7 +282,7 @@ $swap-widget-anim-timing: 300ms;
 
   .widget-title {
     color: var(--dropdown-text-color) !important;
-    font-size: 1.10rem;
+    font-size: 16px;
   }
 
   .currency-text {
@@ -742,6 +742,4 @@ $swap-widget-anim-timing: 300ms;
       }
     }
   }
-
-
 }

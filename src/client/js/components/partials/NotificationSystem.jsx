@@ -1,13 +1,8 @@
 import React, { Component } from 'react';
-import _ from "underscore";
 import classnames from 'classnames';
-
-import Wallet from '../../utils/wallet';
-import Metrics from '../../utils/metrics';
 import EventManager from '../../utils/events';
 import TxQueue from '../../utils/txQueue';
-
-import TxStatusView from './TxStatusView';
+import TxStatusNotificationView from "./TxStatusNotificationView";
 
 export default class NotificationSystem extends Component {
   constructor(props) {
@@ -48,7 +43,7 @@ export default class NotificationSystem extends Component {
   }
 
   render() {
-    var data = TxQueue.getTx(this.state.hash) || {};
+    const data = TxQueue.getTx(this.state.hash) || {};
 
     return (
       <div className={classnames("notification-drawer", {
@@ -60,7 +55,7 @@ export default class NotificationSystem extends Component {
       })}>
         <div className="level is-mobile">
           <div className="level-item">
-            <TxStatusView data={data} success={data.success} />
+            <TxStatusNotificationView data={data} success={data.success} />
           </div>
           <div className="level-item is-flex-grow-0">
             <span

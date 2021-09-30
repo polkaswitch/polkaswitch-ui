@@ -46,13 +46,11 @@ export default class ConnectWalletButton extends Component {
     if (Wallet.isConnectedToAnyNetwork()) {
       return (
         <>
-        <img className="image-icon" src="/images/metamask.png" />
-        <span className="wallet-address">
-          {this.getTruncWalletAddress()}
-        </span>
-        <span className="icon icon-arrow-down">
-          <ion-icon name="chevron-down"></ion-icon>
-        </span>
+          <span className="dot"></span>
+          <img className="image-icon" width={20} height={18} src="/images/metamask.png" />
+          <span className="wallet-address">
+            {this.getTruncWalletAddress()}
+          </span>
         </>
       );
     } else {
@@ -68,16 +66,11 @@ export default class ConnectWalletButton extends Component {
     var isConnected = Wallet.isConnectedToAnyNetwork();
 
     return (
-      <div className="wallet-status">
-        <button
-          className={classnames("button custom-btn", {
-            "is-white is-medium connected": isConnected,
-            "is-primary": !isConnected
-          })}
-          onClick={this.handleConnection.bind(this)}
-          aria-haspopup="true" aria-controls="dropdown-menu6">
-          {this.renderButtonContent()}
-        </button>
+      <div className={classnames("wallet-status custom-btn", {
+        "button is-primary": !isConnected
+        })}
+        onClick={this.handleConnection.bind(this)}>
+        {this.renderButtonContent()}
       </div>
     );
   }

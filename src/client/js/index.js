@@ -47,6 +47,8 @@ var config  = await fetch(
 );
 window.NETWORK_CONFIGS = await config.json();
 
+// initialize TokenList
+window.COINGECKO_TOKEN_LIST = await(await fetch('/tokens/coingecko.list.json')).json();
 window.MAX_RETRIES = process.env.IS_PRODUCTION ? 3 : 1;
 
 await Storage.initialize();
@@ -55,7 +57,7 @@ await TokenListManager.updateTokenList();
 await Wallet.initialize();
 await SwapFn.initialize();
 await Nxtp.initalize();
-TxQueue.initalize();
+TxQueue.initialize();
 
 if (Wallet.isMetamaskSupported()) {
   console.log('MetaMask is installed!');

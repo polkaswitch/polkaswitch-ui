@@ -10,9 +10,12 @@ import {
 
 import SwapHome from './pages/SwapHome';
 import TokenClaimHome from './pages/TokenClaimHome';
+import MarketsHome from './pages/MarketsHome';
+import StakeHome from './pages/StakeHome';
 import Footer from './partials/Footer';
 import classnames from 'classnames';
 import { keepTheme } from '../utils/theme';
+import Markets from "./pages/MarketsHome";
 
 require('../../css/index.scss');
 
@@ -60,6 +63,12 @@ export default class App extends Component {
             </Route>
             <Route path="/claim">
               <TokenClaimHome />
+            </Route>
+            <Route path="/markets">
+              <MarketsHome />
+            </Route>
+            <Route path="/stake">
+              <StakeHome />
             </Route>
             <Route>
               <Redirect to="/swap" />

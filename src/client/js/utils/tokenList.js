@@ -8,8 +8,12 @@ let store = require('store');
 const Utils = ethers.utils;
 
 window.TokenListManager = {
+  swap: {
+    from:{},
+    to:{},
+    network: 'Ethereum'
+  },
   _tokenLists: {},
-
   initialize: async function() {
     // pre-load all token lists
     var filteredNetworks = _.filter(window.NETWORK_CONFIGS, (v) => { return v.enabled });
@@ -42,7 +46,6 @@ window.TokenListManager = {
 
   updateNetwork: function(network, connectStrategy) {
     EventManager.emitEvent('networkPendingUpdate', 1);
-
     Storage.updateNetwork(network);
 
     this.updateTokenList().then(function() {
@@ -95,6 +98,23 @@ window.TokenListManager = {
     window.TOKEN_LIST = tokenList;
     this.updateTokenListwithCustom(network);
     window.NATIVE_TOKEN = _.findWhere(tokenList, { native: true });
+    // update swap token configuration
+    const swap = {
+      from: this.findTokenById(network.defaultPair.from),
+      to: this.findTokenById(network.defaultPair.to),
+      network: network.name
+    }
+    this.updateSwapConfig(swap);
+  },
+
+  updateSwapConfig: function(swap) {
+    this.swap = _.extend(this.getSwapConfig(), swap);
+    store.set('swap', this.swap);
+    EventManager.emitEvent('swapConfigUpdated', 1);
+  },
+
+  getSwapConfig: function () {
+    return this.swap;
   },
 
   findTokenById: function(tid, optionalNetwork) {
@@ -111,6 +131,12 @@ window.TokenListManager = {
       console.log("WARN: TokenListManager: Token ID Not Found:", tid, optionalNetwork?.name);
     }
     return foundToken;
+  },
+
+  findTokenBySymbolFromCoinGecko: function(symbol) {
+    return _.find(window.COINGECKO_TOKEN_LIST, function(v) {
+      return v.symbol.toLowerCase() === symbol;
+    });
   },
 
   updateTokenListwithCustom: function (network) {

@@ -69,6 +69,27 @@ export default class SwapNetworkToggle extends Component {
   }
 
   render() {
+    var networkList = _.map(this.NETWORKS, function(v, i) {
+      return (
+        <a href="#"
+          key={i}
+          onClick={this.handleDropdownClick(v)}
+          className={classnames("dropdown-item level is-mobile", {
+            "disabled": !v.enabled
+          })}
+        >
+          <span className="level-left my-2">
+            <span className="level-item">
+              <TokenIconImg
+                size={32}
+                imgSrc={v.logoURI} />
+            </span>
+            <span className="level-item">{v.name} {!v.enabled && "(Coming Soon)"}</span>
+          </span>
+        </a>
+      );
+    }.bind(this));
+
     return (
       <div className="swap-network-toggle box notification">
         <div className="level is-mobile option">

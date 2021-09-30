@@ -1,0 +1,135 @@
+
+.trading-view-wrapper {
+  padding: 30px 32px;
+  border-radius: 24px;
+
+  .dropdown-trigger button {
+    height: 54px;
+    background-color: transparent !important;
+    padding: 0;
+  }
+  .trading-view-header {
+    display: flex;
+    justify-content: space-between;
+
+    .price-details {
+
+      .price {
+        line-height: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        text-align: end;
+      }
+
+      .wrapper {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        box-sizing: border-box;
+        align-items: flex-end;
+        justify-content: flex-end;
+        margin-top: 8px;
+
+        .percent {
+          font-size: 16px;
+        }
+
+        .period {
+          margin-left: 12px;
+          font-size: 16px;
+        }
+      }
+
+      @media screen and (max-width: 768px) {
+        .price {
+          font-size: 18px;
+        }
+
+        .wrapper {
+          .percent {
+            font-size: 14px;
+          }
+
+          .period {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+
+  .trading-view-body {
+    display: flex;
+    flex-direction: column;
+
+    .chart-view-option {
+      display: flex;
+      flex-wrap: wrap;
+      box-sizing: border-box;
+      justify-content: flex-end;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    .chart {
+      width: 100%;
+      height: 300px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+
+      img {
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .empty-primary-text {
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .empty-sub-text {
+        margin-top: 10px;
+        font-size: 14px;
+      }
+    }
+
+    .chart-range-selector {
+      display: flex;
+      flex-wrap: wrap;
+      box-sizing: border-box;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 14px;
+
+      .time-range-item {
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 19px;
+        cursor: pointer;
+        height: 14px;
+        padding: 3px 6px;
+        background: rgb(255, 255, 255);;
+        box-sizing: border-box;
+        margin-left: 15px;
+        border-radius: 4px;
+
+        &:hover {
+          color: #333;
+          border-radius: 4px;
+          background: #eee;
+        }
+      }
+
+      .active {
+        font-weight: bold;
+        border-radius: 4px;
+        background: #eee;
+      }
+    }
+  }
+}
+

@@ -216,6 +216,7 @@ export default class SwapOrderWidget extends Component {
       message: "Action: Swap Tokens"
     });
     Metrics.track("swap-flipped-tokens");
+    TokenListManager.updateSwapConfig({to: this.state.from, from: this.state.to});
     this.setState({
       to: this.state.from,
       fromAmount: this.state.toAmount ? SwapFn.validateEthValue(this.state.to, this.state.toAmount) : undefined,
@@ -370,6 +371,7 @@ export default class SwapOrderWidget extends Component {
       _s["fromAmount"] = SwapFn.validateEthValue(token, this.state.fromAmount);
     }
 
+    TokenListManager.updateSwapConfig({[this.state.searchTarget]: token});
     this.setState(_s, function() {
       Metrics.track("swap-token-changed", {
         changed: this.state.searchTarget,

@@ -152,36 +152,200 @@ html, body {
   }
 }
 
+.nav-menu {
+  width: auto;
+  display: flex;
+  align-items: center;
+  margin-left: 38px;
+  height: 100%;
+
+  .nav-link {
+    color: #333;
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    padding: 0 1rem;
+    height: 100%;
+    cursor: pointer;
+
+    &.active {
+      color: black;
+      border-bottom: 2px solid $primary;
+    }
+
+    &:hover {
+      color: black;
+    }
+  }
+}
 
 #nav {
-  margin: 25px auto;
+  display: flex;
+  background-color: transparent;
+  height: 67px;
+  border-bottom: 1px solid $third-white;
   transition: margin-top 300ms;
+  padding-left: 24px;
+  padding-right: 24px;
+  margin-top: -15px;
 
   .logo-icon {
     width: auto;
     height: auto;
 
     img {
-      height: 37px;
+      margin-left: 10px;
+      height: 36px;
     }
+  }
+
+  .level:not(:last-child),
+  .level-item:not(:last-child) {
+    margin-right: 4px;
   }
 
   .button {
     box-shadow: 0 0.5em 1em -0.125em rgb(10 10 10 / 10%), 0 0px 0 1px rgb(10 10 10 / 2%);
-    border-radius: 15px;
+    border-radius: 12px;
+    width: 164px;
+    height: 42px;
   }
 
   .bridge-button {
-    span {
-      font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    height: 42px;
+    background-color: $secondary-white-background;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    padding-bottom: calc(0.5em - 1px);
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: calc(0.5em - 1px);
+
+    &:hover {
+      background-color: $third-white;
     }
+
+    img {
+      width: 22px;
+      height: 16px;
+      margin-right: 13px;
+    }
+
+    a {
+      font-size: 16px;
+      color: #4a4a4a;
+    }
+  }
+
+  .settings-icon {
+    font-size: 24px;
+    height: 34px;
+    width: 34px;
+    line-height: 34px;
+    text-align: center;
+    cursor: pointer;
+    &:hover {
+      color: #333;
+      border-radius: 40px;
+      background: #eee;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    background-color: $secondary-white-background;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-top: -9px;
+    margin-bottom: 0px !important;
+    border: none;
+
+    .nav-menu {
+      display: none;
+    }
+
+    .bridge-button {
+      border: none;
+      padding: 0px;
+      background-color: transparent;
+
+      &:hover {
+        background-color: transparent;
+      }
+
+      img {
+        margin-right: 0px;
+      }
+      a span {
+        display: none;
+      }
+    }
+  }
+  @media screen and (min-width: 768px) {
+    .nav-menu {
+      width: 100%;
+    }
+  }
+}
+
+#mobile-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 57px;
+  border-bottom: 1px solid $third-white;
+  transition: margin-top 300ms;
+  margin-bottom: 20px;
+
+  @media screen and (max-width: 768px) {
+    .nav-menu {
+      width: auto;
+      margin: 0;
+    }
+  }
+
+  @media screen and (min-width: 768px) {
+    display: none;
+  }
+}
+
+.flyout {
+  background-color: $secondary-white-background;
+  min-width: 262px;
+  overflow: auto;
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
+  0px 24px 32px rgba(0, 0, 0, 0.01);
+  border-radius: 16px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+  font-weight: 700;
+  position: absolute;
+  top: 4.5rem;
+  right: 0px;
+  z-index: 100;
+
+  .menu-item {
+    display: flex;
+    padding: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .divider {
+    border-bottom: 1px solid $third-white;
+    margin: 8px;
   }
 }
 
 @media screen and (min-width: 769px) {
   #nav {
-    margin: 50px auto;
-
     .logo-title {
       font-size: 24px;
     }
@@ -256,15 +420,32 @@ html, body {
 }
 
 .wallet-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-right: 1px solid #ccc;
+  height: 30px;
+
+  .dot {
+    height: 6px;
+    width: 6px;
+    background-color: $primary;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+  }
 
   .wallet-address {
-    font-weight: bold;
+    font-weight: 400;
+    font-size: 12px;
     color: #333;
-    font-size: 14px;
     display: block;
     padding-right: 10px;
-    margin-right: 5px;
-    border-right: 1px solid #ccc;
+
+    @media screen and (max-width: 768px) {
+      display: none;
+    }
   }
 
   .button .icon:last-child:not(:first-child) {
@@ -283,7 +464,7 @@ html, body {
 
   .image-icon {
     height: 19px;
-    margin-right: 11px;
+    margin-right: 8px;
   }
 
   .icon-person {

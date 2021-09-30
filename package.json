@@ -21,6 +21,7 @@
     "express": "4.16.3",
     "express-basic-auth": "1.2.0",
     "helmet": "4.4.1",
+    "lightweight-charts": "^3.5.0",
     "morgan": "^1.10.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
