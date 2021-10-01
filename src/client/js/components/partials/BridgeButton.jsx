@@ -31,14 +31,18 @@ export default class BridgeButton extends Component {
   }
 
   render() {
-    var network = TokenListManager.getCurrentNetworkConfig();
+    const network = TokenListManager.getCurrentNetworkConfig();
+    const isConnected = Wallet.isConnectedToAnyNetwork();
 
     return (
-      <div className={"bridge-button"}>
+      <div className={classnames("bridge-button", {
+        "is-hidden": isConnected
+      })}>
+        <img src="/images/bridge-white.png" />
         <a
           href={network.bridgeURI}
-          className="button is-white is-medium connected">
-          <span>Bridge</span>
+          className="is-white is-medium connected">
+          <span>Bridge Assets</span>
         </a>
       </div>
     );

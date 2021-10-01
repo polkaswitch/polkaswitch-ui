@@ -33,7 +33,9 @@ export default class SwapTransactionDetails extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.fromAmount != this.props.fromAmount) {
+    if ((prevProps.fromAmount !== this.props.fromAmount) ||
+        (prevProps.from.symbol !== this.props.from.symbol) ||
+        (prevProps.to.symbol !== this.props.to.symbol)) {
       this.updateValues();
     }
   }
@@ -211,7 +213,6 @@ export default class SwapTransactionDetails extends Component {
                     {SwapFn.getSetting().slippage}%
                   </span>
                 </div>
-
               </div>
             </div>
           </div>

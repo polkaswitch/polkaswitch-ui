@@ -142,7 +142,7 @@ export default class CustomTokenModal extends Component {
           // try again
           console.error("Failed to fetch symbol", e);
           _.defer(function() {
-            this.fetchSymbol(attempt + 1);
+            this.fetchSymbol(attempt + 1, tokenAddr);
           }.bind(this))
         }.bind(this));
   }
@@ -167,7 +167,7 @@ export default class CustomTokenModal extends Component {
           // try again
           console.error("Failed to fetch name", e);
           _.defer(function() {
-            this.fetchName(attempt + 1);
+            this.fetchName(attempt + 1, tokenAddr);
           }.bind(this))
         }.bind(this));
   }
@@ -195,7 +195,7 @@ export default class CustomTokenModal extends Component {
           // try again
           console.error("Failed to fetch decimals", e);
           _.defer(function() {
-            this.fetchDecimals(attempt + 1);
+            this.fetchDecimals(attempt + 1, tokenAddr);
           }.bind(this))
         }.bind(this));
   }

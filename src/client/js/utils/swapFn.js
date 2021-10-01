@@ -282,8 +282,13 @@ window.SwapFn = {
 
   _getExpectedReturnCache: {},
 
-  getExpectedReturn: async function(fromToken, toToken, amount) {
-    var key = [fromToken.address, toToken.address, amount.toString()].join('');
+  getExpectedReturn: async function(fromToken, toToken, amount, chainId) {
+    var network = chainId ?
+      TokenListManager.getNetworkById(chainId) :
+      TokenListManager.getCurrentNetworkConfig();
+    var chainId = network.chainId;
+
+    var key = [fromToken.address, toToken.address, amount.toString(), chainId].join('');
     if (key in this._getExpectedReturnCache) {
       var cacheValue = this._getExpectedReturnCache[key];
       if ((Date.now()) - cacheValue._cacheTimestamp < 5000) { // 5 seconds cache
@@ -293,9 +298,9 @@ window.SwapFn = {
     }
 
     const contract = new Contract(
-      TokenListManager.getCurrentNetworkConfig().aggregatorAddress,
+      network.aggregatorAddress,
       window.oneSplitAbi,
-      Wallet.getReadOnlyProvider(true)
+      Wallet.getReadOnlyProvider(chainId)
     );
     var result = await contract.getExpectedReturn(
       fromToken.address,

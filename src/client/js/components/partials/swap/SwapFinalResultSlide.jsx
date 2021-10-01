@@ -32,7 +32,7 @@ export default class SwapFinalResultSlide extends Component {
             </div>
           </div>
 
-          <div className={classnames("view", { "failed": !this.props.transactionSuccess })}>
+          <div className={classnames("centered-view", { "failed": !this.props.transactionSuccess })}>
             <div className="icon">
               {this.props.transactionSuccess ? (
                 <ion-icon name="rocket-outline"></ion-icon>
@@ -50,7 +50,7 @@ export default class SwapFinalResultSlide extends Component {
                     <div>Sent to the blockchain and pending confirmation.<br/>Check notifications drawer for more updates.</div>
 
                     <br/>
-                    <TxExplorerLink hash={this.props.transactionHash}>
+                    <TxExplorerLink network={this.props.toChain} hash={this.props.transactionHash}>
                       View on Explorer <ion-icon name="open-outline"></ion-icon>
                     </TxExplorerLink>
                   </div>

@@ -15,6 +15,7 @@ export default function TokenSearchItem(props) {
     <span className="level-left my-2">
       <span className="level-item">
         <TokenIconImg
+          network={props.network}
           size={35}
           token={token} />
       </span>

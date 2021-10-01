@@ -5,11 +5,8 @@ import * as ethers from 'ethers';
 import TokenListManager from './tokenList';
 import BN from 'bignumber.js';
 import * as Sentry from "@sentry/react";
-
 import WalletConnectProvider from "@walletconnect/web3-provider";
-
 const BigNumber = ethers.BigNumber;
-const Utils = ethers.utils;
 const Contract = ethers.Contract;
 
 window.WalletJS = {
@@ -73,8 +70,10 @@ window.WalletJS = {
     }.bind(this));
   },
 
-  getReadOnlyProvider: function() {
-    var network = TokenListManager.getCurrentNetworkConfig();
+  getReadOnlyProvider: function(chainId) {
+    var network = chainId ?
+      TokenListManager.getNetworkById(chainId) :
+      TokenListManager.getCurrentNetworkConfig();
     const provider = new ethers.providers.JsonRpcProvider(network.nodeProvider);
     return provider;
   },
@@ -190,9 +189,13 @@ window.WalletJS = {
     return !!this._cachedWeb3Provider;
   },
 
-  isMatchingConnectedNetwork: function() {
+  isMatchingConnectedNetwork: function(optionalNetwork) {
     var network = TokenListManager.getCurrentNetworkConfig();
-    return +network.chainId === +this._cachedNetworkId;
+    if (optionalNetwork) {
+      return +optionalNetwork.chainId === +this._cachedNetworkId;
+    } else {
+      return +network.chainId === +this._cachedNetworkId;
+    }
   },
 
   currentAddress: function() {

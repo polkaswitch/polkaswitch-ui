@@ -9,20 +9,24 @@ import EventManager from '../../../utils/events';
 import TokenListManager from '../../../utils/tokenList';
 import TokenIconImg from './../TokenIconImg';
 
+import CrossChainToggle from './CrossChainToggle';
+import NetworkDropdown from './NetworkDropdown';
+
 export default class SwapNetworkToggle extends Component {
   constructor(props) {
     super(props);
 
     this.handleDropdownClick = this.handleDropdownClick.bind(this);
 
-    this.NETWORKS = window.NETWORK_CONFIGS;
     this.state = {
       selected: TokenListManager.getCurrentNetworkConfig(),
       active: false,
+      singleChain: !TokenListManager.isCrossChainEnabled(),
       hoverable: true,
     };
     this.subscribers = [];
     this.handleNetworkHoverable = this.handleNetworkHoverable.bind(this);
+    this.handleCrossChainChange = this.handleCrossChainChange.bind(this);
   }
 
   componentDidMount() {
@@ -35,6 +39,13 @@ export default class SwapNetworkToggle extends Component {
     });
   }
 
+  handleCrossChainChange(checked) {
+    this.setState({
+      singleChain: checked
+    });
+    TokenListManager.toggleCrossChain(!checked);
+  }
+
   handleNetworkHoverable(event) {
     if (event && (event.hoverable !== this.state.hoverable)) {
       this.setState({
@@ -44,19 +55,17 @@ export default class SwapNetworkToggle extends Component {
   }
 
   handleDropdownClick(network) {
-    return function handleClick(e) {
-      if (network.enabled) {
-        Sentry.addBreadcrumb({
-          message: "Action: Network Changed: " + network.name
-        });
-        this.setState({
-          selected: network
-        });
-        let connectStrategy = Wallet.isConnectedToAnyNetwork() &&
-          Wallet.getConnectionStrategy();
-        TokenListManager.updateNetwork(network, connectStrategy);
-      }
-    }.bind(this);
+    if (network.enabled) {
+      Sentry.addBreadcrumb({
+        message: "Action: Network Changed: " + network.name
+      });
+      this.setState({
+        selected: network
+      });
+      let connectStrategy = Wallet.isConnectedToAnyNetwork() &&
+        Wallet.getConnectionStrategy();
+      TokenListManager.updateNetwork(network, connectStrategy);
+    }
   }
 
   render() {
@@ -72,7 +81,7 @@ export default class SwapNetworkToggle extends Component {
           <span className="level-left my-2">
             <span className="level-item">
               <TokenIconImg
-                size={30}
+                size={32}
                 imgSrc={v.logoURI} />
             </span>
             <span className="level-item">{v.name} {!v.enabled && "(Coming Soon)"}</span>
@@ -86,47 +95,22 @@ export default class SwapNetworkToggle extends Component {
         <div className="level is-mobile option">
           <div className="level-left">
             <div className="level-item">
-              <span>
-                <span className="option-title">Network</span>
-                <span
-                  className="is-hidden hint-icon hint--top hint--medium"
-                  aria-label="Change Network"
-                >?</span>
-              </span>
+              <CrossChainToggle
+                checked={this.state.singleChain}
+                handleChange={this.handleCrossChainChange} />
             </div>
           </div>
 
           <div className="level-right">
             <div className="level-item">
-              <div className={classnames("dropdown is-right ", {
-                  "is-hoverable": this.state.hoverable
-              })}>
-                <div className="dropdown-trigger">
-                  <button className="button is-info is-light" aria-haspopup="true" aria-controls="dropdown-menu">
-                    <span className="level">
-                      <span className="level-left my-2">
-                        <span className="level-item">
-                          <TokenIconImg
-                            size={30}
-                            imgSrc={this.state.selected.logoURI} />
-                        </span>
-                        <span className="level-item">{this.state.selected.name}</span>
-                      </span>
-                    </span>
-                    <span className="icon is-small">
-                      <ion-icon name="chevron-down"></ion-icon>
-                    </span>
-                  </button>
-                </div>
-                <div
-                    className="dropdown-menu"
-                    id="dropdown-menu"
-                    role="menu">
-                  <div className="dropdown-content">
-                    {networkList}
-                  </div>
-                </div>
-              </div>
+              <NetworkDropdown
+                className={classnames("is-right", {
+                "is-hoverable": this.state.hoverable,
+                "is-hidden": !this.state.singleChain
+                })}
+                selected={this.state.selected}
+                handleDropdownClick={this.handleDropdownClick}
+              />
             </div>
           </div>
         </div>

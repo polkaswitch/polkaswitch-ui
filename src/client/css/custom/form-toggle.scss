@@ -4,11 +4,11 @@ $white:#FFFFFF;
 
 $switcher-background: $light-blue;
 $switcher-height: 40px;
-$switcher-width: 200px;
+$switcher-width: 170px;
 $switcher-toggle-padding: 5px;
 $switcher-off-color: #a2bcce;
 $switcher-on-color: #666;
-$switcher-radius: 17px;
+$switcher-radius: 10px;
 
 .switcher {
   position: relative;
@@ -29,7 +29,7 @@ $switcher-radius: 17px;
     height: $switcher-height;
     border-radius: $switcher-radius;
 
-    background-color: $switcher-background;
+    background-color: var(--bg-element);
     outline:none;
     user-select: none;
 
@@ -63,9 +63,9 @@ $switcher-radius: 17px;
     position: absolute;
     top: $switcher-toggle-padding;
     bottom: $switcher-toggle-padding;
-    background:$white;
+    background:var(--dialogue-bg);
     border-radius: $switcher-radius - $switcher-toggle-padding;
-    box-shadow: 0px 0px 10px #f1f1f1;
+    box-shadow: 0px 0px 10px var(--switch-shadow);
   }
 
   input {
@@ -73,7 +73,7 @@ $switcher-radius: 17px;
 
     &:checked {
       &:before {
-        color:$switcher-on-color;
+        color:var(--toggle-text);
         transition: color .5s .2s;
       }
       &:after {
@@ -100,6 +100,17 @@ $switcher-radius: 17px;
         right: $switcher-toggle-padding;
         transition: left .4s .2s, right .5s, background .35s -.1s;
       }
+    }
+  }
+}
+
+.cross-chain-toggle.switcher {
+  input {
+    &:before {
+      content: 'Swap';
+    }
+    &:after {
+      content: 'Bridge';
     }
   }
 }

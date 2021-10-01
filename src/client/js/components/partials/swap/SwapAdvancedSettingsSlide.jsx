@@ -54,12 +54,12 @@ export default class SwapAdvancedSettingsSlide extends Component {
             </div>
           </div>
 
-          <hr />
+          <hr className="theme-hr" />
 
           <div className="option">
             <div>
               <span>
-                <b>Gas Price</b>
+                <b className="setting-input-title">Gas Price</b>
                 <span
                     className="hint-icon hint--bottom hint--medium"
                     aria-label="You can expedite your transaction by paying more Gas Fees. You can choose between either faster transactions or cheaper fees (in GWei)"
@@ -73,7 +73,7 @@ export default class SwapAdvancedSettingsSlide extends Component {
           <div className="option">
             <div>
               <span>
-                <b>Slippage Tolerance</b>
+                <b className="setting-input-title">Slippage Tolerance</b>
                 <span
                   className="hint-icon hint--bottom hint--medium"
                   aria-label="Your transaction will revert if the price changes unfavorably by more than this percentage"
@@ -88,7 +88,7 @@ export default class SwapAdvancedSettingsSlide extends Component {
             <div className="level-left">
               <div className="level-item">
                 <span>
-                  <b>Liquidity Sources</b>
+                  <b className="setting-input-title">Liquidity Sources</b>
                   <span
                     className="hint-icon hint--bottom hint--medium"
                     aria-label="Coming Soon! Customize which sources to route your swap through"
@@ -100,7 +100,7 @@ export default class SwapAdvancedSettingsSlide extends Component {
             <div className="level-right">
               <div className="level-item">
                 <div className="select">
-                  <select disabled>
+                  <select disabled className="setting-dropdown">
                     <option>10</option>
                     <option>2</option>
                     <option>1</option>

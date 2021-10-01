@@ -9,7 +9,7 @@ export default {
   _queue: {},
   compareTime: 3 * 60 * 60 * 24 * 1000,
 
-  initalize: async function() {
+  initialize: async function() {
     this._queue = this.getQueue();
     const keys = _.keys(this._queue);
     const length = keys.length;

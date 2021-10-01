@@ -21,6 +21,7 @@ window.Storage = {
   swapSettings: _.extend({}, DEFAULT_SWAP_SETTINGS),
 
   selectedNetwork: false,
+  crossChainEnabled: false,
 
   initialize: function() {
     let cachedSettings = store.get('settings');
@@ -38,11 +39,22 @@ window.Storage = {
       enabled: true
     });
     this.selectedNetwork = (storedNetwork && storedNetwork.name) || defaultNetwork;
+
+    this.crossChainEnabled = store.get('crossChainEnabled', false);
   },
 
   updateNetwork: function(network) {
     this.selectedNetwork = network.name;
     store.set('selectedNetwork', this.selectedNetwork);
+  },
+
+  toggleCrossChain: function(enabled) {
+    this.crossChainEnabled = enabled;
+    store.set('crossChainEnabled', this.crossChainEnabled);
+  },
+
+  isCrossChainEnabled: function() {
+    return this.crossChainEnabled;
   },
 
   getNetwork: function() {

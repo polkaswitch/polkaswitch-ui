@@ -5,6 +5,7 @@
   "main": "src/server/index.js",
   "scripts": {
     "build": "webpack --mode production --env production --env main",
+    "ci-build": "webpack --mode production --env development",
     "watch": "webpack --watch --mode development --env development",
     "start": "node src/server/index.js",
     "server": "nodemon -r dotenv/config src/server/index.js"
@@ -20,6 +21,7 @@
     "express": "4.16.3",
     "express-basic-auth": "1.2.0",
     "helmet": "4.4.1",
+    "lightweight-charts": "^3.5.0",
     "morgan": "^1.10.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
@@ -33,6 +35,8 @@
     "@babel/plugin-proposal-class-properties": "7.13.0",
     "@babel/preset-env": "7.13.9",
     "@babel/preset-react": "7.12.13",
+    "@connext/nxtp-sdk": "0.0.46",
+    "@connext/nxtp-utils": "0.0.46",
     "@sentry/react": "6.11.0",
     "@sentry/tracing": "6.11.0",
     "@sentry/webpack-plugin": "^1.17.1",
