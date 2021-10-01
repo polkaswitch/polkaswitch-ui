@@ -21,6 +21,7 @@
   --hint-color:#b5daf2;
   --disabled-dropdown:f5f5f5;
   --back-arrow-icon:#f0f8ff;
+  --bridge-btn-border:#dddddd;
 }
 .theme-dark {
   --dark-text: #5E4B56;
@@ -45,6 +46,7 @@
   --hint-color:#5a545d;
   --disabled-dropdown:#1e1721;
   --back-arrow-icon:#ffffff;
+  --bridge-btn-border:#00000000;
 }
 
 .theme-hr{
@@ -59,13 +61,6 @@
   background: var(--disabled-dropdown) !important;
   color: var(--symbol-color) !important;
   border-color: var(--input-border) !important;
-}
-
-.bridge-button{
-  a{
-    background: var(--dialogue-bg) !important;
-    color: var(--toggle-text) !important;
-  }
 }
 
 input{
@@ -214,7 +209,8 @@ html, body {
   }
 
   .bridge-button {
-    border: 1px solid #ddd;
+    background: var(--dialogue-bg) !important;
+    border: 1px solid var(--bridge-btn-border) !important;
     border-radius: 12px;
     height: 42px;
     background-color: $secondary-white-background;
@@ -239,7 +235,7 @@ html, body {
 
     a {
       font-size: 16px;
-      color: #4a4a4a;
+      color: var(--toggle-text) !important;
     }
   }
 
