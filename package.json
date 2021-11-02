@@ -17,6 +17,7 @@
   "author": "polkaswitch",
   "dependencies": {
     "@sentry/node": "6.11.0",
+    "axios": "^0.24.0",
     "compression": "1.7.4",
     "connect-flash": "^0.1.1",
     "cookie-session": "1.4.0",
@@ -31,7 +32,8 @@
     "passport-local": "^1.0.0",
     "redis": "^3.1.2",
     "underscore": "1.12.1",
-    "vhost": "^3.0.2"
+    "vhost": "^3.0.2",
+    "web3": "^1.6.0"
   },
   "devDependencies": {
     "@babel/core": "7.13.8",
@@ -41,10 +43,11 @@
     "@babel/preset-react": "7.12.13",
     "@connext/nxtp-sdk": "0.0.56",
     "@connext/nxtp-utils": "0.0.56",
+    "@reduxjs/toolkit": "^1.6.2",
     "@sentry/react": "6.11.0",
     "@sentry/tracing": "6.11.0",
     "@sentry/webpack-plugin": "^1.17.1",
-    "@walletconnect/web3-provider": "^1.4.1",
+    "@walletconnect/web3-provider": "^1.6.6",
     "babel-loader": "8.2.2",
     "babel-polyfill": "6.26.0",
     "bignumber.js": "^9.0.1",
@@ -73,6 +76,7 @@
     "react": "17.0.2",
     "react-custom-scroll": "4.2.2",
     "react-dom": "17.0.2",
+    "react-redux": "^7.2.6",
     "react-router-dom": "5.2.0",
     "react-transition-group": "4.4.1",
     "rxjs": "^6.6.7",

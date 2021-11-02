@@ -13,6 +13,10 @@ import BN from 'bignumber.js';
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 
+import { store } from './store/store'
+import { Provider } from 'react-redux'
+import { Updater } from './store/tokenList/updater';
+
 const IS_MAIN_NETWORK = (process.env.IS_MAIN_NETWORK === "true");
 
 if (process.env.IS_PRODUCTION) {
@@ -65,4 +69,8 @@ if (Wallet.isMetamaskSupported()) {
   console.error('Metamask not installed!');
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+  <Provider store={store}>
+    <Updater />
+    <App />
+  </Provider>, document.getElementById('root'));
