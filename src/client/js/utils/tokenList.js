@@ -89,10 +89,17 @@ window.TokenListManager = {
       gasStats = { safeLow: defaultGasPrice, fast: defaultGasPrice, fastest: defaultGasPrice };
     }
 
-    // Binance Smart Chain GasAPI has different fields
-    if (!_.has(gasStats, 'safeLow')) {
-      gasStats.safeLow = gasStats.standard;
+    // xDai GasAPI has different fields
+    if (network.name === 'xDai') {
       gasStats.fastest = gasStats.fast;
+      gasStats.safeLow = gasStats.slow;
+      gasStats.fast = gasStats.average;
+    } else if (network.name === 'Smart Chain') {
+      // Binance Smart Chain GasAPI has different fields
+      if (!_.has(gasStats, 'safeLow')) {
+        gasStats.safeLow = gasStats.standard;
+        gasStats.fastest = gasStats.fast;
+      }
     }
 
     window.GAS_STATS = _.mapObject(

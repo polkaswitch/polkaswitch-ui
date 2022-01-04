@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import React, { useEffect, useRef, useState } from 'react';
 import { createChart, CrosshairMode } from 'lightweight-charts';
 import { ResponsiveContainer, AreaChart, Area, Tooltip } from 'recharts';
@@ -33,6 +34,7 @@ export default function TradingViewChart() {
     AVAX: '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7',
     xDai: '0xe91d153e0b41518a2ce8dd3d7944fa863463a97d',
     FTM: '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83',
+    MOVR: '0x98878B06940aE243284CA214f92Bb71a2b032B8A'
   };
   const viewModes = ['candlestick', 'line'];
   const candleChartContainerRef = useRef();
@@ -41,58 +43,53 @@ export default function TradingViewChart() {
     const swapConfig = TokenListManager.getSwapConfig();
     const network = TokenListManager.getCurrentNetworkConfig();
     const list = [];
-    if (!network.crossChainSupported) {
-      // TODO not supported at the moment
-      return list;
-    } else {
-      const fromSymbol = swapConfig.from.symbol;
-      const fromAddress = swapConfig.from.address;
-      const fromChain = swapConfig.fromChain;
-      const fromTokenLogo = swapConfig.from.logoURI;
-      const toSymbol = swapConfig.to.symbol;
-      const toAddress = swapConfig.to.address;
-      const toChain = swapConfig.toChain;
-      const toTokenLogo = swapConfig.to.logoURI;
+    const fromSymbol = swapConfig.from.symbol;
+    const fromAddress = swapConfig.from.address;
+    const fromChain = swapConfig.fromChain;
+    const fromTokenLogo = swapConfig.from.logoURI
+    const toSymbol = swapConfig.to.symbol;
+    const toAddress = swapConfig.to.address;
+    const toChain = swapConfig.toChain;
+    const toTokenLogo = swapConfig.to.logoURI
 
-      list.push({
-        name: fromSymbol + '/' + toSymbol,
-        fromSymbol,
-        fromAddress,
-        fromTokenLogo,
-        toSymbol,
-        toAddress,
-        toTokenLogo,
-        fromChain,
-        toChain,
-      });
-      list.push({
-        name: toSymbol + '/' + fromSymbol,
-        fromSymbol: toSymbol,
-        fromAddress: toAddress,
-        fromTokenLogo: toTokenLogo,
-        fromChain: toChain,
-        toSymbol: fromSymbol,
-        toAddress: fromAddress,
-        toTokenLogo: fromTokenLogo,
-        toChain: fromChain,
-      });
-      list.push({
-        name: fromSymbol,
-        fromSymbol,
-        fromAddress: fromAddress,
-        fromTokenLogo,
-        fromChain,
-      });
-      list.push({
-        name: toSymbol,
-        fromSymbol: toSymbol,
-        fromAddress: toAddress,
-        fromTokenLogo: toTokenLogo,
-        fromChain: toChain,
-      });
-    }
+    list.push({
+      name: fromSymbol + '/' + toSymbol,
+      fromSymbol,
+      fromAddress,
+      fromTokenLogo,
+      toSymbol,
+      toAddress,
+      toTokenLogo,
+      fromChain,
+      toChain
+    });
+    list.push({
+      name: toSymbol + '/' + fromSymbol,
+      fromSymbol: toSymbol,
+      fromAddress: toAddress,
+      fromTokenLogo: toTokenLogo,
+      fromChain: toChain,
+      toSymbol: fromSymbol,
+      toAddress: fromAddress,
+      toTokenLogo: fromTokenLogo,
+      toChain: fromChain
+    });
+    list.push({
+      name: fromSymbol,
+      fromSymbol,
+      fromAddress: fromAddress,
+      fromTokenLogo,
+      fromChain,
+    });
+    list.push({
+      name: toSymbol,
+      fromSymbol: toSymbol,
+      fromAddress: toAddress,
+      fromTokenLogo: toTokenLogo,
+      fromChain: toChain
+    });
     return list;
-  };
+  }
   let candleSeries = useRef(null);
   // init states
   const initTokenPair = createTokenPairList();
@@ -235,109 +232,92 @@ export default function TradingViewChart() {
     const network = TokenListManager.getCurrentNetworkConfig();
     let fromTokenPrices = [];
     let toTokenPrices = [];
-    let tokenPrices;
+    let tokenPrices = [];
 
     setIsLoading(true);
-    if (!network.crossChainSupported) {
-      // TODO not supported at the moment
-      tokenPrices = [];
-    } else {
-      const fromChain = TokenListManager.getNetworkByName(
-        selectedPair.fromChain,
-      );
-      const toChain = TokenListManager.getNetworkByName(selectedPair.toChain);
 
-      if (viewMode === 'line') {
-        const { fromTimestamp, toTimestamp } = getTimestamps(timeRange);
-        const platformOfFromChain = fromChain.coingecko.platform;
+    const fromChain = TokenListManager.getNetworkByName(selectedPair.fromChain);
+    const toChain = TokenListManager.getNetworkByName(selectedPair.toChain);
 
-        if (selectedPair.fromSymbol && selectedPair.toSymbol) {
-          const platformOfToChain = toChain.coingecko.platform;
-          const fromAddress = getContractAddress(
-            selectedPair.fromAddress,
-            selectedPair.fromSymbol,
-            platformOfFromChain,
-          );
-          const toAddress = getContractAddress(
-            selectedPair.toAddress,
-            selectedPair.toSymbol,
-            platformOfToChain,
-          );
+    if (viewMode === 'line') {
+      const { fromTimestamp, toTimestamp } = getTimestamps(timeRange);
+      const platformOfFromChain = fromChain.coingecko.platform;
 
-          fromTokenPrices = await fetchLinePrices(
-            platformOfFromChain,
-            fromAddress,
-            'usd',
-            fromTimestamp,
-            toTimestamp,
-          );
-          toTokenPrices =
-            (await fetchLinePrices(
-              platformOfToChain,
-              toAddress,
-              'usd',
-              fromTimestamp,
-              toTimestamp,
-            )) || [];
-          tokenPrices = mergeLinePrices(fromTokenPrices, toTokenPrices);
-        } else {
-          const fromAddress = getContractAddress(
-            selectedPair.fromAddress,
-            selectedPair.fromSymbol,
-            platformOfFromChain,
-          );
+      if (selectedPair.fromSymbol && selectedPair.toSymbol) {
+        const platformOfToChain = toChain.coingecko.platform;
+        const fromAddress = getContractAddress(
+          selectedPair.fromAddress,
+          selectedPair.fromSymbol,
+          platformOfFromChain,
+        );
+        const toAddress = getContractAddress(
+          selectedPair.toAddress,
+          selectedPair.toSymbol,
+          platformOfToChain,
+        );
 
-          fromTokenPrices = await fetchLinePrices(
-            platformOfFromChain,
-            fromAddress,
-            'usd',
-            fromTimestamp,
-            toTimestamp,
-          );
-          tokenPrices = mergeLinePrices(fromTokenPrices, null);
-        }
+        fromTokenPrices = await fetchLinePrices(
+          platformOfFromChain,
+          fromAddress,
+          'usd',
+          fromTimestamp,
+          toTimestamp,
+        );
+        toTokenPrices = (await fetchLinePrices(
+          platformOfToChain,
+          toAddress,
+          'usd',
+          fromTimestamp,
+          toTimestamp,
+        )) || [];
+        tokenPrices = mergeLinePrices(fromTokenPrices, toTokenPrices);
       } else {
-        if (selectedPair.fromSymbol && selectedPair.toSymbol) {
-          const fromCoin = TokenListManager.findTokenBySymbolFromCoinGecko(
+        const fromAddress = getContractAddress(
+          selectedPair.fromAddress,
+          selectedPair.fromSymbol,
+          platformOfFromChain,
+        );
+
+        fromTokenPrices = await fetchLinePrices(
+            platformOfFromChain,
+            fromAddress,
+            'usd',
+            fromTimestamp,
+            toTimestamp,
+        );
+        tokenPrices = mergeLinePrices(fromTokenPrices, null);
+      }
+    } else {
+      if (selectedPair.fromSymbol && selectedPair.toSymbol) {
+        const fromCoin = TokenListManager.findTokenBySymbolFromCoinGecko(
             selectedPair.fromSymbol.toLowerCase(),
-          );
-          const toCoin = TokenListManager.findTokenBySymbolFromCoinGecko(
+        );
+        const toCoin = TokenListManager.findTokenBySymbolFromCoinGecko(
             selectedPair.toSymbol.toLowerCase(),
-          );
+        );
 
-          if (fromCoin && toCoin) {
-            fromTokenPrices =
-              (await fetchCandleStickPrices(
-                fromCoin.id,
-                'usd',
-                timeRange.value,
-              )) || [];
-            toTokenPrices =
-              (await fetchCandleStickPrices(
-                toCoin.id,
-                'usd',
-                timeRange.value,
-              )) || [];
-          }
-
-          tokenPrices = mergeCandleStickPrices(fromTokenPrices, toTokenPrices);
-        } else {
-          const coinId = TokenListManager.findTokenBySymbolFromCoinGecko(
-            selectedPair.fromSymbol.toLowerCase(),
-          );
-
-          if (coinId) {
-            fromTokenPrices = await fetchCandleStickPrices(
-              coinId.id,
+        if (fromCoin && toCoin) {
+          fromTokenPrices = (await fetchCandleStickPrices(
+              fromCoin.id,
               'usd',
               timeRange.value,
-            );
-          }
-          tokenPrices = mergeCandleStickPrices(fromTokenPrices, null);
+          )) || [];
+          toTokenPrices = (await fetchCandleStickPrices(
+              toCoin.id,
+              'usd',
+              timeRange.value,
+          )) || [];
         }
+
+        tokenPrices = mergeCandleStickPrices(fromTokenPrices, toTokenPrices);
+      } else {
+        const coinId = TokenListManager.findTokenBySymbolFromCoinGecko(selectedPair.fromSymbol.toLowerCase());
+        if (coinId) {
+          fromTokenPrices = await fetchCandleStickPrices(coinId.id, 'usd', timeRange.value);
+        }
+        tokenPrices = mergeCandleStickPrices(fromTokenPrices, null);
       }
     }
-
     setTimeout(function () {
       setIsLoading(false);
       setTokenPriceData(tokenPrices);
@@ -411,6 +391,7 @@ export default function TradingViewChart() {
       const url = `${platform}/contract/${contract.toLowerCase()}/market_chart/range?vs_currency=${currency}&from=${fromTimestamp}&to=${toTimestamp}`;
       result = await CoingeckoManager.fetchLinePrices(url);
       return result;
+
     } catch (err) {
       console.error('Failed to fetch price data', err);
       await fetchLinePrices(
@@ -461,8 +442,7 @@ export default function TradingViewChart() {
       } else {
         const tempObj = {};
         for (let i = 0; i < fromTokenPrices.length; i++) {
-          tempObj[getFilteredTimestamp(fromTokenPrices[i][0])] =
-            fromTokenPrices[i];
+          tempObj[getFilteredTimestamp(fromTokenPrices[i][0])] = fromTokenPrices[i];
         }
 
         for (let j = 0; j < toTokenPrices.length; j++) {
@@ -555,8 +535,7 @@ export default function TradingViewChart() {
   };
 
   const getFilteredTimestamp = (timestampMillisec) => {
-    const timestampSec =
-      (timestampMillisec - (timestampMillisec % 1000)) / 1000;
+    const timestampSec = (timestampMillisec - (timestampMillisec % 1000)) / 1000;
     return timestampSec - (timestampSec % 60);
   };
 

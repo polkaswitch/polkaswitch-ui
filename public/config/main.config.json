@@ -14,6 +14,7 @@
     "gasApi": "https://ethgasstation.info/json/ethgasAPI.json",
     "color": "#5C69B5",
     "desiredParts": 3,
+    "abi": "oneSplitAbi",
     "chain": {
       "chainId": "0x1",
       "chainName": "Ethereum Mainnet"
@@ -28,10 +29,8 @@
       "USDC",
       "DAI"
     ],
-    "tradeView": {
-      "platform": "ethereum",
-      "lineUrl": "https://api.coingecko.com/api/v3/coins/ethereum",
-      "candleStickUrl": "https://api.coingecko.com/api/v3/coins"
+    "coingecko": {
+      "platform": "ethereum"
     },
     "singleChainSupported": false,
     "crossChainSupported": true,
@@ -56,6 +55,7 @@
     "gasApi": "https://ethgasstation.info/json/ethgasAPI.json",
     "desiredParts": 3,
     "color": "#4E99E3",
+    "abi": "oneSplitAbi",
     "chain": {
       "chainId": "0x507",
       "rpcUrls": ["https://rpc.testnet.moonbeam.network"],
@@ -86,7 +86,7 @@
   {
     "enabled": true,
     "name": "Polygon",
-    "aggregatorAddress": "0xB9E1505be481FC3fb8E87E92554E45FE6FbcFB7e",
+    "aggregatorAddress": "0xad44915C24a74d97489810274C368c0DD311236E",
     "crossChainAggregatorAddress": "0xA6d27b5B051F2C24E768C7859b2468CbE356ABCd",
     "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png",
     "bridgeURI": "https://wallet.matic.network/",
@@ -98,8 +98,9 @@
     ],
     "explorerBaseUrl": "https://polygonscan.com/tx/",
     "gasApi": "https://gasstation-mainnet.matic.network",
-    "desiredParts": 3,
+    "desiredParts": 20,
     "color": "#725BDF",
+    "abi": "polygonAbi",
     "chain": {
       "chainId": "0x89",
       "rpcUrls": ["https://rpc-mainnet.maticvigil.com"],
@@ -147,8 +148,9 @@
     ],
     "explorerBaseUrl": "https://bscscan.com/tx/",
     "gasApi": false,
-    "desiredParts": 3,
+    "desiredParts": 9,
     "color": "#FCC413",
+    "abi": "oneSplitAbi",
     "chain": {
       "chainId": "0x38",
       "rpcUrls": ["https://bsc-dataseed.binance.org/"],
@@ -196,8 +198,9 @@
     "nodeProvider2": "https://avalanche--mainnet--rpc.datahub.figment.io/apikey/b56dcd7987f05a43637a94ad98d546be/ext/bc/C/rpc",
     "explorerBaseUrl": "https://cchain.explorer.avax.network/tx/",
     "gasApi": false,
-    "desiredParts": 3,
+    "desiredParts": 6,
     "color": "#CF4D47",
+    "abi": "oneSplitAbi",
     "chain": {
       "chainId": "0xA86A",
       "rpcUrls": ["https://api.avax.network/ext/bc/C/rpc"],
@@ -234,7 +237,7 @@
   {
     "enabled": true,
     "name": "xDai",
-    "aggregatorAddress": "0x45886377b9930b1fDf0A16EE966F70A0240eD029",
+    "aggregatorAddress": "0xF09ecB66eF88973eBE7B0B5B5d700050F200c85D",
     "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/xdai/info/logo.png",
     "bridgeURI": "https://bridge.xdaichain.com/",
     "tokenList": "/tokens/100.list.json",
@@ -243,9 +246,10 @@
       "https://rpc.xdaichain.com/"
     ],
     "explorerBaseUrl": "https://blockscout.com/xdai/mainnet/tx/",
-    "gasApi": false,
-    "desiredParts": 18,
+    "gasApi": "https://blockscout.com/xdai/mainnet/api/v1/gas-price-oracle",
+    "desiredParts": 16,
     "color": "#67C19D",
+    "abi": "xDaiAbi",
     "chain": {
       "chainId": "0x64",
       "rpcUrls": ["https://rpc.xdaichain.com/"],
@@ -257,7 +261,7 @@
       }
     },
     "defaultPair": {
-      "to": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
+      "to": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
       "from": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
     },
     "topTokens": [
@@ -274,10 +278,13 @@
     "singleChainSupported": true,
     "crossChainSupported": true,
     "supportedCrossChainTokens": [
+      "USDT",
+      "USDC",
+      "DAI"
     ]
   },
   {
-    "enabled": false,
+    "enabled": true,
     "name": "Fantom",
     "aggregatorAddress": "0xF09ecB66eF88973eBE7B0B5B5d700050F200c85D",
     "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/fantom/info/logo.png",
@@ -285,15 +292,16 @@
     "tokenList": "/tokens/250.list.json",
     "chainId": "250",
     "nodeProviders": [
-      "https://rpcapi.fantom.network"
+      "https://rpc.ftm.tools/"
     ],
     "explorerBaseUrl": "https://ftmscan.com/tx/",
     "gasApi": false,
-    "desiredParts": 18,
+    "desiredParts": 12,
     "color": "#3164EE",
+    "abi": "oneSplitAbi",
     "chain": {
       "chainId": "0xFA",
-      "rpcUrls": ["https://rpcapi.fantom.network"],
+      "rpcUrls": ["https://rpc.ftm.tools/"],
       "chainName": "Fantom",
       "nativeCurrency": {
         "name": "Fantom",
@@ -302,15 +310,15 @@
       }
     },
     "defaultPair": {
-      "to": "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e",
+      "to": "0x04068da6c83afcfa0e13ba15a6696662335d5b75",
       "from": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
     },
     "topTokens": [
       "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e",
       "0x04068da6c83afcfa0e13ba15a6696662335d5b75",
-      "0x321162cd933e2be498cd2267a90534a804051b11",
-      "0x74b23882a30290451a17c44f4f05243b6b58c76d",
+      "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E",
+      "0x321162Cd933E2Be498Cd2267a90534A804051b11",
+      "0x74b23882a30290451A17c44f4F05243b6b58C76d",
       "0xae75a438b2e0cb8bb01ec1e1e376de11d44477cc"
     ],
     "coingecko": {
@@ -318,6 +326,53 @@
     },
     "singleChainSupported": true,
     "crossChainSupported": true,
+    "supportedCrossChainTokens": [
+      "USDT",
+      "USDC",
+      "DAI"
+    ]
+  },
+  {
+    "enabled": false,
+    "name": "Moonriver",
+    "aggregatorAddress": "0x45886377b9930b1fDf0A16EE966F70A0240eD029",
+    "logoURI": "https://assets.coingecko.com/coins/images/17984/small/9285.png",
+    "bridgeURI": "https://app.solarbeam.io/bridge",
+    "tokenList": "/tokens/1285.list.json",
+    "chainId": "1285",
+    "nodeProviders": ["https://rpc.moonriver.moonbeam.network"],
+    "explorerBaseUrl": "https://moonriver.moonscan.io/tx/",
+    "gasApi": false,
+    "desiredParts": 18,
+    "color": "#3164EE",
+    "abi": "moonriverAbi",
+    "chain": {
+      "chainId": "0x505",
+      "rpcUrls": ["https://rpc.moonriver.moonbeam.network"],
+      "chainName": "Moonriver",
+      "nativeCurrency": {
+        "name": "Moonriver",
+        "symbol": "MOVR",
+        "decimals": 18
+      }
+    },
+    "defaultPair": {
+      "to": "0x6bD193Ee6D2104F14F94E2cA6efefae561A4334B",
+      "from": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+    },
+    "topTokens": [
+      "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "0x6bD193Ee6D2104F14F94E2cA6efefae561A4334B",
+      "0xB44a9B6905aF7c801311e8F4E76932ee959c663C",
+      "0xE3F5a90F9cb311505cd691a46596599aA1A0AD7D",
+      "0x80A16016cC4A2E6a2CACA8a4a498b1699fF0f844",
+      "0x98878B06940aE243284CA214f92Bb71a2b032B8A"
+    ],
+    "coingecko": {
+      "platform": "moonriver"
+    },
+    "singleChainSupported": true,
+    "crossChainSupported": false,
     "supportedCrossChainTokens": [
     ]
   }

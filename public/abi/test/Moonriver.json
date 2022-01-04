@@ -1,0 +1,611 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "contract ISwitchView",
+        "name": "_SwitchView",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "minReturn",
+        "type": "uint256"
+      }
+    ],
+    "name": "Swap",
+    "type": "event"
+  },
+  {
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "fallback"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "SwitchView",
+    "outputs": [
+      {
+        "internalType": "contract ISwitchView",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
+        "type": "uint256"
+      }
+    ],
+    "name": "_swapOnMoonswap",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
+        "type": "uint256"
+      }
+    ],
+    "name": "_swapOnMoonswapETH",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "_swapOnMoonswapInternal",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "returnAmount",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "midToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
+        "type": "uint256"
+      }
+    ],
+    "name": "_swapOnMoonswapOverMid",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
+        "type": "uint256"
+      }
+    ],
+    "name": "_swapOnSolarbeam",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
+        "type": "uint256"
+      }
+    ],
+    "name": "_swapOnSolarbeamETH",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "_swapOnSolarbeamInternal",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "returnAmount",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "midToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
+        "type": "uint256"
+      }
+    ],
+    "name": "_swapOnSolarbeamOverMid",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
+        "type": "uint256"
+      }
+    ],
+    "name": "_swapOnSushiswap",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
+        "type": "uint256"
+      }
+    ],
+    "name": "_swapOnSushiswapETH",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "_swapOnSushiswapInternal",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "returnAmount",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "midToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
+        "type": "uint256"
+      }
+    ],
+    "name": "_swapOnSushiswapOverMid",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "parts",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
+        "type": "uint256"
+      }
+    ],
+    "name": "getExpectedReturn",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "returnAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "distribution",
+        "type": "uint256[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "parts",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "destTokenEthPriceTimesGasPrice",
+        "type": "uint256"
+      }
+    ],
+    "name": "getExpectedReturnWithGas",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "returnAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "estimateGasAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "distribution",
+        "type": "uint256[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minReturn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "distribution",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
+        "type": "uint256"
+      }
+    ],
+    "name": "swap",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "returnAmount",
+        "type": "uint256"
+      }
+    ],
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "function"
+  }
+]

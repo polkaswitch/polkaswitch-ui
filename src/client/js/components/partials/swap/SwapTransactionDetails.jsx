@@ -57,26 +57,16 @@ export default class SwapTransactionDetails extends Component {
       await SwapFn.calculateMinReturn(
         this.props.from,
         this.props.to,
-        Utils.parseUnits(fromAmount, this.props.from.decimals),
-      )
-        .then(
-          function (r) {
-            _.defer(
-              function () {
-                this.setState({ minReturn: r });
-              }.bind(this),
-            );
-          }.bind(this),
-        )
-        .catch(
-          function (r) {
-            _.defer(
-              function () {
-                this.setState({ minReturn: '--' });
-              }.bind(this),
-            );
-          }.bind(this),
-        );
+        Utils.parseUnits(fromAmount, this.props.from.decimals)
+      ).then(function({ minReturn }) {
+        _.defer(function(){
+          this.setState({ minReturn: minReturn });
+        }.bind(this));
+      }.bind(this)).catch(function(r) {
+        _.defer(function(){
+          this.setState({ minReturn: "--" });
+        }.bind(this));
+      }.bind(this));
 
       await SwapFn.calculatePriceImpact(
         this.props.from,

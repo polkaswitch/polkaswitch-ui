@@ -39,6 +39,9 @@ window.WalletJS = {
     window.crossChainOneSplitAbi = await (
       await fetch('/abi/cross-chain/cross-chain-aggregator.json')
     ).json();
+    window.polygonAbi = await (await fetch('/abi/test/Polygon.json')).json();
+    window.moonriverAbi = await (await fetch('/abi/test/Moonriver.json')).json();
+    window.xDaiAbi = await (await fetch('/abi/test/Xdai.json')).json();
 
     EventManager.listenFor(
       'initiateWalletConnect',

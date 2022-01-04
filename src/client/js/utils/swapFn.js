@@ -53,6 +53,21 @@ window.SwapFn = {
     return Storage.swapSettings;
   },
 
+  _getContract: function () {
+    const signer = Wallet.getProvider().getSigner();
+    const currentNetworkConfig = TokenListManager.getCurrentNetworkConfig();
+    const currentNetworkName = currentNetworkConfig.name;
+    const abiName = currentNetworkConfig.abi;
+    const recipient = Wallet.currentAddress();
+    const contract = new Contract(
+      currentNetworkConfig.aggregatorAddress,
+      window[abiName],
+      signer
+    );
+
+    return { currentNetworkName, contract, recipient }
+  },
+
   isNetworkGasDynamic: function () {
     var network = TokenListManager.getCurrentNetworkConfig();
     // if no gasAPI supplied, always default to auto;
@@ -77,71 +92,36 @@ window.SwapFn = {
     }
   },
 
-  calculateMinReturn: function (fromToken, toToken, amount) {
-    return this.getExpectedReturn(fromToken, toToken, amount).then(
-      function (actualReturn) {
-        var y = 1.0 - Storage.swapSettings.slippage / 100.0;
-        var r = BN(actualReturn.returnAmount.toString()).times(y);
-
-        var minReturn = Utils.formatUnits(r.toFixed(0), toToken.decimals);
-
-        return minReturn;
-      }.bind(this),
-    );
+  calculateMinReturn: function(fromToken, toToken, amount) {
+    return this.getExpectedReturn(
+      fromToken, toToken, amount
+    ).then(function(actualReturn) {
+      const y = 1.0 - (Storage.swapSettings.slippage / 100.0);
+      const r = BN(actualReturn.returnAmount.toString()).times(y);
+      const minReturn = Utils.formatUnits(r.toFixed(0), toToken.decimals);
+      const distribution = actualReturn.distribution;
+      const expectedAmount = Utils.formatUnits(actualReturn.returnAmount.toString(), toToken.decimals);
+      return { minReturn, distribution, expectedAmount }
+    }.bind(this));
   },
 
   calculateEstimatedTransactionCost: function (
     fromToken,
     toToken,
     amountBN,
-    distribution,
+    distribution
   ) {
-    const signer = Wallet.getProvider().getSigner();
-    const contract = new Contract(
-      TokenListManager.getCurrentNetworkConfig().aggregatorAddress,
-      window.oneSplitAbi,
-      signer,
-    );
-
-    return contract.estimateGas
-      .swap(
-        fromToken.address,
-        toToken.address,
-        amountBN, // uint256 in wei
-        BigNumber.from(0),
-        distribution,
-        0, // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
-        {
-          // gasPrice: // the price to pay per gas
-          // gasLimit: // the limit on the amount of gas to allow the transaction to consume; any unused gas is returned at the gasPrice,
-          value: fromToken.native ? amountBN : undefined,
-          gasPrice: !this.isGasAutomatic()
-            ? Utils.parseUnits('' + this.getGasPrice(), 'gwei')
-            : undefined,
-        },
-      )
-      .then(
-        async function (gasUnitsEstimated) {
-          // Returns the estimate units of gas that would be
-          // required to execute the METHOD_NAME with args and overrides.
-
-          let gasPrice;
-
-          if (this.isGasAutomatic()) {
-            gasPrice = await Wallet.getReadOnlyProvider().getGasPrice();
-            gasPrice = Math.ceil(Utils.formatUnits(gasPrice, 'gwei'));
-          } else {
-            gasPrice = this.getGasPrice();
-          }
-
-          return Utils.formatUnits(
-            Utils.parseUnits(
-              '' + gasPrice * gasUnitsEstimated.toString(),
-              'gwei',
-            ),
-          );
-        }.bind(this),
-      );
+    const { currentNetworkName, contract, recipient } = this._getContract();
+    switch (currentNetworkName) {
+      case 'Polygon':
+        return this._estimateGasWithPolygonAbi(contract, fromToken, toToken, amountBN, distribution);
+      case 'Moonriver':
+        return this._estimateGasWithMoonriverAbi(contract, fromToken, toToken, amountBN, recipient, distribution);
+      case 'xDai':
+        return this._estimateGasWithXdaiAbi(contract, fromToken, toToken, amountBN, distribution);
+      default:
+        return this._estimateGasWithOneSplitAbi(contract, fromToken, toToken, amountBN, distribution);
+    }
   },
 
   calculatePriceImpact: function (fromToken, toToken, amount) {
@@ -357,15 +337,16 @@ window.SwapFn = {
       localStorage.removeItem('route');
       const contract = new Contract(
         network.aggregatorAddress,
-        window.oneSplitAbi,
-        Wallet.getReadOnlyProvider(chainId),
+        window[network.abi],
+        Wallet.getReadOnlyProvider(chainId)
       );
+
       let result = await contract.getExpectedReturn(
         fromToken.address,
         toToken.address,
         amount, // uint256 in wei
         network.desiredParts, // desired parts of splits accross pools(3 is recommended)
-        0, // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
+        0  // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
       );
 
       result = _.extend({}, result);
@@ -376,18 +357,7 @@ window.SwapFn = {
     }
   },
 
-  /*
-    function swap(
-      IERC20 fromToken,
-      IERC20 destToken,
-      uint256 amount,
-      uint256 minReturn,
-      uint256[] memory distribution,
-      uint256 flags
-    ) public payable returns(uint256 returnAmount)
-  */
-
-  _swap: function (fromToken, toToken, amountBN, distribution) {
+  _swap: function(fromToken, toToken, amountBN) {
     const pathRoute = localStorage.getItem('route');
     const chainId = TokenListManager.getCurrentNetworkConfig().chainId;
 
@@ -396,66 +366,237 @@ window.SwapFn = {
       return PathFinder.getSwap(fromToken.symbol, toToken.symbol, originAmount, pathRoute, chainId);
     }
 
-    console.log(
-      `Calling SWAP() with ${fromToken.symbol} to ${
-        toToken.symbol
-      } of ${amountBN.toString()}`,
-    );
-    const signer = Wallet.getProvider().getSigner();
-    const contract = new Contract(
-      TokenListManager.getCurrentNetworkConfig().aggregatorAddress,
-      window.oneSplitAbi,
-      signer,
-    );
+    console.log(`Calling SWAP() with ${fromToken.symbol} to ${toToken.symbol} of ${amountBN.toString()}`);
+    const { currentNetworkName, contract, recipient } = this._getContract();
 
-    return this.calculateMinReturn(fromToken, toToken, amountBN).then(
-      function (minReturn) {
-        /*
+    return this.calculateMinReturn(
+      fromToken, toToken, amountBN
+    ).then(function({ minReturn, distribution, expectedAmount }) {
+      /*
         returns(
           uint256 returnAmount
         )
       */
-        return contract
-          .swap(
-            fromToken.address,
-            toToken.address,
-            amountBN, // uint256 in wei
-            Utils.parseUnits(minReturn, toToken.decimals),
-            distribution,
-            0, // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
-            {
-              // gasPrice: // the price to pay per gas
-              // gasLimit: // the limit on the amount of gas to allow the transaction to consume; any unused gas is returned at the gasPrice,
-              value: fromToken.native ? amountBN : undefined,
-              gasPrice: !this.isGasAutomatic()
-                ? Utils.parseUnits('' + this.getGasPrice(), 'gwei')
-                : undefined,
-            },
-          )
-          .then(
-            function (transaction) {
-              console.log(
-                `Waiting SWAP() with ${fromToken.symbol} to ${
-                  toToken.symbol
-                } of ${amountBN.toString()}`,
-              );
-
-              const network = TokenListManager.getCurrentNetworkConfig();
-              const chainId = network.chainId;
-
-              TxQueue.queuePendingTx({
-                chainId: chainId,
-                from: fromToken,
-                to: toToken,
-                amount: amountBN,
-                tx: transaction,
-              });
-              return transaction.hash;
-            }.bind(this),
-          );
-      }.bind(this),
-    );
+      switch(currentNetworkName) {
+        case 'Polygon':
+          this._swapWithPolygonAbi(contract, fromToken, toToken, amountBN, expectedAmount, minReturn, distribution);
+          break;
+        case 'Moonriver':
+          this._swapWithMoonriverAbi(contract, fromToken, toToken, amountBN, minReturn, recipient, distribution);
+          break;
+        case 'xDai':
+          this._swapWithXdaiAbi(contract, fromToken, toToken, amountBN, minReturn, distribution);
+          break;
+        default:
+          this._swapWithOneSplitAbi(contract, fromToken, toToken, amountBN, minReturn, distribution);
+      }
+    }.bind(this));
   },
+
+  _swapWithOneSplitAbi: function(contract, fromToken, toToken, amountBN, minReturn, distribution) {
+    return contract.swap(
+      fromToken.address,
+      toToken.address,
+      amountBN, // uint256 in wei
+      Utils.parseUnits(minReturn, toToken.decimals), // minReturn
+      distribution,
+      0,  // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
+      {
+        // gasPrice: // the price to pay per gas
+        // gasLimit: // the limit on the amount of gas to allow the transaction to consume; any unused gas is returned at the gasPrice,
+        value: fromToken.native ? amountBN : undefined,
+        gasPrice: !this.isGasAutomatic()
+            ? Utils.parseUnits("" + this.getGasPrice(), "gwei")
+            : undefined
+      }
+    ).then(function(transaction) {
+      this._returnSwapResult(transaction, fromToken, toToken, amountBN);
+    }.bind(this));
+  },
+
+  _swapWithPolygonAbi: function(contract, fromToken, toToken, amountBN, expectedAmount, minReturn, distribution) {
+    return contract.swap(
+      fromToken.address,
+      toToken.address,
+      amountBN, // uint256 in wei
+      Utils.parseUnits(expectedAmount, toToken.decimals), // expectedReturn
+      Utils.parseUnits(minReturn, toToken.decimals), // minReturn
+      distribution,
+      0,  // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
+      {
+        // gasPrice: // the price to pay per gas
+        // gasLimit: // the limit on the amount of gas to allow the transaction to consume; any unused gas is returned at the gasPrice,
+        value: fromToken.native ? amountBN : undefined,
+        gasPrice: !this.isGasAutomatic()
+            ? Utils.parseUnits("" + this.getGasPrice(), "gwei")
+            : undefined
+      }
+    ).then(function(transaction) {
+      this._returnSwapResult(transaction, fromToken, toToken, amountBN);
+    }.bind(this));
+  },
+
+  _swapWithMoonriverAbi: function(contract, fromToken, toToken, amountBN, minReturn, recipient, distribution) {
+    return contract.swap(
+      fromToken.address,
+      toToken.address,
+      amountBN, // uint256 in wei
+      Utils.parseUnits(minReturn, toToken.decimals), // minReturn
+      recipient,
+      distribution,
+      0,  // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
+      {
+        // gasPrice: // the price to pay per gas
+        // gasLimit: // the limit on the amount of gas to allow the transaction to consume; any unused gas is returned at the gasPrice,
+        value: fromToken.native ? amountBN : undefined,
+        gasPrice: !this.isGasAutomatic()
+            ? Utils.parseUnits("" + this.getGasPrice(), "gwei")
+            : undefined
+      }
+    ).then(function(transaction) {
+      this._returnSwapResult(transaction, fromToken, toToken, amountBN);
+    }.bind(this));
+  },
+
+  _swapWithXdaiAbi: function(contract, fromToken, toToken, amountBN, minReturn, distribution) {
+    return contract.swap(
+      fromToken.address,
+      toToken.address,
+      amountBN, // uint256 in wei
+      Utils.parseUnits(minReturn, toToken.decimals), // minReturn
+      distribution,
+      0,  // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
+      {
+        // gasPrice: // the price to pay per gas
+        // gasLimit: // the limit on the amount of gas to allow the transaction to consume; any unused gas is returned at the gasPrice,
+        value: fromToken.native ? amountBN : undefined,
+        gasPrice: !this.isGasAutomatic()
+            ? Utils.parseUnits("" + this.getGasPrice(), "gwei")
+            : undefined
+      }
+    ).then(function(transaction) {
+      this._returnSwapResult(transaction, fromToken, toToken, amountBN);
+    }.bind(this));
+  },
+
+  _returnSwapResult: function (transaction, fromToken, toToken, amountBN) {
+    console.log(`Waiting SWAP() with ${fromToken.symbol} to ${toToken.symbol} of ${amountBN.toString()}`);
+    const network = TokenListManager.getCurrentNetworkConfig();
+    const chainId = network.chainId;
+
+    TxQueue.queuePendingTx({
+      chainId: chainId,
+      from: fromToken,
+      to: toToken,
+      amount: amountBN,
+      tx: transaction
+    });
+    return transaction.hash;
+  },
+
+  _estimateGasWithXdaiAbi: function(contract, fromToken, toToken, amountBN, distribution) {
+    return contract.estimateGas.swap(
+      fromToken.address,
+      toToken.address,
+      amountBN, // uint256 in wei
+      BigNumber.from(0),
+      distribution,
+      0,  // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
+      {
+        // gasPrice: // the price to pay per gas
+        // gasLimit: // the limit on the amount of gas to allow the transaction to consume; any unused gas is returned at the gasPrice,
+        value: fromToken.native ? amountBN : undefined,
+        gasPrice: !this.isGasAutomatic()
+            ? Utils.parseUnits("" + this.getGasPrice(), "gwei")
+            : undefined
+      }
+    ).then(async function(gasUnitsEstimated) {
+      console.log('### gasUnitsEstimated ###', gasUnitsEstimated)
+      return await this._returnEstimatedGasResult(gasUnitsEstimated);
+    }.bind(this));
+  },
+
+  _estimateGasWithOneSplitAbi: function(contract, fromToken, toToken, amountBN, distribution) {
+    return contract.estimateGas.swap(
+        fromToken.address,
+        toToken.address,
+        amountBN, // uint256 in wei
+        BigNumber.from(0),
+        distribution,
+        0,  // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
+        {
+          // gasPrice: // the price to pay per gas
+          // gasLimit: // the limit on the amount of gas to allow the transaction to consume; any unused gas is returned at the gasPrice,
+          value: fromToken.native ? amountBN : undefined,
+          gasPrice: !this.isGasAutomatic()
+              ? Utils.parseUnits("" + this.getGasPrice(), "gwei")
+              : undefined
+        }
+    ).then(async function(gasUnitsEstimated) {
+      return await this._returnEstimatedGasResult(gasUnitsEstimated);
+    }.bind(this));
+  },
+
+  _estimateGasWithPolygonAbi: function(contract, fromToken, toToken, amountBN, distribution) {
+    return contract.estimateGas.swap(
+      fromToken.address,
+      toToken.address,
+      amountBN, // uint256 in wei
+      BigNumber.from(0), // expectedReturn
+      BigNumber.from(0), // minReturn
+      distribution,
+      0,  // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
+      {
+        // gasPrice: // the price to pay per gas
+        // gasLimit: // the limit on the amount of gas to allow the transaction to consume; any unused gas is returned at the gasPrice,
+        value: fromToken.native ? amountBN : undefined,
+        gasPrice: !this.isGasAutomatic()
+            ? Utils.parseUnits("" + this.getGasPrice(), "gwei")
+            : undefined
+      }
+    ).then(async function(gasUnitsEstimated) {
+      return await this._returnEstimatedGasResult(gasUnitsEstimated);
+    }.bind(this));
+  },
+
+  _estimateGasWithMoonriverAbi: function(contract, fromToken, toToken, amountBN, recipient, distribution) {
+    return contract.estimateGas.swap(
+      fromToken.address,
+      toToken.address,
+      amountBN, // uint256 in wei
+      BigNumber.from(0), // minReturn
+      recipient,
+      distribution,
+      0,  // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
+      {
+        // gasPrice: // the price to pay per gas
+        // gasLimit: // the limit on the amount of gas to allow the transaction to consume; any unused gas is returned at the gasPrice,
+        value: fromToken.native ? amountBN : undefined,
+        gasPrice: !this.isGasAutomatic()
+            ? Utils.parseUnits("" + this.getGasPrice(), "gwei")
+            : undefined
+      }
+    ).then(async function(gasUnitsEstimated) {
+      return await this._returnEstimatedGasResult(gasUnitsEstimated);
+    }.bind(this));
+  },
+
+  _returnEstimatedGasResult: async function(gasUnitsEstimated) {
+    // Returns the estimate units of gas that would be
+    // required to execute the METHOD_NAME with args and overrides.
+    let gasPrice;
+
+    if (this.isGasAutomatic()) {
+      gasPrice = await Wallet.getReadOnlyProvider().getGasPrice();
+      gasPrice = Math.ceil(Utils.formatUnits(gasPrice, "gwei"));
+    } else {
+      gasPrice = this.getGasPrice();
+    }
+
+    return Utils.formatUnits(
+        Utils.parseUnits("" + (gasPrice * gasUnitsEstimated.toString()), "gwei")
+    );
+  }
 };
 
 export default window.SwapFn;
