@@ -1,12 +1,13 @@
 import _ from 'underscore';
+import * as ethers from 'ethers';
+import BN from 'bignumber.js';
 import EventManager from './events';
 import TxQueue from './txQueue';
-import * as ethers from 'ethers';
 import TokenListManager from './tokenList';
 import Wallet from './wallet';
 import Storage from './storage';
-import BN from 'bignumber.js';
 import { ApprovalState } from '../constants/Status';
+import PathFinder from './pathfinder';
 
 // never exponent
 BN.config({ EXPONENTIAL_AT: 1e9 });
@@ -27,9 +28,14 @@ window.SwapFn = {
       }
 
       // floor to the minimum possible value
+      console.log('Decimals', -token.decimals)
+      console.log('targetAmount', targetAmount)
+      console.log(10 ** -token.decimals);
       targetAmount = Math.max(10 ** -token.decimals, targetAmount);
+      console.log('Calculated targetAmount1:', targetAmount);
 
       targetAmount = BN(BN(targetAmount).toFixed(token.decimals)).toString();
+      console.log('Calculated targetAmount2:', targetAmount);
       return targetAmount;
     } else {
       return undefined;
@@ -245,6 +251,13 @@ window.SwapFn = {
   },
 
   _approve: function (tokenContractAddress, amountBN) {
+    const pathRoute = localStorage.getItem('route');
+    const chainId = TokenListManager.getCurrentNetworkConfig().chainId;
+
+    if (['1inch', 'paraswap'].includes(pathRoute)) {
+      return PathFinder.getApproveTx(tokenContractAddress, amountBN, pathRoute, chainId);
+    }
+
     console.log(
       `Calling APPROVE() with ${tokenContractAddress} ${amountBN.toString()}`,
     );
@@ -271,7 +284,7 @@ window.SwapFn = {
       });
   },
 
-  _getAllowance: function (token) {
+  _getAllowance: function (token, pathRoute = '1inch') {
     if (!Wallet.isConnected()) {
       return Promise.resolve(false);
     }
@@ -285,8 +298,17 @@ window.SwapFn = {
       window.erc20Abi,
       Wallet.getProvider(),
     );
+  
+    const userAddress = Wallet.currentAddress();
+    const pathRoute = localStorage.getItem('route');
+    const chainId = TokenListManager.getCurrentNetworkConfig().chainId;
+
+    if (['1inch', 'paraswap'].includes(pathRoute)) {
+      return PathFinder.getAllowance(userAddress, token.address, pathRoute, chainId);
+    }
+
     return contract.allowance(
-      Wallet.currentAddress(),
+      userAddress,
       TokenListManager.getCurrentNetworkConfig().aggregatorAddress,
     );
   },
@@ -307,20 +329,21 @@ window.SwapFn = {
 
   _getExpectedReturnCache: {},
 
-  getExpectedReturn: async function (fromToken, toToken, amount, chainId) {
-    var network = chainId
-      ? TokenListManager.getNetworkById(chainId)
+  getExpectedReturn: async function (fromToken, toToken, amount, chain) {
+    const network = chain
+      ? TokenListManager.getNetworkById(chain)
       : TokenListManager.getCurrentNetworkConfig();
-    var chainId = network.chainId;
+    const chainId = network.chainId;
 
-    var key = [
+    const key = [
       fromToken.address,
       toToken.address,
       amount.toString(),
       chainId,
     ].join('');
+
     if (key in this._getExpectedReturnCache) {
-      var cacheValue = this._getExpectedReturnCache[key];
+      const cacheValue = this._getExpectedReturnCache[key];
       if (Date.now() - cacheValue._cacheTimestamp < 5000) {
         // 5 seconds cache
         console.log('Using expectedReturn cache: ', key);
@@ -328,23 +351,38 @@ window.SwapFn = {
       }
     }
 
-    const contract = new Contract(
-      network.aggregatorAddress,
-      window.oneSplitAbi,
-      Wallet.getReadOnlyProvider(chainId),
-    );
-    var result = await contract.getExpectedReturn(
-      fromToken.address,
-      toToken.address,
-      amount, // uint256 in wei
-      network.desiredParts, // desired parts of splits accross pools(3 is recommended)
-      0, // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
-    );
+    if (chainId === '1') {
+      const originAmount = new BN(amount.toString()).dividedBy(10 ** fromToken.decimals);
+      const { destAmount, route } = await PathFinder.getQuote(fromToken.symbol, toToken.symbol, originAmount, chainId);
+      const returnAmount = new BN(destAmount).times(10 ** toToken.decimals).toFixed(0);
+      
+      localStorage.setItem('route', route);
+      const result = { returnAmount, route };
 
-    var result = _.extend({}, result);
-    result._cacheTimestamp = new Date();
-    this._getExpectedReturnCache[key] = result;
-    return result;
+      return result;
+    } else {
+      localStorage.removeItem('route');
+      const contract = new Contract(
+        network.aggregatorAddress,
+        window.oneSplitAbi,
+        Wallet.getReadOnlyProvider(chainId),
+      );
+      let result = await contract.getExpectedReturn(
+        fromToken.address,
+        toToken.address,
+        amount, // uint256 in wei
+        network.desiredParts, // desired parts of splits accross pools(3 is recommended)
+        0, // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
+      );
+
+      result = _.extend({}, result);
+      result._cacheTimestamp = new Date();
+      this._getExpectedReturnCache[key] = result;
+      
+      console.log('Estimation Result:', result);
+
+      return result;
+    }
   },
 
   /*
@@ -359,6 +397,14 @@ window.SwapFn = {
   */
 
   _swap: function (fromToken, toToken, amountBN, distribution) {
+    const pathRoute = localStorage.getItem('route');
+    const chainId = TokenListManager.getCurrentNetworkConfig().chainId;
+
+    if (['1inch', 'paraswap'].includes(pathRoute)) {
+      const originAmount = new BN(amountBN.toString()).dividedBy(10 ** fromToken.decimals);
+      return PathFinder.getSwap(fromToken.symbol, toToken.symbol, originAmount, pathRoute, chainId);
+    }
+
     console.log(
       `Calling SWAP() with ${fromToken.symbol} to ${
         toToken.symbol

@@ -1,7 +1,8 @@
 import Wallet from './wallet';
 
 export default {
-  _baseUrl: 'https://api.swing.xyz',
+  // _baseUrl: 'https://api.swing.xyz',
+  _baseUrl: 'http://192.168.3.199:3000',
 
   sendGet: async function (url, params = {}) {
     let result = null;
@@ -11,7 +12,6 @@ export default {
       Object.keys(params).forEach((key) =>
         endpoint.searchParams.append(key, params[key]),
       );
-      console.log('URL=', endpoint);
       const response = await fetch(endpoint);
 
       if (response.ok) {
@@ -53,7 +53,7 @@ export default {
     return result;
   },
 
-  getQuote: async function (chainId, srcToken, destToken, srcAmount) {
+  getQuote: async function (srcToken, destToken, srcAmount, chainId) {
     const priceData = await this.sendGet('quote', {
       chainId,
       srcToken,
@@ -64,7 +64,15 @@ export default {
     return priceData;
   },
 
-  getApprove: async function (route, chainId, tokenAddress, amount) {
+  getAllowance: async function (userAddress, tokenAddress, route, chainId) {
+    const allowance = await this.sendGet('allowance', {
+      route, chainId, userAddress, tokenAddress
+    });
+
+    return allowance;
+  },
+
+  getApproveTx: async function (tokenAddress, amount, route, chainId) {
     const userAddress = Wallet.currentAddress();
     const tx = await this.sendGet('approve', {
       route,
@@ -78,7 +86,7 @@ export default {
     return txHash;
   },
 
-  getSwap: async function (route, chainId, srcToken, destToken, srcAmount) {
+  getSwap: async function (srcToken, destToken, srcAmount, route, chainId) {
     const userAddress = Wallet.currentAddress();
     const tx = await this.sendPost('swap', {
       chainId,

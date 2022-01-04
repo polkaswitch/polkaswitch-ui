@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'underscore';
-import classnames from 'classnames';
 import TokenIconImg from './../TokenIconImg';
-import Wallet from '../../../utils/wallet';
 import TokenListManager from '../../../utils/tokenList';
 
 export default class TokenSwapDistribution extends Component {
@@ -10,7 +8,7 @@ export default class TokenSwapDistribution extends Component {
     super(props);
   }
 
-  renderPool(key, name, icon, poolWidth) {
+  renderPool(key, icon, poolWidth) {
     return (
       <div
         key={key}
@@ -267,12 +265,7 @@ export default class TokenSwapDistribution extends Component {
         className="token-dist-wrapper"
         aria-label="Routing distribution for the swap"
       >
-        {_.map(
-          pools,
-          function (v, i) {
-            return this.renderPool(i, v.name, v.icon, v.size);
-          }.bind(this),
-        )}
+        {_.map(pools, (v, i) => this.renderPool(i, v.icon, v.size))}
       </div>
     );
   }

@@ -24,8 +24,7 @@ export default class SwapOrderSlide extends Component {
     this.handleTokenAmountChange = this.handleTokenAmountChange.bind(this);
     this.validateOrderForm = this.validateOrderForm.bind(this);
     this.fetchSwapEstimate = this.fetchSwapEstimate.bind(this);
-    this.fetchSingleChainSwapEstimate =
-      this.fetchSingleChainSwapEstimate.bind(this);
+    this.fetchSingleChainSwapEstimate = this.fetchSingleChainSwapEstimate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleMax = this.handleMax.bind(this);
     this.handleTokenSwap = this.handleTokenSwap.bind(this);
@@ -69,6 +68,8 @@ export default class SwapOrderSlide extends Component {
       this.props.swapDistribution,
     );
 
+    console.log('FromToken:', this.props.from);
+    console.log('ToToken:', this.props.to);
     if (!fromAmount || fromAmount.length === 0) {
       fromAmount = '0';
     } else {
@@ -88,6 +89,8 @@ export default class SwapOrderSlide extends Component {
         calculatingSwap: true,
       },
       function (_timeNow, _attempt, _cb) {
+        console.log('From Token:', this.props.from);
+        console.log('fromAmount:', fromAmount);
         var fromAmountBN = window.ethers.utils.parseUnits(
           fromAmount,
           this.props.from.decimals,
@@ -137,12 +140,14 @@ export default class SwapOrderSlide extends Component {
           var dist = _.map(result.distribution, function (e) {
             return e.toNumber();
           });
+          console.log('Changed Dist=', dist);
 
           Wallet.getBalance(this.props.from)
             .then((bal) => {
               return SwapFn.getApproveStatus(
                 this.props.from,
                 fromAmountBN,
+                result.route
               ).then((status) => {
                 console.log('Approval Status', status);
                 this.props.onSwapEstimateComplete(
