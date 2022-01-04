@@ -2,7 +2,6 @@ import Wallet from './wallet';
 
 export default {
   _baseUrl: 'https://api.swing.xyz',
-  // _baseUrl: 'http://192.168.3.199:3000',
 
   sendGet: async function (url, params = {}) {
     let result = null;
@@ -74,7 +73,7 @@ export default {
 
   getApproveTx: async function (tokenAddress, amount, route, chainId) {
     const userAddress = Wallet.currentAddress();
-    const tx = await this.sendGet('approve', {
+    const tx = await this.sendGet('approve/transaction', {
       route,
       chainId,
       tokenAddress,

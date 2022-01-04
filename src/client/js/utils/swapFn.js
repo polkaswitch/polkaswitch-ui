@@ -213,7 +213,6 @@ window.SwapFn = {
   getApproveStatus: function (token, amountBN) {
     return this._getAllowance(token).then(
       function (allowanceBN) {
-        console.log('allowanceBN', allowanceBN);
         if (token.native || (allowanceBN && allowanceBN.gte(amountBN))) {
           return Promise.resolve(ApprovalState.APPROVED);
         } else {
@@ -227,7 +226,7 @@ window.SwapFn = {
     const pathRoute = localStorage.getItem('route');
     const chainId = TokenListManager.getCurrentNetworkConfig().chainId;
 
-    if (['1inch', 'paraswap'].includes(pathRoute)) {
+    if (['oneinch', 'paraswap'].includes(pathRoute)) {
       return PathFinder.getApproveTx(tokenContractAddress, amountBN, pathRoute, chainId);
     }
 
@@ -276,8 +275,12 @@ window.SwapFn = {
     const pathRoute = localStorage.getItem('route');
     const chainId = TokenListManager.getCurrentNetworkConfig().chainId;
 
-    if (['1inch', 'paraswap'].includes(pathRoute)) {
-      return PathFinder.getAllowance(userAddress, token.address, pathRoute, chainId);
+    if (['oneinch', 'paraswap'].includes(pathRoute)) {
+      return PathFinder.getAllowance(
+        userAddress, token.address, pathRoute, chainId
+      )
+      .then(({ allowance }) => new BN(allowance))
+      .catch(() => new BN(0));
     }
 
     return contract.allowance(
@@ -361,7 +364,7 @@ window.SwapFn = {
     const pathRoute = localStorage.getItem('route');
     const chainId = TokenListManager.getCurrentNetworkConfig().chainId;
 
-    if (['1inch', 'paraswap'].includes(pathRoute)) {
+    if (['oneinch', 'paraswap'].includes(pathRoute)) {
       const originAmount = new BN(amountBN.toString()).dividedBy(10 ** fromToken.decimals);
       return PathFinder.getSwap(fromToken.symbol, toToken.symbol, originAmount, pathRoute, chainId);
     }
