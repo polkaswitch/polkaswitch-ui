@@ -20,7 +20,7 @@ window.SwapFn = {
   initialize: function () {},
 
   validateEthValue: function (token, value) {
-    var targetAmount = +value;
+    let targetAmount = +value;
 
     if (!isNaN(targetAmount)) {
       if (targetAmount === 0) {
@@ -28,17 +28,10 @@ window.SwapFn = {
       }
 
       // floor to the minimum possible value
-      console.log('Decimals', -token.decimals)
-      console.log('targetAmount', targetAmount)
-      console.log(10 ** -token.decimals);
       targetAmount = Math.max(10 ** -token.decimals, targetAmount);
-      console.log('Calculated targetAmount1:', targetAmount);
-
       targetAmount = BN(BN(targetAmount).toFixed(token.decimals)).toString();
-      console.log('Calculated targetAmount2:', targetAmount);
+
       return targetAmount;
-    } else {
-      return undefined;
     }
   },
 
@@ -284,7 +277,7 @@ window.SwapFn = {
       });
   },
 
-  _getAllowance: function (token, pathRoute = '1inch') {
+  _getAllowance: function (token) {
     if (!Wallet.isConnected()) {
       return Promise.resolve(false);
     }
@@ -379,8 +372,6 @@ window.SwapFn = {
       result._cacheTimestamp = new Date();
       this._getExpectedReturnCache[key] = result;
       
-      console.log('Estimation Result:', result);
-
       return result;
     }
   },

@@ -68,8 +68,6 @@ export default class SwapOrderSlide extends Component {
       this.props.swapDistribution,
     );
 
-    console.log('FromToken:', this.props.from);
-    console.log('ToToken:', this.props.to);
     if (!fromAmount || fromAmount.length === 0) {
       fromAmount = '0';
     } else {
@@ -89,8 +87,6 @@ export default class SwapOrderSlide extends Component {
         calculatingSwap: true,
       },
       function (_timeNow, _attempt, _cb) {
-        console.log('From Token:', this.props.from);
-        console.log('fromAmount:', fromAmount);
         var fromAmountBN = window.ethers.utils.parseUnits(
           fromAmount,
           this.props.from.decimals,
@@ -147,7 +143,6 @@ export default class SwapOrderSlide extends Component {
               return SwapFn.getApproveStatus(
                 this.props.from,
                 fromAmountBN,
-                result.route
               ).then((status) => {
                 console.log('Approval Status', status);
                 this.props.onSwapEstimateComplete(
