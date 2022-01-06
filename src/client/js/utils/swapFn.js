@@ -92,7 +92,7 @@ window.SwapFn = {
     );
   },
 
-  calculateMinReturn(fromToken, toToken, amount) {
+  async calculateMinReturn(fromToken, toToken, amount) {
     return this.getExpectedReturn(
       fromToken, toToken, amount
     ).then((actualReturn) => {
@@ -371,7 +371,7 @@ window.SwapFn = {
     }
   },
 
-  swap(fromToken, toToken, amountBN) {
+  async swap(fromToken, toToken, amountBN) {
     const pathRoute = localStorage.getItem('route');
     const chainId = TokenListManager.getCurrentNetworkConfig().chainId;
 
