@@ -44,7 +44,7 @@ export default class AlphaOnboardingCard extends Component {
         function () {
           Promise.all(
             _.map(['METH', 'MUNI', 'MSUSHI', 'MBAL'], function (sym) {
-              return SwapFn._mint(sym, window.ethers.utils.parseEther('100'));
+              return SwapFn.mint(sym, window.ethers.utils.parseEther('100'));
             }),
           ).then(
             function (values) {

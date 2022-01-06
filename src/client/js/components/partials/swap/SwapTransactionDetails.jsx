@@ -17,20 +17,21 @@ export default class SwapTransactionDetails extends Component {
       transactionEstimate: '--',
       highSlippage: false,
     };
-
+    this.subscribers = [];
     this.handleSettingsChange = this.handleSettingsChange.bind(this);
   }
 
   componentDidMount() {
-    this.subNetworkChange = EventManager.listenFor(
-      'swapSettingsUpdated',
-      this.handleSettingsChange,
+    this.subscribers.push(
+      EventManager.listenFor('walletUpdated', this.handleSettingsChange),
     );
     this.updateValues();
   }
 
   componentWillUnmount() {
-    this.subNetworkChange.unsubscribe();
+    this.subscribers.forEach(function (v) {
+      EventManager.unsubscribe(v);
+    });
   }
 
   componentDidUpdate(prevProps) {
@@ -44,11 +45,22 @@ export default class SwapTransactionDetails extends Component {
   }
 
   handleSettingsChange() {
+    this.initState();
     this.updateValues();
+  }
+
+  initState() {
+    this.setState({
+      minReturn: '--',
+      priceImpact: '--',
+      transactionEstimate: '--',
+      highSlippage: false
+    });
   }
 
   async updateValues() {
     if (Wallet.isConnected()) {
+      console.log('## updateValues ### ', 'called');
       var fromAmount = SwapFn.validateEthValue(
         this.props.from,
         this.props.fromAmount,
