@@ -126,31 +126,4 @@ export default {
       console.log(e);
     }
   },
-
-  sendMultipleTransaction: async function (data1, data2) {
-    try {
-      // Send 1st transaction
-      const txHash1 = await window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [data1],
-      });
-      // Check status
-      let txResult = null;
-      while (!txResult) {
-        txResult = await window.ethereum.request({
-          method: 'eth_getTransactionReceipt',
-          params: [txHash1],
-        });
-      }
-      // Send 2nd transaction
-      const txHash2 = await window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [data2],
-      });
-      return txHash2;
-    } catch (e) {
-      console.log(e);
-    }
-    return null;
-  },
 };
