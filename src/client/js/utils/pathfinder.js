@@ -1,16 +1,14 @@
 import Wallet from './wallet';
 
 export default {
-  _baseUrl: 'https://api.swing.xyz',
+  baseUrl: 'https://api.swing.xyz',
 
-  sendGet: async function (url, params = {}) {
+  async sendGet(url, params = {}) {
     let result = null;
 
     try {
-      const endpoint = new URL(`${this._baseUrl}/${url}`);
-      Object.keys(params).forEach((key) =>
-        endpoint.searchParams.append(key, params[key]),
-      );
+      const endpoint = new URL(`${this.baseUrl}/${url}`);
+      Object.keys(params).forEach((key) => endpoint.searchParams.append(key, params[key]),);
       const response = await fetch(endpoint);
 
       if (response.ok) {
@@ -26,11 +24,11 @@ export default {
     return result;
   },
 
-  sendPost: async function (url, params) {
+  async sendPost(url, params) {
     let result = null;
 
     try {
-      const response = await fetch(`${this._baseUrl}/${url}`, {
+      const response = await fetch(`${this.baseUrl}/${url}`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -52,7 +50,7 @@ export default {
     return result;
   },
 
-  getQuote: async function (srcToken, destToken, srcAmount, chainId) {
+  async getQuote(srcToken, destToken, srcAmount, chainId) {
     const priceData = await this.sendGet('quote', {
       chainId,
       srcToken,
@@ -63,7 +61,7 @@ export default {
     return priceData;
   },
 
-  getAllowance: async function (userAddress, tokenAddress, route, chainId) {
+  async getAllowance(userAddress, tokenAddress, route, chainId) {
     const allowance = await this.sendGet('allowance', {
       route, chainId, userAddress, tokenAddress
     });
@@ -71,7 +69,7 @@ export default {
     return allowance;
   },
 
-  getApproveTx: async function (tokenAddress, amount, route, chainId) {
+  async getApproveTx(tokenAddress, amount, route, chainId) {
     const userAddress = Wallet.currentAddress();
     const tx = await this.sendGet('approve/transaction', {
       route,
@@ -85,7 +83,7 @@ export default {
     return txHash;
   },
 
-  getSwap: async function (srcToken, destToken, srcAmount, route, chainId) {
+  async getSwap(srcToken, destToken, srcAmount, route, chainId) {
     const userAddress = Wallet.currentAddress();
     const tx = await this.sendPost('swap', {
       chainId,
@@ -100,7 +98,7 @@ export default {
     return txHash;
   },
 
-  sendTransaction: async function (txObject) {
+  async sendTransaction(txObject) {
     try {
       const txHash = window.ethereum.request({
         method: 'eth_sendTransaction',
@@ -110,11 +108,14 @@ export default {
     } catch (e) {
       console.log('Failed to send transaction:', e);
     }
+
+    return null;
   },
 
-  waitTransaction: async function (txHash) {
+  async waitTransaction(txHash) {
     try {
       let txResult = null;
+      /* eslint-disable no-await-in-loop */
       while (!txResult) {
         txResult = await window.ethereum.request({
           method: 'eth_getTransactionReceipt',
@@ -123,7 +124,9 @@ export default {
       }
       return txResult;
     } catch (e) {
-      console.log(e);
+      console.log('Failed to wait transaction:', e);
     }
+
+    return null;
   },
 };
