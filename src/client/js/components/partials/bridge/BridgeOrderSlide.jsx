@@ -188,7 +188,7 @@ export default class BridgeOrderSlide extends Component {
                   Metrics.track('bridge-estimate-result', {
                     from: this.props.from,
                     to: this.props.to,
-                    fromAmont: fromAmountBN.toString(),
+                    fromAmount: fromAmountBN.toString(),
                     toAmount: this.props.toAmount,
                     swapDistribution: this.props.swapDistribution,
                   });

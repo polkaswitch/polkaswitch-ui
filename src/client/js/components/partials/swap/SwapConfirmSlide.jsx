@@ -69,7 +69,7 @@ export default class SwapConfirmSlide extends Component {
                 Metrics.track('swap-complete', {
                   from: this.props.from,
                   to: this.props.to,
-                  fromAmont: this.props.fromAmount,
+                  fromAmount: this.props.fromAmount,
                 });
 
                 this.setState({

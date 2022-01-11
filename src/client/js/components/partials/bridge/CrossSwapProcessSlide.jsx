@@ -106,7 +106,7 @@ export default class CrossSwapProcessSlide extends Component {
                 fromChain: this.props.fromChain,
                 from: this.props.from,
                 to: this.props.to,
-                fromAmont: this.props.fromAmount,
+                fromAmount: this.props.fromAmount,
               });
 
               if (
@@ -151,7 +151,7 @@ export default class CrossSwapProcessSlide extends Component {
                 fromChain: this.props.fromChain,
                 from: this.props.from,
                 to: this.props.to,
-                fromAmont: this.props.fromAmount,
+                fromAmount: this.props.fromAmount,
               });
 
               this.setState({

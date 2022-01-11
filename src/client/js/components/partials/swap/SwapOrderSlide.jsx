@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import _ from 'underscore';
 import classnames from 'classnames';
 import BN from 'bignumber.js';
@@ -24,94 +25,146 @@ export default class SwapOrderSlide extends Component {
     this.handleTokenAmountChange = this.handleTokenAmountChange.bind(this);
     this.validateOrderForm = this.validateOrderForm.bind(this);
     this.fetchSwapEstimate = this.fetchSwapEstimate.bind(this);
-    this.fetchSingleChainSwapEstimate = this.fetchSingleChainSwapEstimate.bind(this);
+    this.fetchSingleChainSwapEstimate =
+      this.fetchSingleChainSwapEstimate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleMax = this.handleMax.bind(this);
     this.handleTokenSwap = this.handleTokenSwap.bind(this);
   }
 
   componentDidUpdate(prevProps) {
+    const { from, to, refresh, fromAmount } = this.props;
+    const { calculatingSwap } = this.state;
     if (
-      (this.props.from &&
-        this.props.to &&
+      (from &&
+        to &&
         prevProps.from &&
-        this.props.from.address !== prevProps.from.address) ||
-      this.props.to.address !== prevProps.to.address ||
-      this.props.refresh !== prevProps.refresh ||
-      (this.props.fromAmount !== prevProps.fromAmount &&
-        !this.state.calculatingSwap)
+        from.address !== prevProps.from.address) ||
+      to.address !== prevProps.to.address ||
+      refresh !== prevProps.refresh ||
+      (fromAmount !== prevProps.fromAmount && !calculatingSwap)
     ) {
-      if (this.props.fromAmount) {
-        this.fetchSwapEstimate(this.props.fromAmount);
+      if (fromAmount) {
+        this.fetchSwapEstimate(fromAmount);
       }
     }
   }
 
-  fetchSwapEstimate(origFromAmount, timeNow, attempt, cb) {
-    var fromAmount = origFromAmount;
+  handleTokenAmountChange(e) {
+    const { from, to } = this.props;
 
-    if (!attempt) {
-      attempt = 0;
-    } else if (attempt > window.MAX_RETRIES) {
-      this.setState({
-        calculatingSwap: false,
-        errored: true,
-        errorMsg: false,
+    if (!Number.isNaN(+e.target.value)) {
+      let targetAmount = e.target.value;
+
+      // if input is in exponential format, convert to decimal.
+      // we do this because all of our logic does not like the exponential format
+      // when converting to BigNumber.
+      // Otherwise we take the raw number as is, otherwise you get funky
+      // input behaviour (i.e disappearing trailing zeros in decimals)
+      if (targetAmount.toLowerCase().includes('e')) {
+        targetAmount = SwapFn.validateEthValue(from, targetAmount);
+      }
+
+      if (!SwapFn.isValidParseValue(from, targetAmount)) {
+        // do nothing for now.
+        // we don't want to interrupt the INPUT experience,
+        // as it moves the cursor around. we correct the value at the Submit step,
+        // in the higher-order component SwapWidget.jsx
+      }
+
+      Metrics.track('swap-token-value', {
+        value: targetAmount,
+        from,
+        to,
       });
-      console.error('Swap Failure: MAX RETRIES REACHED');
-      return;
+
+      this.fetchSwapEstimate(targetAmount);
     }
+  }
 
-    this.props.onSwapEstimateComplete(
-      origFromAmount,
-      this.props.toAmount,
-      this.props.swapDistribution,
-    );
+  handleSubmit() {
+    const { handleSubmit, from, fromAmount } = this.props;
 
-    if (!fromAmount || fromAmount.length === 0) {
-      fromAmount = '0';
-    } else {
-      fromAmount = SwapFn.validateEthValue(this.props.from, fromAmount);
+    if (!Wallet.isConnected()) {
+      EventManager.emitEvent('promptWalletConnect', 1);
+    } else if (!SwapFn.isValidParseValue(from, fromAmount)) {
+      const correctAmt = SwapFn.validateEthValue(from, fromAmount);
+      this.fetchSwapEstimate(correctAmt, undefined, undefined, handleSubmit);
+    } else if (this.validateOrderForm()) {
+      EventManager.emitEvent('networkHoverableUpdated', { hoverable: false });
+      handleSubmit();
     }
+  }
 
-    if (!timeNow) {
-      timeNow = Date.now();
+  handleTokenSwap(e) {
+    const { onSwapTokens } = this.props;
+    const { calculatingSwap } = this.state;
+
+    if (!calculatingSwap) {
+      onSwapTokens(e);
     }
+  }
 
-    this.calculatingSwapTimestamp = timeNow;
+  handleNetworkDropdownChange(isFrom) {
+    const { handleCrossChainChange } = this.props;
 
-    this.setState(
-      {
-        errored: false,
-        errorMsg: false,
-        calculatingSwap: true,
-      },
-      function (_timeNow, _attempt, _cb) {
-        var fromAmountBN = window.ethers.utils.parseUnits(
-          fromAmount,
-          this.props.from.decimals,
-        );
+    const func = (network) => {
+      if (network.enabled) {
+        Sentry.addBreadcrumb({
+          message: `Action: Network Changed: ${network.name}`,
+        });
 
-        // add delay to slow down UI snappiness
-        _.delay(
-          function (_timeNow2, _attempt2, _cb2) {
-            if (this.calculatingSwapTimestamp !== _timeNow2) {
-              return;
-            }
-            this.fetchSingleChainSwapEstimate(
-              origFromAmount,
-              fromAmountBN,
-              _timeNow2,
-              _attempt2,
-              _cb2,
+        handleCrossChainChange(isFrom, network);
+      }
+    };
+
+    return func;
+  }
+
+  handleMax() {
+    const { from } = this.props;
+
+    if (Wallet.isConnected() && from.address) {
+      Wallet.getBalance(from)
+        .then((bal) => {
+          _.defer(() => {
+            // balance is in WEI and is a BigNumber
+            this.fetchSwapEstimate(
+              window.ethers.utils.formatUnits(bal, from.decimals),
             );
-          }.bind(this),
-          500,
-          _timeNow,
-          _attempt,
-          _cb,
-        );
-      }.bind(this, timeNow, attempt, cb),
+          });
+        })
+        .catch((e) => {
+          console.error('Failed to get balance for MAX', e);
+          // try again
+          this.handleMax();
+        });
+    }
+  }
+
+  hasSufficientBalance() {
+    const { availableBalance, fromAmount, from } = this.props;
+
+    if (Wallet.isConnected() && availableBalance && fromAmount && from) {
+      const balBN = BN(availableBalance);
+      const fromBN = BN(fromAmount);
+      return fromBN.lte(balBN);
+    }
+    return true;
+  }
+
+  validateOrderForm() {
+    const { from, to, fromAmount, toAmount } = this.props;
+    const { calculatingSwap } = this.state;
+
+    return (
+      from &&
+      to &&
+      fromAmount &&
+      fromAmount.length > 0 &&
+      toAmount &&
+      toAmount.length > 0 &&
+      !calculatingSwap
     );
   }
 
@@ -122,209 +175,121 @@ export default class SwapOrderSlide extends Component {
     _attempt2,
     _cb2,
   ) {
-    return SwapFn.getExpectedReturn(
-      this.props.from,
-      this.props.to,
-      fromAmountBN,
-    )
-      .then(
-        function (_timeNow3, _cb3, result) {
-          if (this.calculatingSwapTimestamp !== _timeNow3) {
-            return;
-          }
+    const { from, to, toAmount, swapDistribution, onSwapEstimateComplete } =
+      this.props;
 
-          var dist = _.map(result.distribution, function (e) {
-            return e.toNumber();
+    return SwapFn.getExpectedReturn(from, to, fromAmountBN)
+      .then((result) => {
+        if (this.calculatingSwapTimestamp !== _timeNow2) return;
+
+        const dist = _.map(result.distribution, (e) => e.toNumber());
+
+        Wallet.getBalance(from)
+          .then((bal) =>
+            SwapFn.getApproveStatus(from, fromAmountBN).then((status) => {
+              onSwapEstimateComplete(
+                origFromAmount,
+                window.ethers.utils.formatUnits(
+                  result.returnAmount,
+                  to.decimals,
+                ),
+                dist,
+                window.ethers.utils.formatUnits(bal, from.decimals),
+                status,
+              );
+
+              this.setState(
+                {
+                  calculatingSwap: false,
+                },
+                () => {
+                  if (_cb2) {
+                    _cb2();
+                  }
+
+                  Metrics.track('swap-estimate-result', {
+                    from,
+                    to,
+                    fromAmount: fromAmountBN.toString(),
+                    toAmount,
+                    swapDistribution,
+                  });
+                },
+              );
+            }),
+          )
+          .catch((e) => {
+            console.error('Failed to get swap estimate: ', e);
           });
-          console.log('Changed Dist=', dist);
+      })
+      .catch((e) => {
+        console.error('Failed to get swap estimate: ', e);
 
-          Wallet.getBalance(this.props.from)
-            .then((bal) => {
-              return SwapFn.getApproveStatus(
-                this.props.from,
-                fromAmountBN,
-              ).then((status) => {
-                console.log('Approval Status', status);
-                this.props.onSwapEstimateComplete(
-                  origFromAmount,
-                  window.ethers.utils.formatUnits(
-                    result.returnAmount,
-                    this.props.to.decimals,
-                  ),
-                  dist,
-                  window.ethers.utils.formatUnits(
-                    bal,
-                    this.props.from.decimals,
-                  ),
-                  status,
-                );
+        if (this.calculatingSwapTimestamp !== _timeNow2) return;
 
-                this.setState(
-                  {
-                    calculatingSwap: false,
-                  },
-                  () => {
-                    if (_cb3) {
-                      _cb3();
-                    }
-
-                    Metrics.track('swap-estimate-result', {
-                      from: this.props.from,
-                      to: this.props.to,
-                      fromAmont: fromAmountBN.toString(),
-                      toAmount: this.props.toAmount,
-                      swapDistribution: this.props.swapDistribution,
-                    });
-                  },
-                );
-              });
-            })
-            .catch((e) => {
-              console.error('Failed to get swap estimate: ', e);
-            });
-        }.bind(this, _timeNow2, _cb2),
-      )
-      .catch(
-        function (_timeNow3, _attempt3, _cb3, e) {
-          console.error('Failed to get swap estimate: ', e);
-          if (this.calculatingSwapTimestamp !== _timeNow3) {
-            return;
-          }
-
-          // try again
-          this.fetchSwapEstimate(
-            origFromAmount,
-            _timeNow3,
-            _attempt3 + 1,
-            _cb3,
-          );
-        }.bind(this, _timeNow2, _attempt2, _cb2),
-      );
-  }
-
-  handleTokenAmountChange(e) {
-    if (!isNaN(+e.target.value)) {
-      var targetAmount = e.target.value;
-
-      // if input is in exponential format, convert to decimal.
-      // we do this because all of our logic does not like the exponential format
-      // when converting to BigNumber.
-      // Otherwise we take the raw number as is, otherwise you get funky
-      // input behaviour (i.e disappearing trailing zeros in decimals)
-      if (targetAmount.toLowerCase().includes('e')) {
-        targetAmount = SwapFn.validateEthValue(this.props.from, targetAmount);
-      }
-
-      if (!SwapFn.isValidParseValue(this.props.from, targetAmount)) {
-        // do nothing for now.
-        // we don't want to interrupt the INPUT experience,
-        // as it moves the cursor around. we correct the value at the Submit step,
-        // in the higher-order component SwapWidget.jsx
-      }
-
-      Metrics.track('swap-token-value', {
-        value: targetAmount,
-        from: this.props.from,
-        to: this.props.to,
+        // try again
+        this.fetchSwapEstimate(origFromAmount, _timeNow2, _attempt2 + 1, _cb2);
       });
+  }
 
-      this.fetchSwapEstimate(targetAmount);
+  fetchSwapEstimate(origFromAmount, timeNow = Date.now(), attempt = 0, cb) {
+    const { onSwapEstimateComplete, toAmount, swapDistribution, from } =
+      this.props;
+    let fromAmount = origFromAmount;
+
+    if (attempt > window.MAX_RETRIES) {
+      this.setState({
+        calculatingSwap: false,
+        errored: true,
+        errorMsg: false,
+      });
+      console.error('Swap Failure: MAX RETRIES REACHED');
+      return;
     }
-  }
 
-  validateOrderForm() {
-    return (
-      this.props.from &&
-      this.props.to &&
-      this.props.fromAmount &&
-      this.props.fromAmount.length > 0 &&
-      this.props.toAmount &&
-      this.props.toAmount.length > 0 &&
-      !this.state.calculatingSwap
-    );
-  }
+    onSwapEstimateComplete(origFromAmount, toAmount, swapDistribution);
 
-  hasSufficientBalance() {
-    if (
-      Wallet.isConnected() &&
-      this.props.availableBalance &&
-      this.props.fromAmount &&
-      this.props.from
-    ) {
-      var balBN = BN(this.props.availableBalance);
-      var fromBN = BN(this.props.fromAmount);
-      return fromBN.lte(balBN);
+    if (!fromAmount || fromAmount.length === 0) {
+      fromAmount = '0';
     } else {
-      return true;
+      fromAmount = SwapFn.validateEthValue(from, fromAmount);
     }
-  }
 
-  handleSubmit(e) {
-    if (!Wallet.isConnected()) {
-      EventManager.emitEvent('promptWalletConnect', 1);
-    } else if (
-      !SwapFn.isValidParseValue(this.props.from, this.props.fromAmount)
-    ) {
-      var correctAmt = SwapFn.validateEthValue(
-        this.props.from,
-        this.props.fromAmount,
-      );
-      this.fetchSwapEstimate(
-        correctAmt,
-        undefined,
-        undefined,
-        this.props.handleSubmit,
-      );
-    } else if (this.validateOrderForm()) {
-      EventManager.emitEvent('networkHoverableUpdated', { hoverable: false });
-      this.props.handleSubmit();
-    }
-  }
+    this.calculatingSwapTimestamp = timeNow;
 
-  handleTokenSwap(e) {
-    if (!this.state.calculatingSwap) {
-      this.props.onSwapTokens(e);
-    }
-  }
-
-  handleNetworkDropdownChange(isFrom) {
-    return function (network) {
-      if (network.enabled) {
-        Sentry.addBreadcrumb({
-          message: 'Action: Network Changed: ' + network.name,
-        });
-
-        this.props.handleCrossChainChange(isFrom, network);
-      }
-    }.bind(this);
-  }
-
-  handleMax() {
-    if (Wallet.isConnected() && this.props.from.address) {
-      Wallet.getBalance(this.props.from)
-        .then(
-          function (bal) {
-            _.defer(
-              function () {
-                // balance is in WEI and is a BigNumber
-                this.fetchSwapEstimate(
-                  window.ethers.utils.formatUnits(
-                    bal,
-                    this.props.from.decimals,
-                  ),
-                );
-              }.bind(this),
-            );
-          }.bind(this),
-        )
-        .catch(
-          function (e) {
-            console.error('Failed to get balance for MAX', e);
-            // try again
-            this.handleMax();
-          }.bind(this),
+    this.setState(
+      {
+        errored: false,
+        errorMsg: false,
+        calculatingSwap: true,
+      },
+      () => {
+        const fromAmountBN = window.ethers.utils.parseUnits(
+          fromAmount,
+          from.decimals,
         );
-    }
+
+        // add delay to slow down UI snappiness
+        _.delay(
+          (_timeNow2, _attempt2, _cb2) => {
+            if (this.calculatingSwapTimestamp !== _timeNow2) {
+              return;
+            }
+            this.fetchSingleChainSwapEstimate(
+              origFromAmount,
+              fromAmountBN,
+              _timeNow2,
+              _attempt2,
+              _cb2,
+            );
+          },
+          500,
+          timeNow,
+          attempt,
+          cb,
+        );
+      },
+    );
   }
 
   renderTokenInput(target, token) {
@@ -332,22 +297,33 @@ export default class SwapOrderSlide extends Component {
       return <div />;
     }
 
-    var isFrom = target === 'from';
+    const {
+      fromAmount,
+      toAmount,
+      refresh,
+      fromChain,
+      toChain,
+      handleSearchToggle,
+    } = this.props;
+    const { calculatingSwap, errored, errorMsg } = this.state;
+    const isFrom = target === 'from';
+    const targetAmount = target === 'from' ? fromAmount : toAmount;
 
     return (
       <div className="level is-mobile">
         <div
           className="level is-mobile is-narrow my-0 token-dropdown"
-          onClick={this.props.handleSearchToggle(target)}
+          role="presentation"
+          onClick={handleSearchToggle(target)}
         >
           <TokenIconBalanceGroupView
-            network={isFrom ? this.props.fromChain : this.props.toChain}
+            network={isFrom ? fromChain : toChain}
             token={token}
-            refresh={this.props.refresh}
+            refresh={refresh}
           />
           <div className="level-item">
             <span className="icon-down">
-              <ion-icon name="chevron-down"></ion-icon>
+              <ion-icon name="chevron-down" />
             </span>
           </div>
         </div>
@@ -355,33 +331,33 @@ export default class SwapOrderSlide extends Component {
           <div className="field" style={{ width: '100%', maxWidth: '250px' }}>
             <div
               className={classnames('control', {
-                'is-loading': !isFrom && this.state.calculatingSwap,
+                'is-loading': !isFrom && calculatingSwap,
               })}
               style={{ width: '100%' }}
             >
               <input
                 onChange={this.handleTokenAmountChange}
-                value={
-                  !isFrom && this.state.errored
-                    ? ''
-                    : this.props[`${target}Amount`] || ''
-                }
+                value={!isFrom && errored ? '' : targetAmount || ''}
                 type="number"
                 min="0"
                 lang="en"
                 step="0.000000000000000001"
                 className={classnames('input is-medium', {
-                  //"is-danger": isFrom && !this.hasSufficientBalance(),
+                  // "is-danger": isFrom && !this.hasSufficientBalance(),
                   'is-to': !isFrom,
                   'is-from': isFrom,
-                  'is-danger': !isFrom && this.state.errored,
+                  'is-danger': !isFrom && errored,
                 })}
                 placeholder="0.0"
                 disabled={!isFrom}
               />
 
               {isFrom && (
-                <div className="max-btn" onClick={this.handleMax}>
+                <div
+                  className="max-btn"
+                  role="presentation"
+                  onClick={this.handleMax}
+                >
                   Max
                 </div>
               )}
@@ -390,9 +366,9 @@ export default class SwapOrderSlide extends Component {
                 <div className="warning-funds">Insufficient funds</div>
               )}
 
-              {!isFrom && this.state.errored && (
+              {!isFrom && errored && (
                 <div className="warning-funds">
-                  {this.state.errorMsg || 'Estimate failed. Try again'}
+                  {errorMsg || 'Estimate failed. Try again'}
                 </div>
               )}
             </div>
@@ -403,6 +379,8 @@ export default class SwapOrderSlide extends Component {
   }
 
   render() {
+    const { handleSettingsToggle, swapDistribution, from, to } = this.props;
+
     return (
       <div className="page page-view-order">
         <div className="page-inner">
@@ -411,9 +389,10 @@ export default class SwapOrderSlide extends Component {
               <div className="level-item">
                 <span
                   className="icon clickable settings-icon"
-                  onClick={this.props.handleSettingsToggle}
+                  role="presentation"
+                  onClick={handleSettingsToggle}
                 >
-                  <ion-icon name="settings-outline"></ion-icon>
+                  <ion-icon name="settings-outline" />
                 </span>
               </div>
             </div>
@@ -423,17 +402,25 @@ export default class SwapOrderSlide extends Component {
             <div className="text-gray-stylized">
               <span>You Pay</span>
             </div>
-            {this.renderTokenInput('from', this.props.from)}
+            {this.renderTokenInput('from', from)}
           </div>
 
           <div className="swap-icon-wrapper">
-            <div className="swap-icon-v2 icon" onClick={this.handleTokenSwap}>
-              <ion-icon name="swap-vertical-outline"></ion-icon>
+            <div
+              className="swap-icon-v2 icon"
+              role="presentation"
+              onClick={this.handleTokenSwap}
+            >
+              <ion-icon name="swap-vertical-outline" />
             </div>
 
-            <div className="swap-icon is-hidden" onClick={this.handleTokenSwap}>
-              <i className="fas fa-long-arrow-alt-up"></i>
-              <i className="fas fa-long-arrow-alt-down"></i>
+            <div
+              className="swap-icon is-hidden"
+              role="presentation"
+              onClick={this.handleTokenSwap}
+            >
+              <i className="fas fa-long-arrow-alt-up" />
+              <i className="fas fa-long-arrow-alt-down" />
             </div>
           </div>
 
@@ -441,13 +428,13 @@ export default class SwapOrderSlide extends Component {
             <div className="text-gray-stylized">
               <span>You Receive</span>
             </div>
-            {this.renderTokenInput('to', this.props.to)}
+            {this.renderTokenInput('to', to)}
           </div>
 
           <div
             className={classnames('hint--large', 'token-dist-expand-wrapper', {
-              'hint--top': this.props.swapDistribution,
-              expand: this.props.swapDistribution,
+              'hint--top': swapDistribution,
+              expand: swapDistribution,
             })}
             aria-label="We have queried multiple exchanges to find the best possible pricing for this swap. The below routing chart shows which exchanges we used to achieve the best swap."
           >
@@ -455,11 +442,12 @@ export default class SwapOrderSlide extends Component {
               <span>Routing Distribution</span>
               <span className="hint-icon">?</span>
             </div>
-            <TokenSwapDistribution parts={this.props.swapDistribution} />
+            <TokenSwapDistribution parts={swapDistribution} />
           </div>
 
           <div>
             <button
+              type="button"
               disabled={Wallet.isConnected() && !this.validateOrderForm()}
               className="button is-primary is-fullwidth is-medium"
               onClick={this.handleSubmit}
@@ -472,3 +460,27 @@ export default class SwapOrderSlide extends Component {
     );
   }
 }
+
+SwapOrderSlide.propTypes = {
+  handleCrossChainChange: PropTypes.func.isRequired,
+  handleSearchToggle: PropTypes.func.isRequired,
+  handleSettingsToggle: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  swapDistribution: PropTypes.func.isRequired,
+  onSwapTokens: PropTypes.func.isRequired,
+  onSwapEstimateComplete: PropTypes.func.isRequired,
+  refresh: PropTypes.func.isRequired,
+  from: PropTypes.objectOf(PropTypes.object).isRequired,
+  to: PropTypes.objectOf(PropTypes.object).isRequired,
+  fromChain: PropTypes.objectOf(PropTypes.object).isRequired,
+  toChain: PropTypes.objectOf(PropTypes.object).isRequired,
+  fromAmount: PropTypes.string,
+  toAmount: PropTypes.string,
+  availableBalance: PropTypes.string,
+};
+
+SwapOrderSlide.defaultProps = {
+  fromAmount: '0',
+  toAmount: '0',
+  availableBalance: undefined,
+};

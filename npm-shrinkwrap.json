@@ -5,6 +5,7 @@
   "requires": true,
   "packages": {
     "": {
+      "name": "polkaswitch-ui",
       "version": "1.0.0",
       "dependencies": {
         "@sentry/node": "6.11.0",
@@ -25,6 +26,7 @@
         "numeral": "2.0.6",
         "passport": "^0.4.1",
         "passport-local": "^1.0.0",
+        "prop-types": "^15.8.1",
         "react": "17.0.2",
         "react-custom-scroll": "4.2.2",
         "react-dom": "17.0.2",
@@ -23985,13 +23987,13 @@
       }
     },
     "node_modules/prop-types": {
-      "version": "15.7.2",
-      "resolved": "https://registry.npmjs.org/prop-types/-/prop-types-15.7.2.tgz",
-      "integrity": "sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==",
+      "version": "15.8.1",
+      "resolved": "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz",
+      "integrity": "sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==",
       "dependencies": {
         "loose-envify": "^1.4.0",
         "object-assign": "^4.1.1",
-        "react-is": "^16.8.1"
+        "react-is": "^16.13.1"
       }
     },
     "node_modules/proxy-addr": {
@@ -32463,7 +32465,9 @@
           "resolved": "https://registry.npmjs.org/ajv-formats/-/ajv-formats-2.1.1.tgz",
           "integrity": "sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==",
           "dev": true,
-          "requires": {}
+          "requires": {
+            "ajv": "^8.0.0"
+          }
         },
         "ethers": {
           "version": "5.4.6",
@@ -32946,7 +32950,9 @@
           "resolved": "https://registry.npmjs.org/ajv-formats/-/ajv-formats-2.1.1.tgz",
           "integrity": "sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==",
           "dev": true,
-          "requires": {}
+          "requires": {
+            "ajv": "^8.0.0"
+          }
         },
         "ansi-styles": {
           "version": "4.3.0",
@@ -33625,7 +33631,9 @@
           "resolved": "https://registry.npmjs.org/ajv-formats/-/ajv-formats-2.1.1.tgz",
           "integrity": "sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==",
           "dev": true,
-          "requires": {}
+          "requires": {
+            "ajv": "^8.0.0"
+          }
         },
         "ansi-styles": {
           "version": "4.3.0",
@@ -49010,13 +49018,13 @@
       }
     },
     "prop-types": {
-      "version": "15.7.2",
-      "resolved": "https://registry.npmjs.org/prop-types/-/prop-types-15.7.2.tgz",
-      "integrity": "sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==",
+      "version": "15.8.1",
+      "resolved": "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz",
+      "integrity": "sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==",
       "requires": {
         "loose-envify": "^1.4.0",
         "object-assign": "^4.1.1",
-        "react-is": "^16.8.1"
+        "react-is": "^16.13.1"
       }
     },
     "proxy-addr": {
