@@ -303,7 +303,12 @@ export default class BridgeOrderSlide extends Component {
       this.props.onSwapTokens(e);
     }
   }
+  handleTransferFromSolanaToEthereum(){
 
+  }
+  handleTransferFromEthereumToSolana(){
+    
+  }
   handleNetworkDropdownChange(isFrom) {
     return function (network) {
       if (network.enabled) {
@@ -506,6 +511,23 @@ export default class BridgeOrderSlide extends Component {
               {Wallet.isConnected() ? 'Review Bridge Order' : 'Connect Wallet'}
             </button>
           </div>
+          <div className="bridge-order-btn-wrapper">
+            <button
+              className="button is-primary bridge-order-btn"
+              onClick={this.handleTransferFromSolanaToEthereum}
+            >
+              Transfer From SOL To ETH
+            </button>
+          </div>
+          <div className="bridge-order-btn-wrapper">
+            <button
+              className="button is-primary bridge-order-btn"
+              onClick={this.handleTransferFromEthereumToSolana}
+            >
+              Transfer From ETH To SOL
+            </button>
+          </div>
+          
         </div>
       </div>
     );

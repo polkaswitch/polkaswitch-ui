@@ -41,44 +41,6 @@
     ]
   },
   {
-    "enabled": true,
-    "name": "Solana",
-    "aggregatorAddress": "0x689236A0C4A391FdD76dE5c6a759C7984166d166",
-    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png",
-    "bridgeURI": "https://wallet.matic.network/",
-    "tokenList": "/tokens/eth.list.json",
-    "chainId": "2",
-    "nodeProviders": [
-      "https://eth-mainnet.alchemyapi.io/v2/hrkUnlgn_VD_KbxEjpo7D2mVwTfAVUJW"
-    ],
-    "explorerBaseUrl": "https://etherscan.io/tx/",
-    "gasApi": "https://ethgasstation.info/json/ethgasAPI.json",
-    "color": "#5C69B5",
-    "desiredParts": 3,
-    "abi": "oneSplitAbi",
-    "chain": {
-      "chainId": "0x1",
-      "chainName": "Ethereum Mainnet"
-    },
-    "defaultPair": {
-      "to": "USDT",
-      "from": "USDC"
-    },
-    "topTokens": [
-      "USDT",
-      "USDC"
-    ],
-    "coingecko": {
-      "platform": "solana"
-    },
-    "singleChainSupported": false,
-    "crossChainSupported": true,
-    "supportedCrossChainTokens": [
-      "USDT",
-      "USDC"
-    ]
-  },
-  {
     "enabled": false,
     "name": "Arbitrum",
     "aggregatorAddress": "0x689236A0C4A391FdD76dE5c6a759C7984166d166",
