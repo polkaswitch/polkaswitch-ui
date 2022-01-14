@@ -277,27 +277,52 @@ window.WalletJS = {
   _connectProviderWalletConnect: function () {
     let network = TokenListManager.getCurrentNetworkConfig();
 
-    const provider = new WalletConnectProvider({
-      rpc: {
-        137: 'https://rpc-mainnet.maticvigil.com',
-      },
-      chainId: 137,
+    // const provider = new WalletConnectProvider({
+    //   rpc: {
+    //     137: 'https://rpc-mainnet.maticvigil.com',
+    //   },
+    //   chainId: 137,
+    // });
+    // provider
+    //   .enable()
+    //   .then(
+    //     function (v) {
+    //       var web3Provider = new ethers.providers.Web3Provider(provider);
+
+    //       return this._saveConnection(web3Provider, 'walletConnect');
+    //     }.bind(this),
+    //   )
+    //   .catch(function (e) {
+    //     console.error(e);
+    //   });
+
+    // this.initListeners(provider);
+
+    detectEthereumProvider()
+    .then((detectedProvider) => {
+      if (detectedProvider) {
+        const provider = new ethers.providers.Web3Provider(
+          // @ts-ignore
+          detectedProvider,
+          "any"
+        );
+
+        provider
+          .enable()
+          .then(
+            function (v) {
+              var web3Provider = new ethers.providers.Web3Provider(provider);
+
+              return this._saveConnection(web3Provider, 'walletConnect');
+            }.bind(this),
+          )
+          .catch(function (e) {
+            console.error(e);
+          });
+      }
+
+      this.initListeners(provider);
     });
-
-    provider
-      .enable()
-      .then(
-        function (v) {
-          var web3Provider = new ethers.providers.Web3Provider(provider);
-
-          return this._saveConnection(web3Provider, 'walletConnect');
-        }.bind(this),
-      )
-      .catch(function (e) {
-        console.error(e);
-      });
-
-    this.initListeners(provider);
   },
 
   _connectProviderMetamask: function () {

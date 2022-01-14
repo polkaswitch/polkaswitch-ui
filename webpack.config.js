@@ -121,7 +121,9 @@ module.exports = (env) => {
     devtool : isProduction ? 'source-map' : 'inline-source-map',
     plugins: plugins,
     experiments: {
-      topLevelAwait: true
+      topLevelAwait: true,
+      asyncWebAssembly: true,
+      syncWebAssembly: true
     }
   };
 };

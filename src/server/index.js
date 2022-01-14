@@ -17,6 +17,7 @@ var passport = require('./middleware/auth');
 
 const isProduction = process.env.NODE_ENV === 'production';
 const app = express();
+express.static.mime.types['wasm'] = 'application/wasm';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,

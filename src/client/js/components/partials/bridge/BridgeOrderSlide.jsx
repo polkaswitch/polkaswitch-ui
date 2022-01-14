@@ -10,10 +10,11 @@ import Metrics from '../../../utils/metrics';
 import EventManager from '../../../utils/events';
 import SwapFn from '../../../utils/swapFn';
 import AvailableRoutes from './AvailableRoutes';
+import SolanaToEth from '../../partials/SolanaToEth';
 
 import TxBridgeManager from '../../../utils/txBridgeManager';
-
 export default class BridgeOrderSlide extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -303,12 +304,7 @@ export default class BridgeOrderSlide extends Component {
       this.props.onSwapTokens(e);
     }
   }
-  handleTransferFromSolanaToEthereum(){
 
-  }
-  handleTransferFromEthereumToSolana(){
-    
-  }
   handleNetworkDropdownChange(isFrom) {
     return function (network) {
       if (network.enabled) {
@@ -512,20 +508,7 @@ export default class BridgeOrderSlide extends Component {
             </button>
           </div>
           <div className="bridge-order-btn-wrapper">
-            <button
-              className="button is-primary bridge-order-btn"
-              onClick={this.handleTransferFromSolanaToEthereum}
-            >
-              Transfer From SOL To ETH
-            </button>
-          </div>
-          <div className="bridge-order-btn-wrapper">
-            <button
-              className="button is-primary bridge-order-btn"
-              onClick={this.handleTransferFromEthereumToSolana}
-            >
-              Transfer From ETH To SOL
-            </button>
+            <SolanaToEth/>
           </div>
           
         </div>
