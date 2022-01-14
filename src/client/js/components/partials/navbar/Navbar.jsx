@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import NavMenu from './NavMenu';
 import ConnectWalletButton from '../ConnectWalletButton';
+import SolanaWalletConnect from '../SolanaWalletConnect';
 import NotificationButton from '../NotificationButton';
 import BridgeButton from '../BridgeButton';
 import Settings from '../Settings';
@@ -32,6 +33,9 @@ export default class Navbar extends Component {
           </div>
           <div className="level-item is-narrow">
             <ConnectWalletButton />
+          </div>
+          <div className="level-item is-narrow">
+            <SolanaWalletConnect />
           </div>
           {/*<div className="level-item"><Settings /></div>*/}
         </div>

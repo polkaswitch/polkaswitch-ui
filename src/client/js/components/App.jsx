@@ -18,7 +18,7 @@ import Footer from './partials/Footer';
 import { keepTheme } from '../utils/theme';
 import { BalanceProvider } from '../context/balance';
 import useLoadBalances from './pages/useLoadBalance';
-
+import {SolanaWalletProvider} from '../context/solana-wallet';
 require('../../css/index.scss');
 
 const App = () => {
@@ -46,43 +46,45 @@ const App = () => {
     useLoadBalances();
 
   return (
-    <BalanceProvider
-      value={{ ...myApplicationState, setMyApplicationState, loadBalances }}
-    >
-      {myApplicationState && (
-        <Router>
-          <div className={classnames({ fullscreen: isFullScreen })}>
-            <Switch>
-              <Route exact path="/">
-                <Redirect to="/swap" />
-              </Route>
-              <Route path="/swap">
-                <SwapHome />
-              </Route>
-              <Route path="/bridge">
-                <BridgeHome />
-              </Route>
-              <Route path="/claim">
-                <TokenClaimHome />
-              </Route>
-              <Route path="/stake">
-                <StakeHome />
-              </Route>
-              <Route path="/wallet">
-                <WalletHome />
-              </Route>
-              <Route path="/status">
-                <StatusHome />
-              </Route>
-              <Route>
-                <Redirect to="/swap" />
-              </Route>
-            </Switch>
-            <Footer />
-          </div>
-        </Router>
-      )}
-    </BalanceProvider>
+    <SolanaWalletProvider>
+      <BalanceProvider
+        value={{ ...myApplicationState, setMyApplicationState, loadBalances }}
+      >
+        {myApplicationState && (
+          <Router>
+            <div className={classnames({ fullscreen: isFullScreen })}>
+              <Switch>
+                <Route exact path="/">
+                  <Redirect to="/swap" />
+                </Route>
+                <Route path="/swap">
+                  <SwapHome />
+                </Route>
+                <Route path="/bridge">
+                  <BridgeHome />
+                </Route>
+                <Route path="/claim">
+                  <TokenClaimHome />
+                </Route>
+                <Route path="/stake">
+                  <StakeHome />
+                </Route>
+                <Route path="/wallet">
+                  <WalletHome />
+                </Route>
+                <Route path="/status">
+                  <StatusHome />
+                </Route>
+                <Route>
+                  <Redirect to="/swap" />
+                </Route>
+              </Switch>
+              <Footer />
+            </div>
+          </Router>
+        )}
+      </BalanceProvider>
+    </SolanaWalletProvider>
   );
 };
 
