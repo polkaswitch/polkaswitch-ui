@@ -104,7 +104,7 @@ export async function transferFromSOL2ETH(solanaWallet){
   var originChain = CHAIN_ID_ETH; 
   var originAsset = uint8ArrayToHex(zeroPad(hexToUint8Array(erc20USDT.slice(2)), 32)) // origin asset  will be changed by the token mint
 
-  var amount = '0.5'; // amount
+  var amount = '0.1'; // amount
   var targetChain = CHAIN_ID_ETH; // target chain
   
   var targetAddress = zeroPad(hexToUint8Array(Wallet.currentAddress().slice(2)), 32) // target address
@@ -113,7 +113,7 @@ export async function transferFromSOL2ETH(solanaWallet){
   var terraWallet = null; // terra wallet
   var sourceParsedTokenAccount = usdtToken; // source parsed token account
 
-  var singedVAA = await crossTransfer(
+  var signedVAAHex = await crossTransfer(
     sourceChain, // source chain
     
     sourceAsset, // source asset
@@ -129,6 +129,18 @@ export async function transferFromSOL2ETH(solanaWallet){
     terraWallet, // terra wallet
     sourceParsedTokenAccount // source parsed token account
   );
+  console.log(signedVAAHex);
+  var signedVAA = hexToUint8Array(signedVAAHex);
+  console.log("Redeeming from wormhole");
+
+  await redeemToken(
+    targetChain,
+    signedVAA,
+    signer,
+    solanaWallet,
+    terraWallet
+  );
+
 }
 
 export async function transferFromETH2SOL(){
