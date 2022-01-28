@@ -1,15 +1,17 @@
 import React from 'react';
-import TokenListManager from '../../../utils/tokenList';
-import TokenIconImg from '../TokenIconImg';
 import * as ethers from 'ethers';
 import BN from 'bignumber.js';
-import { BigNumber, constants, providers, Signer, utils } from 'ethers';
+import {
+  BigNumber, constants, providers, Signer, utils
+} from 'ethers';
+import TokenIconImg from '../TokenIconImg';
+import TokenListManager from '../../../utils/tokenList';
 
 export default function AssetTableRow({ data }) {
   const Utils = window.ethers.utils;
 
-  let network = TokenListManager.getNetworkById(data.chainId);
-  let fullOutput = utils.formatUnits(data.balanceBN, data.decimals);
+  const network = TokenListManager.getNetworkById(data.chainId);
+  const fullOutput = utils.formatUnits(data.balanceBN, data.decimals);
 
   return (
     <div className="columns wallets-page-tokens-table__row is-mobile">
@@ -20,7 +22,10 @@ export default function AssetTableRow({ data }) {
             {data.name || data.symbol}
           </h4>
           <span className="wallets-page-tokens-table__sub">
-            {data.symbol} &middot; <span>{network.name}</span>
+            {data.symbol}
+            {' '}
+            &middot;
+            <span>{network.name}</span>
           </span>
         </div>
       </div>

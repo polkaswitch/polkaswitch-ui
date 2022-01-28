@@ -5,12 +5,12 @@ import * as ethers from 'ethers';
 import numeral from 'numeral';
 import moment from 'moment';
 
-const BigNumber = ethers.BigNumber;
-const Utils = ethers.utils;
-
 import TokenListManager from '../../utils/tokenList';
 
 import TxExplorerLink from './TxExplorerLink';
+
+const { BigNumber } = ethers;
+const Utils = ethers.utils;
 
 export default class TxCrossChainActiveStatusView extends Component {
   constructor(props) {
@@ -25,40 +25,40 @@ export default class TxCrossChainActiveStatusView extends Component {
   }
 
   render() {
-    var txData = this.props.data.crosschainTx;
+    const txData = this.props.data.crosschainTx;
 
     if (!txData) {
       return <div />;
     }
 
-    var sendingChain = TokenListManager.getNetworkById(
+    const sendingChain = TokenListManager.getNetworkById(
       txData.invariant.sendingChainId,
     );
-    var receivingChain = TokenListManager.getNetworkById(
+    const receivingChain = TokenListManager.getNetworkById(
       txData.invariant.receivingChainId,
     );
-    var sendingAsset = TokenListManager.findTokenById(
+    const sendingAsset = TokenListManager.findTokenById(
       Utils.getAddress(txData.invariant.sendingAssetId),
       sendingChain,
     );
-    var receivingAsset = TokenListManager.findTokenById(
+    const receivingAsset = TokenListManager.findTokenById(
       Utils.getAddress(txData.invariant.receivingAssetId),
       receivingChain,
     );
 
-    var input = txData.sending.amount
+    const input = txData.sending.amount
       ? numeral(
-          Utils.formatUnits(txData.sending.amount, sendingAsset.decimals),
-        ).format('0.0000a')
+        Utils.formatUnits(txData.sending.amount, sendingAsset.decimals),
+      ).format('0.0000a')
       : '--';
 
-    var icon, lang, clazz;
+    let icon; let lang; let
+      clazz;
 
-    var isActionNeeded =
-      this.props.data.status === 'ReceiverTransactionPrepared';
+    const isActionNeeded = this.props.data.status === 'ReceiverTransactionPrepared';
 
     if (isActionNeeded) {
-      icon = <ion-icon name="information-circle"></ion-icon>;
+      icon = <ion-icon name="information-circle" />;
       lang = <div>ACTION NEEDED</div>;
       clazz = 'action';
     } else {
@@ -75,10 +75,21 @@ export default class TxCrossChainActiveStatusView extends Component {
         <div className="level-item tx-content">
           <div>
             <div>
-              {lang} {input} {sendingAsset.symbol} to {receivingAsset.symbol}
+              {lang}
+              {' '}
+              {input}
+              {' '}
+              {sendingAsset.symbol}
+              {' '}
+              to
+              {' '}
+              {receivingAsset.symbol}
             </div>
             <div>
-              {sendingChain.name} > {receivingChain.name}
+              {sendingChain.name}
+              {' '}
+              &gt;
+              {receivingChain.name}
             </div>
             <div className="tx-meta">
               {moment(this.props.data.preparedTimestamp * 1000).fromNow()}

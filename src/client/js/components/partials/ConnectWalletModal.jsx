@@ -42,7 +42,7 @@ export default class ConnectWalletModal extends Component {
 
       Metrics.track('connect-wallet', { type: target });
       EventManager.emitEvent('initiateWalletConnect', target);
-    }.bind(this);
+    };
   }
 
   handleDisconnect(e) {
@@ -73,14 +73,13 @@ export default class ConnectWalletModal extends Component {
   }
 
   render() {
-    var currentNetworkName =
-      TokenListManager.getCurrentNetworkConfig().chain.chainName;
+    const currentNetworkName = TokenListManager.getCurrentNetworkConfig().chain.chainName;
 
     return (
       <BasicModal
-        modalClasses={'modal-dropdown-options'}
+        modalClasses="modal-dropdown-options"
         open={this.state.open}
-        title={'Connect Your Wallet'}
+        title="Connect Your Wallet"
         handleClose={this.handleClose}
       >
         <div
@@ -107,24 +106,28 @@ export default class ConnectWalletModal extends Component {
                       </div>
                     </>
                   )}
-                  {Wallet.isConnectedToAnyNetwork() &&
-                    !Wallet.isMatchingConnectedNetwork() && (
+                  {Wallet.isConnectedToAnyNetwork()
+                    && !Wallet.isMatchingConnectedNetwork() && (
                       <>
                         <div className="error">
                           You are connected to the wrong network!
                           <br />
-                          Click here to switch to the {currentNetworkName}
+                          Click here to switch to the
+                          {' '}
+                          {currentNetworkName}
                         </div>
                       </>
-                    )}
-                  {Wallet.isMetamaskSupported() &&
-                    !Wallet.isConnectedToAnyNetwork() && (
+                  )}
+                  {Wallet.isMetamaskSupported()
+                    && !Wallet.isConnectedToAnyNetwork() && (
                       <>
                         <div className="has-text-info">
-                          Click here to connect to {currentNetworkName}
+                          Click here to connect to
+                          {' '}
+                          {currentNetworkName}
                         </div>
                       </>
-                    )}
+                  )}
                 </div>
               </div>
             </div>
@@ -190,15 +193,18 @@ export default class ConnectWalletModal extends Component {
 
         <div className="footnote">
           <div>
-            New to{' '}
+            New to
+            {' '}
             <a target="_blank" href="https://ethereum.org/wallets/">
               Ethereum
             </a>
-            ,{' '}
+            ,
+            {' '}
             <a target="_blank" href="https://polygon.technology/technology/">
               Polygon
             </a>
-            , or{' '}
+            , or
+            {' '}
             <a
               target="_blank"
               href="https://wiki.polkadot.network/docs/en/getting-started"

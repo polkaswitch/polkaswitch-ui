@@ -6,9 +6,9 @@ import store from 'store';
 
 import EventManager from './events';
 
-const BigNumber = ethers.BigNumber;
+const { BigNumber } = ethers;
 const Utils = ethers.utils;
-const Contract = ethers.Contract;
+const { Contract } = ethers;
 
 const DEFAULT_SWAP_SETTINGS = Object.freeze({
   gasSpeedSetting: 'safeLow',
@@ -24,8 +24,8 @@ window.Storage = {
   crossChainEnabled: false,
   cachedTokenLogoUrls: {},
 
-  initialize: function () {
-    let cachedSettings = store.get('settings');
+  initialize() {
+    const cachedSettings = store.get('settings');
     if (_.has(cachedSettings, 'gasSpeedSetting')) {
       this.swapSettings = _.extend(
         this.swapSettings,
@@ -34,36 +34,35 @@ window.Storage = {
     }
 
     // initialize the Network
-    var defaultNetwork = _.findWhere(window.NETWORK_CONFIGS, { enabled: true, singleChainSupported: true }).name;
-    var storedNetwork = _.findWhere(window.NETWORK_CONFIGS, {
+    const defaultNetwork = _.findWhere(window.NETWORK_CONFIGS, { enabled: true, singleChainSupported: true }).name;
+    const storedNetwork = _.findWhere(window.NETWORK_CONFIGS, {
       name: store.get('selectedNetwork'),
       enabled: true,
     });
-    this.selectedNetwork =
-      (storedNetwork && storedNetwork.name) || defaultNetwork;
+    this.selectedNetwork = (storedNetwork && storedNetwork.name) || defaultNetwork;
     this.crossChainEnabled = store.get('crossChainEnabled', false);
     this.cachedTokenLogoUrls = store.get('tokenLogoUrls') || {};
   },
 
-  updateNetwork: function (network) {
+  updateNetwork(network) {
     this.selectedNetwork = network.name;
     store.set('selectedNetwork', this.selectedNetwork);
   },
 
-  toggleCrossChain: function (enabled) {
+  toggleCrossChain(enabled) {
     this.crossChainEnabled = enabled;
     store.set('crossChainEnabled', this.crossChainEnabled);
   },
 
-  isCrossChainEnabled: function () {
+  isCrossChainEnabled() {
     return this.crossChainEnabled;
   },
 
-  getNetwork: function () {
+  getNetwork() {
     return this.selectedNetwork;
   },
 
-  resetNetworkSensitiveSettings: function () {
+  resetNetworkSensitiveSettings() {
     this.swapSettings = _.extend(
       this.swapSettings,
       _.pick(
@@ -77,30 +76,29 @@ window.Storage = {
     EventManager.emitEvent('swapSettingsUpdated', 1);
   },
 
-  resetSettings: function (keys) {
+  resetSettings(keys) {
     this.swapSettings = _.extend({}, DEFAULT_SWAP_SETTINGS);
     store.set('settings', this.swapSettings);
     EventManager.emitEvent('swapSettingsUpdated', 1);
   },
 
-  updateSettings: function (settings) {
+  updateSettings(settings) {
     this.swapSettings = _.extend(this.swapSettings, settings);
     store.set('settings', this.swapSettings);
     EventManager.emitEvent('swapSettingsUpdated', 1);
   },
 
-  updateCachedTokenLogoUrl: function (contractAddress, imgSrc) {
+  updateCachedTokenLogoUrl(contractAddress, imgSrc) {
     this.cachedTokenLogoUrls[contractAddress] = imgSrc;
     store.set('tokenLogoUrls', this.cachedTokenLogoUrls);
   },
 
-  getCachedTokenLogoUrl: function (contractAddress) {
+  getCachedTokenLogoUrl(contractAddress) {
     const logoUrl = this.cachedTokenLogoUrls[contractAddress];
     if (logoUrl) {
       return logoUrl;
-    } else {
-      return null;
     }
+    return null;
   },
 };
 

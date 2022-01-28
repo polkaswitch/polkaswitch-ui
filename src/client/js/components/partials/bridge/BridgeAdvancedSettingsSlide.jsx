@@ -11,7 +11,7 @@ export default class BridgeAdvancedSettingsSlide extends Component {
   render() {
     return (
       <div className="page page-stack page-view-settings">
-        <div className="page-inner"></div>
+        <div className="page-inner" />
       </div>
     );
   }

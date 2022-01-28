@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import CoingeckoManager from '../../utils/coingecko';
 
 export default function TokenIconImg(props) {
-  let imgURL = props.imgSrc || (props.token && props.token.logoURI);
+  const imgURL = props.imgSrc || (props.token && props.token.logoURI);
   // init state
   const [errored, setErrored] = useState(false);
   const [imgSrc, setImgSrc] = useState('');
@@ -35,9 +35,8 @@ export default function TokenIconImg(props) {
   };
 
   const getLogoURL = async () => {
-    var network = props.network || TokenListManager.getCurrentNetworkConfig();
-    const assetPlatform =
-      (network.coingecko && network.coingecko.platform) || '';
+    const network = props.network || TokenListManager.getCurrentNetworkConfig();
+    const assetPlatform = (network.coingecko && network.coingecko.platform) || '';
     return await CoingeckoManager.getLogoURL(
       assetPlatform,
       props.token.address,
@@ -46,7 +45,7 @@ export default function TokenIconImg(props) {
 
   return (
     <span
-      className={classnames('token-icon-img-wrapper', { errored: errored })}
+      className={classnames('token-icon-img-wrapper', { errored })}
       style={{
         height: `${props.size || 40}px`,
         width: `${props.size || 40}px`,

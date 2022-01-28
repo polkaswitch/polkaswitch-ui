@@ -13,7 +13,7 @@ export default class TokenIconBalanceGroupView extends Component {
         <div className="level-item">
           <TokenIconImg
             network={this.props.network}
-            size={'35'}
+            size="35"
             token={this.props.token}
           />
         </div>

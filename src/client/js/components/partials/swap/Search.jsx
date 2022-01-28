@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, {
+  useState, useEffect, useMemo, useRef
+} from 'react';
 import classnames from 'classnames';
 
 // TODO WIP component, not used anywhere
@@ -25,13 +27,9 @@ export default function Search() {
     }
   }, [value]);
 
-  const filteredTokenList = useMemo(() => {
-    return [];
-  }, [value]);
+  const filteredTokenList = useMemo(() => [], [value]);
 
-  const filteredPairList = useMemo(() => {
-    return [];
-  }, [value]);
+  const filteredPairList = useMemo(() => [], [value]);
 
   useEffect(() => {
     if (Object.keys(filteredTokenList).length > 2) {
@@ -51,8 +49,8 @@ export default function Search() {
 
   const handleClick = (e) => {
     if (
-      !(menuRef.current && menuRef.current.contains(e.target)) &&
-      !(wrapperRef.current && wrapperRef.current.contains(e.target))
+      !(menuRef.current && menuRef.current.contains(e.target))
+      && !(wrapperRef.current && wrapperRef.current.contains(e.target))
     ) {
       setPairsShown(3);
       setTokensShown(3);
@@ -88,9 +86,9 @@ export default function Search() {
         </span>
         <input
           className="input-box"
-          type={'text'}
+          type="text"
           ref={wrapperRef}
-          placeholder={'Search token or pair...'}
+          placeholder="Search token or pair..."
           value={value}
           onChange={(e) => {
             setValue(e.target.value);
@@ -126,14 +124,12 @@ export default function Search() {
               <div>No results</div>
             </div>
           )}
-          {filteredTokenList.slice(0, tokensShown).map((token) => {
-            return <div className="menu-item"></div>;
-          })}
+          {filteredTokenList.slice(0, tokensShown).map((token) => <div className="menu-item" />)}
           <div
             className={classnames('header', {
               'is-hidden': !(
-                Object.keys(filteredTokenList).length > 3 &&
-                Object.keys(filteredTokenList).length >= tokensShown
+                Object.keys(filteredTokenList).length > 3
+                && Object.keys(filteredTokenList).length >= tokensShown
               ),
             })}
           >
@@ -156,15 +152,13 @@ export default function Search() {
               <div>No results</div>
             </div>
           )}
-          {filteredPairList &&
-            filteredPairList.slice(0, pairsShown).map((pair) => {
-              return <div className="menu-item"></div>;
-            })}
+          {filteredPairList
+            && filteredPairList.slice(0, pairsShown).map((pair) => <div className="menu-item" />)}
           <div
             className={classnames('header', {
               'is-hidden': !(
-                Object.keys(filteredPairList).length > 3 &&
-                Object.keys(filteredPairList).length >= pairsShown
+                Object.keys(filteredPairList).length > 3
+                && Object.keys(filteredPairList).length >= pairsShown
               ),
             })}
           >

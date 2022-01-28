@@ -3,10 +3,11 @@ import classnames from 'classnames';
 import * as ethers from 'ethers';
 import numeral from 'numeral';
 import moment from 'moment';
-const BigNumber = ethers.BigNumber;
-const Utils = ethers.utils;
 import TxExplorerLink from './TxExplorerLink';
 import TokenIconImg from './TokenIconImg';
+
+const { BigNumber } = ethers;
+const Utils = ethers.utils;
 
 export default class TxStatusView extends Component {
   constructor(props) {
@@ -19,11 +20,12 @@ export default class TxStatusView extends Component {
       return <div />;
     }
 
-    var output = numeral(
+    const output = numeral(
       Utils.formatUnits(data.amount, this.props.data.from.decimals),
     ).format('0.0000a');
 
-    let lang, clazz;
+    let lang; let
+      clazz;
 
     if (!data.completed) {
       lang = 'Pending';
@@ -57,7 +59,7 @@ export default class TxStatusView extends Component {
         <div className="column is-mobile">
           <div className="item-1">
             <span className="icon is-left" width={11} height={11}>
-              <ion-icon name="arrow-forward"></ion-icon>
+              <ion-icon name="arrow-forward" />
             </span>
             {data.to.symbol}
           </div>

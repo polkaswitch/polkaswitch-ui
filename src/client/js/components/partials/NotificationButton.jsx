@@ -39,7 +39,7 @@ export default class NotificationButton extends Component {
   }
 
   render() {
-    var isConnected = Wallet.isConnectedToAnyNetwork();
+    const isConnected = Wallet.isConnectedToAnyNetwork();
 
     return (
       <div

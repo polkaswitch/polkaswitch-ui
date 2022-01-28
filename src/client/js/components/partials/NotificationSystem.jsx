@@ -62,7 +62,7 @@ export default class NotificationSystem extends Component {
                 className="icon ion-icon clickable is-medium"
                 onClick={this.handleClose}
               >
-                <ion-icon name="close-outline"></ion-icon>
+                <ion-icon name="close-outline" />
               </span>
             </div>
           </div>

@@ -3,9 +3,9 @@ import * as ethers from 'ethers';
 import BN from 'bignumber.js';
 import numeral from 'numeral';
 
-const BigNumber = ethers.BigNumber;
+const { BigNumber } = ethers;
 const Utils = ethers.utils;
-const Contract = ethers.Contract;
+const { Contract } = ethers;
 
 window.Helper = {};
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default function AdditionalInfoItem(props) {
-  const info = props.info;
+  const { info } = props;
 
   return (
     <div className="additional-info">

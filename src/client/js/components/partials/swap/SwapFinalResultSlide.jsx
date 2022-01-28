@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import _ from 'underscore';
 import classnames from 'classnames';
-import TxExplorerLink from './../TxExplorerLink';
+import TxExplorerLink from '../TxExplorerLink';
 
 export default class SwapFinalResultSlide extends Component {
   constructor(props) {
@@ -19,7 +19,7 @@ export default class SwapFinalResultSlide extends Component {
                   className="icon ion-icon clickable"
                   onClick={this.props.handleDismiss}
                 >
-                  <ion-icon name="arrow-back-outline"></ion-icon>
+                  <ion-icon name="arrow-back-outline" />
                 </span>
               </div>
             </div>
@@ -32,9 +32,9 @@ export default class SwapFinalResultSlide extends Component {
           >
             <div className="icon">
               {this.props.transactionSuccess ? (
-                <ion-icon name="rocket-outline"></ion-icon>
+                <ion-icon name="rocket-outline" />
               ) : (
-                <ion-icon name="alert-circle-outline"></ion-icon>
+                <ion-icon name="alert-circle-outline" />
               )}
             </div>
             <div className="title">
@@ -57,7 +57,9 @@ export default class SwapFinalResultSlide extends Component {
                       network={this.props.toChain}
                       hash={this.props.transactionHash}
                     >
-                      View on Explorer <ion-icon name="open-outline"></ion-icon>
+                      View on Explorer
+                      {' '}
+                      <ion-icon name="open-outline" />
                     </TxExplorerLink>
                   </div>
                 )}

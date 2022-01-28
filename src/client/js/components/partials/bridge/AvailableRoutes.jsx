@@ -5,7 +5,7 @@ import RouteItemWrapper from './RouteItemWrapper';
 
 export default function AvailableRoutes(props) {
   const network = TokenListManager.getCurrentNetworkConfig();
-  //const routes = props.routes
+  // const routes = props.routes
 
   const routes = [
     [
@@ -125,12 +125,10 @@ export default function AvailableRoutes(props) {
       className="token-dist-wrapper control"
       aria-label="Available routes for the swap"
     >
-      {routes.length > 0 &&
-        _.map(routes, function (item, i) {
-          return (
-            <RouteItemWrapper key={i} data={item} index={i}></RouteItemWrapper>
-          );
-        })}
+      {routes.length > 0
+        && _.map(routes, (item, i) => (
+          <RouteItemWrapper key={i} data={item} index={i} />
+        ))}
     </div>
   );
 }

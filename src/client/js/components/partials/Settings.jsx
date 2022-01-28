@@ -42,7 +42,7 @@ export default class Settings extends Component {
           className="icon clickable settings-icon"
           onClick={this.handleClick}
         >
-          <ion-icon name="settings-outline"></ion-icon>
+          <ion-icon name="settings-outline" />
         </span>
         {showing && (
           <div className="flyout">
@@ -50,7 +50,7 @@ export default class Settings extends Component {
             <div className="menu-item">Documentation</div>
             <div className="menu-item">Help</div>
             <div className="menu-item">Telegram</div>
-            <div className="divider"></div>
+            <div className="divider" />
             <div className="menu-item">
               Dark Mode
               <span className="item-switcher hint--bottom hint--medium">
@@ -60,7 +60,7 @@ export default class Settings extends Component {
                   checked={this.state.darkMode}
                   onChange={this.handleDarkModeChange}
                 />
-                <label htmlFor="dark-mode-switcher"></label>
+                <label htmlFor="dark-mode-switcher" />
               </span>
             </div>
             <div className="menu-item">
@@ -72,7 +72,7 @@ export default class Settings extends Component {
                   checked={this.state.viewMode}
                   onChange={this.handleViewModeChange}
                 />
-                <label htmlFor="simplify-mode-switcher"></label>
+                <label htmlFor="simplify-mode-switcher" />
               </span>
             </div>
           </div>

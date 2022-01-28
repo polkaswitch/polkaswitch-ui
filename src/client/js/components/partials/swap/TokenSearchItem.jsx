@@ -7,8 +7,8 @@ export default function TokenSearchItem(props) {
 
   useEffect(() => {
     if (
-      !balances[token.symbol] ||
-      (balances[token.symbol] && balances[token.symbol].refresh)
+      !balances[token.symbol]
+      || (balances[token.symbol] && balances[token.symbol].refresh)
     ) {
       props.fetchBalance(token);
     }

@@ -5,12 +5,12 @@ import AdditionalInfoItem from './AdditionalInfoItem';
 import DashedDivider from './DashedDivider';
 
 export default function RouteItemView(props) {
-  const data = props.data;
+  const { data } = props;
 
   return (
     <div className="bridge-route-item">
-      {data.length > 0 &&
-        _.map(data, function (item, index) {
+      {data.length > 0
+        && _.map(data, (item, index) => {
           switch (item.type) {
             case 'token-network':
               return (

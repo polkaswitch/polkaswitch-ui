@@ -1,6 +1,8 @@
 import React from 'react';
 
-export default function PortfolioNetwork({ logoURI, name, value, change }) {
+export default function PortfolioNetwork({
+  logoURI, name, value, change
+}) {
   return (
     <div className="column is-3">
       <img className="is-rounded token-icon" src={logoURI} />
@@ -10,8 +12,11 @@ export default function PortfolioNetwork({ logoURI, name, value, change }) {
           {value.toLocaleString('en-US', {
             style: 'currency',
             currency: 'USD',
-          })}{' '}
-          ({change}%)
+          })}
+          {' '}
+          (
+          {change}
+          %)
         </span>
       </div>
     </div>

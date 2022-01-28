@@ -39,7 +39,7 @@ export default function Routing() {
               </div>
             </div>
           </div>
-          <div className="column"></div>
+          <div className="column" />
         </div>
       </div>
     </div>

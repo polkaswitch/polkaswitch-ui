@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import _ from 'underscore';
 import classnames from 'classnames';
-import EventManager from '../../utils/events';
 import * as ethers from 'ethers';
+import EventManager from '../../utils/events';
 import Wallet from '../../utils/wallet';
-const Utils = ethers.utils;
 import TokenListManager from '../../utils/tokenList';
 import CustomTokenDetails from './swap/CustomTokenDetails';
 import CustomTokenWarning from './swap/CustomTokenWarning';
+
+const Utils = ethers.utils;
 
 export default class CustomTokenModal extends Component {
   constructor(props) {
@@ -62,7 +63,9 @@ export default class CustomTokenModal extends Component {
   }
 
   handleCustomBtn = (e) => {
-    const { symbol, name, decimals, customTokenAddr } = this.state;
+    const {
+      symbol, name, decimals, customTokenAddr
+    } = this.state;
     const customToken = {
       symbol,
       name,
@@ -82,7 +85,7 @@ export default class CustomTokenModal extends Component {
       fetchingTokenInfo: true,
     });
     const network = TokenListManager.getCurrentNetworkConfig();
-    let _query = e.target.value.toLowerCase().trim();
+    const _query = e.target.value.toLowerCase().trim();
     let filteredTokens = [];
 
     if (_query.length > 0) {
@@ -91,9 +94,7 @@ export default class CustomTokenModal extends Component {
         filteredTokens = _.first(
           _.filter(
             TokenListManager.getTokenListForNetwork(network),
-            function (t) {
-              return t.address && t.address.toLowerCase().includes(_query);
-            },
+            (t) => t.address && t.address.toLowerCase().includes(_query),
           ),
           1,
         );
@@ -142,21 +143,21 @@ export default class CustomTokenModal extends Component {
     }
     Wallet.getSymbol(tokenAddr)
       .then(
-        function (symbol) {
+        (symbol) => {
           this.setState({ symbol });
           this.fetchName(0, tokenAddr);
-        }.bind(this),
+        },
       )
       .catch(
-        function (e) {
+        (e) => {
           // try again
           console.error('Failed to fetch symbol', e);
           _.defer(
-            function () {
+            () => {
               this.fetchSymbol(attempt + 1, tokenAddr);
-            }.bind(this),
+            },
           );
-        }.bind(this),
+        },
       );
   }
 
@@ -173,21 +174,21 @@ export default class CustomTokenModal extends Component {
     }
     Wallet.getName(tokenAddr)
       .then(
-        function (name) {
+        (name) => {
           this.setState({ name });
           this.fetchDecimals(0, tokenAddr);
-        }.bind(this),
+        },
       )
       .catch(
-        function (e) {
+        (e) => {
           // try again
           console.error('Failed to fetch name', e);
           _.defer(
-            function () {
+            () => {
               this.fetchName(attempt + 1, tokenAddr);
-            }.bind(this),
+            },
           );
-        }.bind(this),
+        },
       );
   }
 
@@ -204,24 +205,24 @@ export default class CustomTokenModal extends Component {
     }
     Wallet.getDecimals(tokenAddr)
       .then(
-        function (decimals) {
+        (decimals) => {
           this.setState({
             fetchingTokenInfo: false,
-            decimals: decimals,
+            decimals,
             errored: false,
           });
-        }.bind(this),
+        },
       )
       .catch(
-        function (e) {
+        (e) => {
           // try again
           console.error('Failed to fetch decimals', e);
           _.defer(
-            function () {
+            () => {
               this.fetchDecimals(attempt + 1, tokenAddr);
-            }.bind(this),
+            },
           );
-        }.bind(this),
+        },
       );
   }
 
@@ -238,7 +239,7 @@ export default class CustomTokenModal extends Component {
     } = this.state;
     return (
       <div className={classnames('modal', { 'is-active': open })}>
-        <div onClick={this.handleClose} className="modal-background"></div>
+        <div onClick={this.handleClose} className="modal-background" />
         <div className="modal-content">
           <div className="modal-dropdown-options box">
             <div className="level is-mobile">
@@ -248,7 +249,7 @@ export default class CustomTokenModal extends Component {
                     className="icon ion-icon clickable is-medium"
                     onClick={this.handleClose}
                   >
-                    <ion-icon name="close-outline"></ion-icon>
+                    <ion-icon name="close-outline" />
                   </span>
                 </div>
                 <div className="level-item">

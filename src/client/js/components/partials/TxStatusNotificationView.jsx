@@ -4,8 +4,9 @@ import classnames from 'classnames';
 import * as ethers from 'ethers';
 import numeral from 'numeral';
 import moment from 'moment';
-const Utils = ethers.utils;
 import TxExplorerLink from './TxExplorerLink';
+
+const Utils = ethers.utils;
 
 export default class TxStatusNotificationView extends Component {
   constructor(props) {
@@ -17,22 +18,24 @@ export default class TxStatusNotificationView extends Component {
       return <div />;
     }
 
-    var output = numeral(
+    const output = numeral(
       Utils.formatUnits(this.props.data.amount, this.props.data.from.decimals),
     ).format('0.0000a');
 
-    var icon, lang, clazz;
+    let icon;
+    let lang;
+    let clazz;
 
     if (!this.props.data.completed) {
       icon = <button className="button is-white is-loading">&nbsp;</button>;
       lang = 'PENDING';
       clazz = 'pending';
     } else if (this.props.data.success) {
-      icon = <ion-icon name="checkmark-circle"></ion-icon>;
+      icon = <ion-icon name="checkmark-circle" />;
       lang = 'SWAPPED';
       clazz = 'success';
     } else {
-      icon = <ion-icon name="alert-circle"></ion-icon>;
+      icon = <ion-icon name="alert-circle" />;
       lang = 'FAILED';
       clazz = 'failed';
     }
@@ -45,7 +48,14 @@ export default class TxStatusNotificationView extends Component {
         <div className="level-item tx-content">
           <div>
             <div>
-              {lang} {output} {this.props.data.from.symbol} for{' '}
+              {lang}
+              {' '}
+              {output}
+              {' '}
+              {this.props.data.from.symbol}
+              {' '}
+              for
+              {' '}
               {this.props.data.to.symbol}
             </div>
             <div>
@@ -53,7 +63,9 @@ export default class TxStatusNotificationView extends Component {
                 chainId={this.props.data.chainId}
                 hash={this.props.data.tx.hash}
               >
-                View on Explorer <ion-icon name="open-outline"></ion-icon>
+                View on Explorer
+                {' '}
+                <ion-icon name="open-outline" />
               </TxExplorerLink>
             </div>
           </div>

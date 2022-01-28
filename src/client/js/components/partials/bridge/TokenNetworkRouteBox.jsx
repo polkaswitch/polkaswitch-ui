@@ -2,7 +2,7 @@ import React from 'react';
 import TokenIconImg from '../TokenIconImg';
 
 export default function TokenNetworkRouteBox(props) {
-  const info = props.info;
+  const { info } = props;
 
   return (
     <div className="token-network-route-box">

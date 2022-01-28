@@ -33,14 +33,14 @@ export default class BridgeOrderSlide extends Component {
 
   componentDidUpdate(prevProps) {
     if (
-      (this.props.from &&
-        this.props.to &&
-        prevProps.from &&
-        this.props.from.address !== prevProps.from.address) ||
-      this.props.to.address !== prevProps.to.address ||
-      this.props.refresh !== prevProps.refresh ||
-      (this.props.fromAmount !== prevProps.fromAmount &&
-        !this.state.calculatingSwap)
+      (this.props.from
+        && this.props.to
+        && prevProps.from
+        && this.props.from.address !== prevProps.from.address)
+      || this.props.to.address !== prevProps.to.address
+      || this.props.refresh !== prevProps.refresh
+      || (this.props.fromAmount !== prevProps.fromAmount
+        && !this.state.calculatingSwap)
     ) {
       if (this.props.fromAmount) {
         this.fetchSwapEstimate(this.props.fromAmount);
@@ -49,7 +49,7 @@ export default class BridgeOrderSlide extends Component {
   }
 
   fetchSwapEstimate(origFromAmount, timeNow, attempt, cb) {
-    var fromAmount = origFromAmount;
+    let fromAmount = origFromAmount;
 
     if (!attempt) {
       attempt = 0;
@@ -87,14 +87,14 @@ export default class BridgeOrderSlide extends Component {
         calculatingSwap: true,
       },
       function (_timeNow, _attempt, _cb) {
-        var fromAmountBN = window.ethers.utils.parseUnits(
+        const fromAmountBN = window.ethers.utils.parseUnits(
           fromAmount,
           this.props.from.decimals,
         );
 
         // add delay to slow down UI snappiness
         _.delay(
-          function (_timeNow2, _attempt2, _cb2) {
+          (_timeNow2, _attempt2, _cb2) => {
             if (this.calculatingSwapTimestamp !== _timeNow2) {
               return;
             }
@@ -105,7 +105,7 @@ export default class BridgeOrderSlide extends Component {
               _attempt2,
               _cb2,
             );
-          }.bind(this),
+          },
           500,
           _timeNow,
           _attempt,
@@ -130,7 +130,7 @@ export default class BridgeOrderSlide extends Component {
       return false;
     }
 
-    var bridgeSupported = TxBridgeManager.isSupported(
+    const bridgeSupported = TxBridgeManager.isSupported(
       this.props.to,
       this.props.toChain,
       this.props.from,
@@ -221,7 +221,7 @@ export default class BridgeOrderSlide extends Component {
 
   handleTokenAmountChange(e) {
     if (!isNaN(+e.target.value)) {
-      var targetAmount = e.target.value;
+      let targetAmount = e.target.value;
 
       // if input is in exponential format, convert to decimal.
       // we do this because all of our logic does not like the exponential format
@@ -251,29 +251,28 @@ export default class BridgeOrderSlide extends Component {
 
   validateOrderForm() {
     return (
-      this.props.from &&
-      this.props.to &&
-      this.props.fromAmount &&
-      this.props.fromAmount.length > 0 &&
-      this.props.toAmount &&
-      this.props.toAmount.length > 0 &&
-      !this.state.calculatingSwap
+      this.props.from
+      && this.props.to
+      && this.props.fromAmount
+      && this.props.fromAmount.length > 0
+      && this.props.toAmount
+      && this.props.toAmount.length > 0
+      && !this.state.calculatingSwap
     );
   }
 
   hasSufficientBalance() {
     if (
-      Wallet.isConnected() &&
-      this.props.availableBalance &&
-      this.props.fromAmount &&
-      this.props.from
+      Wallet.isConnected()
+      && this.props.availableBalance
+      && this.props.fromAmount
+      && this.props.from
     ) {
-      var balBN = BN(this.props.availableBalance);
-      var fromBN = BN(this.props.fromAmount);
+      const balBN = BN(this.props.availableBalance);
+      const fromBN = BN(this.props.fromAmount);
       return fromBN.lte(balBN);
-    } else {
-      return true;
     }
+    return true;
   }
 
   handleSubmit(e) {
@@ -282,7 +281,7 @@ export default class BridgeOrderSlide extends Component {
     } else if (
       !SwapFn.isValidParseValue(this.props.from, this.props.fromAmount)
     ) {
-      var correctAmt = SwapFn.validateEthValue(
+      const correctAmt = SwapFn.validateEthValue(
         this.props.from,
         this.props.fromAmount,
       );
@@ -308,7 +307,7 @@ export default class BridgeOrderSlide extends Component {
     return function (network) {
       if (network.enabled) {
         Sentry.addBreadcrumb({
-          message: 'Action: Network Changed: ' + network.name,
+          message: `Action: Network Changed: ${network.name}`,
         });
 
         this.props.handleCrossChainChange(isFrom, network);
@@ -320,9 +319,9 @@ export default class BridgeOrderSlide extends Component {
     if (Wallet.isConnected() && this.props.from.address) {
       Wallet.getBalance(this.props.from)
         .then(
-          function (bal) {
+          (bal) => {
             _.defer(
-              function () {
+              () => {
                 // balance is in WEI and is a BigNumber
                 this.fetchSwapEstimate(
                   window.ethers.utils.formatUnits(
@@ -330,16 +329,16 @@ export default class BridgeOrderSlide extends Component {
                     this.props.from.decimals,
                   ),
                 );
-              }.bind(this),
+              },
             );
-          }.bind(this),
+          },
         )
         .catch(
-          function (e) {
+          (e) => {
             console.error('Failed to get balance for MAX', e);
             // try again
             this.handleMax();
-          }.bind(this),
+          },
         );
     }
   }
@@ -349,19 +348,19 @@ export default class BridgeOrderSlide extends Component {
       return <div />;
     }
 
-    var isFrom = target === 'from';
+    const isFrom = target === 'from';
 
     return (
       <div className="level">
         <div className="level is-narrow">
           <NetworkDropdown
-            crossChain={true}
+            crossChain
             selected={isFrom ? this.props.fromChain : this.props.toChain}
             className={classnames({ 'is-up': !isFrom })}
             handleDropdownClick={this.handleNetworkDropdownChange(isFrom).bind(
               this,
             )}
-            compact={true}
+            compact
           />
         </div>
 
@@ -388,7 +387,7 @@ export default class BridgeOrderSlide extends Component {
                   'is-danger': isFrom && !this.hasSufficientBalance(),
                   'is-to': !isFrom,
                   'is-from': isFrom,
-                  //"is-danger": !isFrom && this.state.errored
+                  // "is-danger": !isFrom && this.state.errored
                 })}
                 placeholder="0.0"
                 disabled={!isFrom}
@@ -419,7 +418,7 @@ export default class BridgeOrderSlide extends Component {
                   />
                   <div className="level-item">
                     <span className="icon-down">
-                      <ion-icon name="chevron-down"></ion-icon>
+                      <ion-icon name="chevron-down" />
                     </span>
                   </div>
                 </div>
@@ -482,8 +481,8 @@ export default class BridgeOrderSlide extends Component {
               'hint--large is-hidden',
               'token-dist-expand-wrapper expand',
               {
-                //"hint--top": this.props.swapDistribution,
-                //"expand": this.props.swapDistribution
+                // "hint--top": this.props.swapDistribution,
+                // "expand": this.props.swapDistribution
               },
             )}
           >

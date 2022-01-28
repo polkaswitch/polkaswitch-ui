@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import _ from 'underscore';
-import Wallet from '../../utils/wallet';
 import numeral from 'numeral';
+import Wallet from '../../utils/wallet';
 
 export default class TokenSymbolBalance extends Component {
   constructor(props) {
@@ -33,9 +33,9 @@ export default class TokenSymbolBalance extends Component {
 
   componentDidUpdate(prevProps) {
     if (
-      this.props.token.address !== prevProps.token.address ||
-      this.props.network?.chainId !== prevProps.network?.chainId ||
-      this.props.refresh !== prevProps.refresh
+      this.props.token.address !== prevProps.token.address
+      || this.props.network?.chainId !== prevProps.network?.chainId
+      || this.props.refresh !== prevProps.refresh
     ) {
       this.setState(
         {
@@ -63,19 +63,18 @@ export default class TokenSymbolBalance extends Component {
 
     if (Wallet.isConnectedToAnyNetwork()) {
       Wallet.getBalance(this.props.token, this.props.network)
-        .then(function(_ts, bal) {
+        .then(function (_ts, bal) {
           if (this.state.timestamp != _ts) {
             return;
           }
 
-            // balance is in WEI and is a BigNumber
-            this.setState({
-              balance: bal,
-              errored: false,
-              loading: false,
-            });
-          }.bind(this, this.state.timestamp),
-        )
+          // balance is in WEI and is a BigNumber
+          this.setState({
+            balance: bal,
+            errored: false,
+            loading: false,
+          });
+        }.bind(this, this.state.timestamp),)
         .catch(
           function (_ts, e) {
             // try again
@@ -97,11 +96,11 @@ export default class TokenSymbolBalance extends Component {
   }
 
   render() {
-    var balOutput;
-    var fullOutput;
+    let balOutput;
+    let fullOutput;
     const Utils = window.ethers.utils;
 
-    var renderBalFn = function () {
+    const renderBalFn = function () {
       return numeral(
         Utils.formatUnits(this.state.balance, this.props.token.decimals),
       ).format('0.0000a');

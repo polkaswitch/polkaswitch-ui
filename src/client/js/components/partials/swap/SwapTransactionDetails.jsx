@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import _ from 'underscore';
 import classnames from 'classnames';
-import Wallet from '../../../utils/wallet';
 import numeral from 'numeral';
 import * as ethers from 'ethers';
+import Wallet from '../../../utils/wallet';
 import EventManager from '../../../utils/events';
 
 const Utils = ethers.utils;
@@ -29,16 +29,16 @@ export default class SwapTransactionDetails extends Component {
   }
 
   componentWillUnmount() {
-    this.subscribers.forEach(function (v) {
+    this.subscribers.forEach((v) => {
       EventManager.unsubscribe(v);
     });
   }
 
   componentDidUpdate(prevProps) {
     if (
-      prevProps.fromAmount !== this.props.fromAmount ||
-      prevProps.from.symbol !== this.props.from.symbol ||
-      prevProps.to.symbol !== this.props.to.symbol
+      prevProps.fromAmount !== this.props.fromAmount
+      || prevProps.from.symbol !== this.props.from.symbol
+      || prevProps.to.symbol !== this.props.to.symbol
     ) {
       this.updateValues();
     }
@@ -61,7 +61,7 @@ export default class SwapTransactionDetails extends Component {
   async updateValues() {
     if (Wallet.isConnected()) {
       console.log('## updateValues ### ', 'called');
-      var fromAmount = SwapFn.validateEthValue(
+      const fromAmount = SwapFn.validateEthValue(
         this.props.from,
         this.props.fromAmount,
       );
@@ -70,15 +70,15 @@ export default class SwapTransactionDetails extends Component {
         this.props.from,
         this.props.to,
         Utils.parseUnits(fromAmount, this.props.from.decimals)
-      ).then(function({ minReturn }) {
-        _.defer(function(){
-          this.setState({ minReturn: minReturn });
-        }.bind(this));
-      }.bind(this)).catch(function(r) {
-        _.defer(function(){
-          this.setState({ minReturn: "--" });
-        }.bind(this));
-      }.bind(this));
+      ).then(({ minReturn }) => {
+        _.defer(() => {
+          this.setState({ minReturn });
+        });
+      }).catch((r) => {
+        _.defer(() => {
+          this.setState({ minReturn: '--' });
+        });
+      });
 
       await SwapFn.calculatePriceImpact(
         this.props.from,
@@ -86,34 +86,32 @@ export default class SwapTransactionDetails extends Component {
         Utils.parseUnits(fromAmount, this.props.from.decimals),
       )
         .then(
-          function (priceImpact) {
+          (priceImpact) => {
             _.defer(
-              function () {
+              () => {
                 this.setState({
                   highSlippage:
                     priceImpact * 100.0 > SwapFn.getSetting().slippage,
                   priceImpact: (priceImpact * 100.0).toFixed(5),
                 });
-              }.bind(this),
+              },
             );
-          }.bind(this),
+          },
         )
         .catch(
-          function (r) {
+          (r) => {
             _.defer(
-              function () {
+              () => {
                 this.setState({
                   priceImpact: '--',
                   highSlippage: false,
                 });
-              }.bind(this),
+              },
             );
-          }.bind(this),
+          },
         );
 
-      var distBN = _.map(this.props.swapDistribution, function (e) {
-        return window.ethers.utils.parseUnits('' + e, 'wei');
-      });
+      const distBN = _.map(this.props.swapDistribution, (e) => window.ethers.utils.parseUnits(`${e}`, 'wei'));
 
       await SwapFn.calculateEstimatedTransactionCost(
         this.props.from,
@@ -122,22 +120,22 @@ export default class SwapTransactionDetails extends Component {
         distBN,
       )
         .then(
-          function (v) {
+          (v) => {
             _.defer(
-              function () {
+              () => {
                 this.setState({ transactionEstimate: v });
-              }.bind(this),
+              },
             );
-          }.bind(this),
+          },
         )
         .catch(
-          function (r) {
+          (r) => {
             _.defer(
-              function () {
+              () => {
                 this.setState({ transactionEstimate: '--' });
-              }.bind(this),
+              },
             );
-          }.bind(this),
+          },
         );
     }
   }
@@ -161,10 +159,16 @@ export default class SwapTransactionDetails extends Component {
           <div className="level-right">
             <div className="level-item">
               <div className="detail-value">
-                1 {this.props.from.symbol} &asymp;{' '}
+                1
+                {' '}
+                {this.props.from.symbol}
+                {' '}
+                &asymp;
+                {' '}
                 {numeral(this.props.toAmount / this.props.fromAmount).format(
                   '0.0[0000000000000]',
-                )}{' '}
+                )}
+                {' '}
                 {this.props.to.symbol}
               </div>
             </div>
@@ -188,7 +192,9 @@ export default class SwapTransactionDetails extends Component {
           <div className="level-right">
             <div className="level-item">
               <div className="detail-value">
-                {this.state.minReturn} {this.props.to.symbol}
+                {this.state.minReturn}
+                {' '}
+                {this.props.to.symbol}
               </div>
             </div>
           </div>
@@ -220,11 +226,15 @@ export default class SwapTransactionDetails extends Component {
                   >
                     (
                     <span className="icon">
-                      <ion-icon name="warning-outline"></ion-icon>
+                      <ion-icon name="warning-outline" />
                     </span>
                     <span>High Slippage)&nbsp;&nbsp;</span>
                   </span>
-                  <span>- {this.state.priceImpact}%</span>
+                  <span>
+                    -
+                    {this.state.priceImpact}
+                    %
+                  </span>
                 </div>
               </div>
             </div>
@@ -249,7 +259,10 @@ export default class SwapTransactionDetails extends Component {
             <div className="level-item">
               <div>
                 <div className="detail-value">
-                  <span>{SwapFn.getSetting().slippage}%</span>
+                  <span>
+                    {SwapFn.getSetting().slippage}
+                    %
+                  </span>
                 </div>
               </div>
             </div>
@@ -271,7 +284,9 @@ export default class SwapTransactionDetails extends Component {
           <div className="level-right">
             <div className="level-item">
               <div className="detail-value">
-                {this.state.transactionEstimate} {window.NATIVE_TOKEN.symbol}
+                {this.state.transactionEstimate}
+                {' '}
+                {window.NATIVE_TOKEN.symbol}
               </div>
             </div>
           </div>

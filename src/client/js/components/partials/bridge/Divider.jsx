@@ -5,7 +5,7 @@ export default function Divider() {
     <div className="divider">
       <div className="vertical-line" />
       <div className="triangle-wrapper">
-        <div className="triangle-right"></div>
+        <div className="triangle-right" />
       </div>
     </div>
   );

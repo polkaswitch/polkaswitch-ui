@@ -8,7 +8,7 @@ export default class Footer extends Component {
           <script
             type="module"
             src="https://cdn.freshstatus.io/widget/index.js"
-          ></script>
+          />
           <a
             href="https://polkaswitch.freshstatus.io"
             id="freshstatus-badge-root"
@@ -20,7 +20,7 @@ export default class Footer extends Component {
 
         <button data-feedback-fish className="footer-feedback button is-medium">
           <span className="icon">
-            <ion-icon name="alert-circle"></ion-icon>
+            <ion-icon name="alert-circle" />
           </span>
           <span>Give Feedback</span>
         </button>

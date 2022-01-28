@@ -1,21 +1,20 @@
 import _ from 'underscore';
 import React, { Component } from 'react';
+import * as ethers from 'ethers';
 import SwapSlippageControl from './SwapSlippageControl';
 import GasPriceControl from './GasPriceControl';
 import SwapFn from '../../utils/swapFn';
 import EventManager from '../../utils/events';
 
-import * as ethers from 'ethers';
-
 export default class AdvancedSettingsSlide extends Component {
   constructor(props) {
     super(props);
 
-    const bridgeOption = SwapFn.getSetting().bridgeOption;
+    const { bridgeOption } = SwapFn.getSetting();
 
     this.state = {
       refresh: Date.now(),
-      bridgeOption: bridgeOption,
+      bridgeOption,
     };
     this.handleSlippage = this.handleSlippage.bind(this);
     this.handleSettingsChange = this.handleSettingsChange.bind(this);
@@ -28,7 +27,7 @@ export default class AdvancedSettingsSlide extends Component {
   }
 
   componentWillUnmount() {
-    this.subscribers.forEach(function (v) {
+    this.subscribers.forEach((v) => {
       EventManager.unsubscribe(v);
     });
   }
@@ -46,7 +45,7 @@ export default class AdvancedSettingsSlide extends Component {
   }
 
   handleBridge(e) {
-    var val = e.currentTarget.value;
+    const val = e.currentTarget.value;
 
     this.setState(
       {
@@ -71,7 +70,7 @@ export default class AdvancedSettingsSlide extends Component {
                   className="icon ion-icon clickable"
                   onClick={this.props.handleBackOnSettings}
                 >
-                  <ion-icon name="arrow-back-outline"></ion-icon>
+                  <ion-icon name="arrow-back-outline" />
                 </span>
               </div>
               <div className="level-item">
@@ -190,7 +189,7 @@ export default class AdvancedSettingsSlide extends Component {
             <div className="level-right">
               <div className="level-item">
                 <span className="icon ion-icon disabled is-medium">
-                  <ion-icon name="add-circle-outline"></ion-icon>
+                  <ion-icon name="add-circle-outline" />
                 </span>
               </div>
             </div>

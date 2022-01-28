@@ -41,27 +41,25 @@ export default class AlphaOnboardingCard extends Component {
         {
           minting: true,
         },
-        function () {
+        () => {
           Promise.all(
-            _.map(['METH', 'MUNI', 'MSUSHI', 'MBAL'], function (sym) {
-              return SwapFn.mint(sym, window.ethers.utils.parseEther('100'));
-            }),
+            _.map(['METH', 'MUNI', 'MSUSHI', 'MBAL'], (sym) => SwapFn.mint(sym, window.ethers.utils.parseEther('100'))),
           ).then(
-            function (values) {
+            (values) => {
               this.setState({
                 minting: false,
                 success: true,
               });
               console.log('done');
-            }.bind(this),
+            },
           );
-        }.bind(this),
+        },
       );
     }
   }
 
   render() {
-    var network = TokenListManager.getCurrentNetworkConfig();
+    const network = TokenListManager.getCurrentNetworkConfig();
 
     if (+network.chainId === 1287) {
       return (
@@ -105,8 +103,7 @@ export default class AlphaOnboardingCard extends Component {
           </div>
         </div>
       );
-    } else {
-      return <div />;
     }
+    return <div />;
   }
 }

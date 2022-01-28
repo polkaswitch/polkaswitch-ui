@@ -11,7 +11,7 @@ export default class DropdownSelectModal extends Component {
   render() {
     return (
       <BasicModal
-        modalClasses={'modal-dropdown-options'}
+        modalClasses="modal-dropdown-options"
         open={this.props.open}
         title={this.props.title}
         handleClose={this.props.handleClose}

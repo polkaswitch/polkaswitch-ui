@@ -8,13 +8,13 @@ import {
   Redirect,
 } from 'react-router-dom';
 
+import classnames from 'classnames';
 import SwapHome from './pages/SwapHome';
 import TokenClaimHome from './pages/TokenClaimHome';
 import BridgeHome from './pages/BridgeHome';
 import WalletHome from './pages/WalletHome';
 import StakeHome from './pages/StakeHome';
 import Footer from './partials/Footer';
-import classnames from 'classnames';
 import { keepTheme } from '../utils/theme';
 
 require('../../css/index.scss');

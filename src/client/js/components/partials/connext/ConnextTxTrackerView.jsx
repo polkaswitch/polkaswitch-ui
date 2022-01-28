@@ -36,7 +36,7 @@ export default class ConnextTxTrackerView extends Component {
   }
 
   render() {
-    var queue = Nxtp.getQueue();
+    const queue = Nxtp.getQueue();
 
     return (
       <div>
@@ -47,15 +47,13 @@ export default class ConnextTxTrackerView extends Component {
                 No recent transactions
               </div>
               <div className="icon has-text-info-light">
-                <ion-icon name="file-tray-outline"></ion-icon>
+                <ion-icon name="file-tray-outline" />
               </div>
             </div>
           </div>
         )}
 
-        {_.map(queue, function (item, i) {
-          return <TxStatusView key={i} data={item} />;
-        })}
+        {_.map(queue, (item, i) => <TxStatusView key={i} data={item} />)}
       </div>
     );
   }

@@ -1,23 +1,19 @@
 import React, { useEffect, useRef } from 'react';
-import TokenIconImg from '../TokenIconImg';
 import classnames from 'classnames';
 import _ from 'underscore';
+import TokenIconImg from '../TokenIconImg';
 
 export default function TokenPairSelector(props) {
-  const renderTokenPairs = () => {
-    return _.map(props.tokenPairs, function (v, i) {
-      return (
-        <a
-          href="#"
-          key={i}
-          onClick={() => handleTokenPairChange(v)}
-          className="dropdown-item"
-        >
-          <span>{v.name}</span>
-        </a>
-      );
-    });
-  };
+  const renderTokenPairs = () => _.map(props.tokenPairs, (v, i) => (
+    <a
+      href="#"
+      key={i}
+      onClick={() => handleTokenPairChange(v)}
+      className="dropdown-item"
+    >
+      <span>{v.name}</span>
+    </a>
+  ));
 
   const handleTokenPairChange = (tokenPair) => {
     props.handleTokenPairChange(tokenPair);
@@ -34,9 +30,9 @@ export default function TokenPairSelector(props) {
               aria-haspopup="true"
               aria-controls="dropdown-menu"
             >
-              {props.selectedPair &&
-                props.selectedPair.fromSymbol &&
-                props.selectedPair.toSymbol && (
+              {props.selectedPair
+                && props.selectedPair.fromSymbol
+                && props.selectedPair.toSymbol && (
                   <span className="level-left">
                     <TokenIconImg
                       size={54}
@@ -53,10 +49,10 @@ export default function TokenPairSelector(props) {
                     />
                     <span className="text">{props.selectedPair.name}</span>
                   </span>
-                )}
-              {props.selectedPair &&
-                props.selectedPair.fromSymbol &&
-                !props.selectedPair.toSymbol && (
+              )}
+              {props.selectedPair
+                && props.selectedPair.fromSymbol
+                && !props.selectedPair.toSymbol && (
                   <span className="level-left">
                     <TokenIconImg
                       size={54}
@@ -66,7 +62,7 @@ export default function TokenPairSelector(props) {
                     />
                     <span>{props.selectedPair.name}</span>
                   </span>
-                )}
+              )}
             </button>
           </div>
           <div className="dropdown-menu" id="dropdown-menu" role="menu">

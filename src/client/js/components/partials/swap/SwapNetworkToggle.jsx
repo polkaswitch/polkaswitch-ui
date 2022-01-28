@@ -33,7 +33,7 @@ export default class SwapNetworkToggle extends Component {
   }
 
   componentWillUnmount() {
-    this.subscribers.forEach(function (v) {
+    this.subscribers.forEach((v) => {
       EventManager.unsubscribe(v);
     });
   }
@@ -49,13 +49,12 @@ export default class SwapNetworkToggle extends Component {
   handleDropdownClick(network) {
     if (network.enabled) {
       Sentry.addBreadcrumb({
-        message: 'Action: Network Changed: ' + network.name,
+        message: `Action: Network Changed: ${network.name}`,
       });
       this.setState({
         selected: network,
       });
-      let connectStrategy =
-        Wallet.isConnectedToAnyNetwork() && Wallet.getConnectionStrategy();
+      const connectStrategy = Wallet.isConnectedToAnyNetwork() && Wallet.getConnectionStrategy();
       TokenListManager.updateNetwork(network, connectStrategy);
     }
   }

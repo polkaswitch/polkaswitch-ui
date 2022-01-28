@@ -33,7 +33,7 @@ export default class Navbar extends Component {
           <div className="level-item is-narrow">
             <ConnectWalletButton />
           </div>
-          {/*<div className="level-item"><Settings /></div>*/}
+          {/* <div className="level-item"><Settings /></div> */}
         </div>
       </nav>
     );

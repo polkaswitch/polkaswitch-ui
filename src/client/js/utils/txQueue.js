@@ -2,17 +2,17 @@ import _ from 'underscore';
 import EventManager from './events';
 import Wallet from './wallet';
 
-let store = require('store');
+const store = require('store');
 
 export default {
   _signerAddress: '',
   _queue: {},
   compareTime: 3 * 60 * 60 * 24 * 1000,
 
-  initialize: async function () {
+  async initialize() {
     this._queue = this.getQueue();
     const keys = _.keys(this._queue);
-    const length = keys.length;
+    const { length } = keys;
     const now = Date.now();
     let delCount = 0;
 
@@ -21,13 +21,13 @@ export default {
         for (let i = 0; i < length; i++) {
           const item = this._queue[keys[i]];
 
-          if (item['completed'] === false) {
+          if (item.completed === false) {
             const provider = Wallet.getReadOnlyProvider();
-            const hash = item.tx.hash;
+            const { hash } = item.tx;
             await this.getTransactionReceipt(provider, hash);
           } else if (
-            item['completed'] === true &&
-            now - item.lastUpdated > this.compareTime
+            item.completed === true
+            && now - item.lastUpdated > this.compareTime
           ) {
             delete this._queue[keys[i]];
             delCount++;
@@ -40,10 +40,10 @@ export default {
     }
   },
 
-  removeOldTx: function () {
+  removeOldTx() {
     this._queue = this.getQueue();
     const keys = _.keys(this._queue);
-    const length = keys.length;
+    const { length } = keys;
     const now = Date.now();
     let delCount = 0;
     if (this._signerAddress && this._signerAddress.length > 0) {
@@ -51,8 +51,8 @@ export default {
         for (let i = 0; i < length; i++) {
           const item = this._queue[keys[i]];
           if (
-            item['completed'] === true &&
-            now - item.lastUpdated > this.compareTime
+            item.completed === true
+            && now - item.lastUpdated > this.compareTime
           ) {
             delete this._queue[keys[i]];
             delCount++;
@@ -65,10 +65,10 @@ export default {
     }
   },
 
-  getTransactionReceipt: async function (provider, hash) {
+  async getTransactionReceipt(provider, hash) {
     if (provider) {
       try {
-        let receipt = await provider.getTransactionReceipt(hash);
+        const receipt = await provider.getTransactionReceipt(hash);
         if (receipt && receipt.confirmations > 3 && receipt.status === 1) {
           this.successTx(hash, receipt, null);
         } else if (receipt && receipt.status === 0) {
@@ -84,9 +84,9 @@ export default {
     }
   },
 
-  queuePendingTx: function (data, confirms) {
+  queuePendingTx(data, confirms) {
     this._queue = this.getQueue();
-    let hash = data.tx.hash;
+    const { hash } = data.tx;
     data.lastUpdated = Date.now();
     data.completed = false;
     data.success = false;
@@ -100,18 +100,18 @@ export default {
     data.tx
       .wait(confirms || 1)
       .then(
-        function (txReceipt) {
+        (txReceipt) => {
           this.successTx(hash, txReceipt, data);
-        }.bind(this),
+        },
       )
       .catch(
-        function (err) {
+        (err) => {
           this.failedTx(hash, data, err);
-        }.bind(this),
+        },
       );
   },
 
-  successTx: function (hash, txReceipt, data) {
+  successTx(hash, txReceipt, data) {
     // Remove old Tx
     this.removeOldTx();
     console.log(txReceipt);
@@ -126,7 +126,7 @@ export default {
     EventManager.emitEvent('txSuccess', hash);
   },
 
-  failedTx: function (hash, data, error) {
+  failedTx(hash, data, error) {
     // Remove old Tx
     this.removeOldTx();
 
@@ -142,17 +142,17 @@ export default {
     EventManager.emitEvent('txFailed', hash);
   },
 
-  getQueue: function () {
+  getQueue() {
     this._signerAddress = Wallet.currentAddress();
     const queue = store.get(this._signerAddress) || {};
     return queue;
   },
 
-  numOfPending: function () {
+  numOfPending() {
     return _.keys(this.getQueue()).length;
   },
 
-  getTx: function (nonce) {
+  getTx(nonce) {
     return this.getQueue()[nonce];
   },
 };

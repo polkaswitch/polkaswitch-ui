@@ -19,7 +19,7 @@ export default class CrossChainToggle extends Component {
           checked={this.props.checked}
           onChange={this.handleChange}
         />
-        <label htmlFor="cross-chain-switcher"></label>
+        <label htmlFor="cross-chain-switcher" />
       </span>
     );
   }

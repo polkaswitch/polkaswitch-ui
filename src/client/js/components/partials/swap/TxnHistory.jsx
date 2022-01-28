@@ -16,7 +16,7 @@ export default function TxnHistory() {
   useEffect(() => {
     setMaxPage(1);
     setPage(1);
-    const length = Object.keys(queue).length;
+    const { length } = Object.keys(queue);
     if (length > 0) {
       let extraPages = 1;
       if (length % itemMax === 0) {
@@ -30,8 +30,8 @@ export default function TxnHistory() {
   useEffect(() => {
     setPage(1);
     setQueue(TxQueue.getQueue());
-    let subTxUpdates = EventManager.listenFor('txQueueUpdated', handleUpdate);
-    let subUpdates = EventManager.listenFor('walletUpdated', handleUpdate);
+    const subTxUpdates = EventManager.listenFor('txQueueUpdated', handleUpdate);
+    const subUpdates = EventManager.listenFor('walletUpdated', handleUpdate);
     return () => {
       subTxUpdates.unsubscribe();
       subUpdates.unsubscribe();
@@ -43,14 +43,12 @@ export default function TxnHistory() {
     setQueue(TxQueue.getQueue());
   };
 
-  const filteredList = useMemo(() => {
-    return (
-      queue &&
-      Object.keys(queue)
+  const filteredList = useMemo(() => (
+    queue
+      && Object.keys(queue)
         .map((key) => queue[key])
         .slice(itemMax * (page - 1), page * itemMax)
-    );
-  }, [queue, itemMax, page, refresh]);
+  ), [queue, itemMax, page, refresh]);
 
   return (
     <div>
@@ -58,20 +56,18 @@ export default function TxnHistory() {
         <div className="grid-table">
           <div className="title-bar">Trade History</div>
           <div className="body">
-            {filteredList &&
-              _.map(filteredList, function (item, i) {
-                return (
-                  <div key={i} className="row">
-                    <TxStatusView key={i} data={item} />
-                  </div>
-                );
-              })}
+            {filteredList
+              && _.map(filteredList, (item, i) => (
+                <div key={i} className="row">
+                  <TxStatusView key={i} data={item} />
+                </div>
+              ))}
           </div>
           <div className="page-button">
             <div onClick={() => setPage(page === 1 ? page : page - 1)}>
               <div className="arrow">←</div>
             </div>
-            <div>{'Page ' + page + ' of ' + maxPage}</div>
+            <div>{`Page ${page} of ${maxPage}`}</div>
             <div onClick={() => setPage(page === maxPage ? page : page + 1)}>
               <div className="arrow">→</div>
             </div>

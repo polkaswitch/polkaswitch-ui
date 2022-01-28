@@ -1,5 +1,6 @@
 import React from 'react';
 import classnames from 'classnames';
+
 export default function ChartRangeSelector(props) {
   const handleTimeRangeChange = (range) => {
     props.handleTimeRangeChange(range);
@@ -7,10 +8,9 @@ export default function ChartRangeSelector(props) {
 
   return (
     <div className="chart-range-selector">
-      {_.map(props.timeRangeList[props.selectedViewMode], function (v, i) {
-        const isActive =
-          i ===
-          props.timeRangeList[props.selectedViewMode].findIndex(
+      {_.map(props.timeRangeList[props.selectedViewMode], (v, i) => {
+        const isActive = i
+          === props.timeRangeList[props.selectedViewMode].findIndex(
             (item) => item.name === props.selectedTimeRange.name,
           );
         return (

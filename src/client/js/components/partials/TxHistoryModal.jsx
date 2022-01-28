@@ -103,9 +103,7 @@ export default class TxHistoryModal extends Component {
         }
 
         Nxtp.fetchActiveTxs()
-          .then(() => {
-            return Nxtp.fetchHistoricalTxs();
-          })
+          .then(() => Nxtp.fetchHistoricalTxs())
           .then(() => {
             this.setState({
               loading: false,
@@ -117,22 +115,19 @@ export default class TxHistoryModal extends Component {
   }
 
   render() {
-    var singleChainQueue = TxQueue.getQueue();
-    var xActiveQueue = Nxtp.getAllActiveTxs();
-    var xAllHistQueue = Nxtp.getAllHistoricalTxs().sort((first, second) => {
-      return second.preparedTimestamp - first.preparedTimestamp;
-    });
-    var xHistQueue = _.first(xAllHistQueue, 5);
+    const singleChainQueue = TxQueue.getQueue();
+    const xActiveQueue = Nxtp.getAllActiveTxs();
+    const xAllHistQueue = Nxtp.getAllHistoricalTxs().sort((first, second) => second.preparedTimestamp - first.preparedTimestamp);
+    const xHistQueue = _.first(xAllHistQueue, 5);
 
-    var emptyQueue =
-      (this.state.showSingleChain && _.keys(singleChainQueue).length < 1) ||
-      (!this.state.showSingleChain &&
-        xActiveQueue.length < 1 &&
-        xHistQueue.length < 1);
+    const emptyQueue = (this.state.showSingleChain && _.keys(singleChainQueue).length < 1)
+      || (!this.state.showSingleChain
+        && xActiveQueue.length < 1
+        && xHistQueue.length < 1);
 
     return (
       <div className={classnames('modal', { 'is-active': this.state.open })}>
-        <div onClick={this.handleClose} className="modal-background"></div>
+        <div onClick={this.handleClose} className="modal-background" />
         <div className="modal-content">
           <div className="tx-history-modal box">
             <div className="level is-mobile">
@@ -142,7 +137,7 @@ export default class TxHistoryModal extends Component {
                     className="icon ion-icon clickable is-medium"
                     onClick={this.handleClose}
                   >
-                    <ion-icon name="close-outline"></ion-icon>
+                    <ion-icon name="close-outline" />
                   </span>
                 </div>
                 <div className="level-item">
@@ -165,7 +160,7 @@ export default class TxHistoryModal extends Component {
                   'is-active': this.state.loading,
                 })}
               >
-                <div className="loader is-loading"></div>
+                <div className="loader is-loading" />
               </div>
 
               {emptyQueue && (
@@ -175,56 +170,56 @@ export default class TxHistoryModal extends Component {
                       No recent transactions
                     </div>
                     <div className="icon has-text-info-light">
-                      <ion-icon name="file-tray-outline"></ion-icon>
+                      <ion-icon name="file-tray-outline" />
                     </div>
                   </div>
                 </div>
               )}
 
-              {this.state.showSingleChain &&
-                _.map(singleChainQueue, function (item, i) {
-                  return <TxStatusView key={i} data={item} />;
-                })}
-              {this.state.showSingleChain &&
-                _.keys(singleChainQueue).length > 0 && (
+              {this.state.showSingleChain
+                && _.map(singleChainQueue, (item, i) => <TxStatusView key={i} data={item} />)}
+              {this.state.showSingleChain
+                && _.keys(singleChainQueue).length > 0 && (
                   <div className="footer-note">
                     Only showing transactions in the last 72 hours.
                   </div>
-                )}
+              )}
 
               {!this.state.showSingleChain && (
                 <div className="footer-note mb-2">
                   {xActiveQueue.length > 0
                     ? 'Current active transactions'
-                    : 'No active transactions'}{' '}
-                  ({xActiveQueue.length})
+                    : 'No active transactions'}
+                  {' '}
+                  (
+                  {xActiveQueue.length}
+                  )
                 </div>
               )}
 
-              {!this.state.showSingleChain &&
-                xActiveQueue.map((item, i) => {
-                  return (
-                    <TxCrossChainActiveStatusView
-                      key={i}
-                      data={item}
-                      handleFinishAction={this.handleFinishAction}
-                    />
-                  );
-                })}
+              {!this.state.showSingleChain
+                && xActiveQueue.map((item, i) => (
+                  <TxCrossChainActiveStatusView
+                    key={i}
+                    data={item}
+                    handleFinishAction={this.handleFinishAction}
+                  />
+                ))}
 
               {!this.state.showSingleChain && xHistQueue.length > 0 && (
                 <div className="footer-note mb-2">
-                  Last five historical transactions ({xHistQueue.length}/
-                  {xAllHistQueue.length})
+                  Last five historical transactions (
+                  {xHistQueue.length}
+                  /
+                  {xAllHistQueue.length}
+                  )
                 </div>
               )}
 
-              {!this.state.showSingleChain &&
-                xHistQueue.map(function (item, i) {
-                  return (
-                    <TxCrossChainHistoricalStatusView key={i} data={item} />
-                  );
-                })}
+              {!this.state.showSingleChain
+                && xHistQueue.map((item, i) => (
+                  <TxCrossChainHistoricalStatusView key={i} data={item} />
+                ))}
             </div>
           </div>
         </div>

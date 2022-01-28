@@ -1,16 +1,18 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import React, { useEffect, useRef, useState } from 'react';
 import { createChart, CrosshairMode } from 'lightweight-charts';
-import { ResponsiveContainer, AreaChart, Area, Tooltip } from 'recharts';
+import {
+  ResponsiveContainer, AreaChart, Area, Tooltip
+} from 'recharts';
+import BN from 'bignumber.js';
+import moment from 'moment';
 import TokenPairSelector from './TokenPairSelector';
 import ChartPriceDetails from './ChartPriceDetails';
 import ChartViewOption from './ChartViewOption';
 import ChartRangeSelector from './ChartRangeSelector';
 import EventManager from '../../../utils/events';
-import BN from 'bignumber.js';
 import TokenListManager from '../../../utils/tokenList';
 import CoingeckoManager from '../../../utils/coingecko';
-import moment from 'moment';
 
 export default function TradingViewChart() {
   const DECIMAL_PLACES = 4;
@@ -45,15 +47,15 @@ export default function TradingViewChart() {
     const list = [];
     const fromSymbol = swapConfig.from.symbol;
     const fromAddress = swapConfig.from.address;
-    const fromChain = swapConfig.fromChain;
-    const fromTokenLogo = swapConfig.from.logoURI
+    const { fromChain } = swapConfig;
+    const fromTokenLogo = swapConfig.from.logoURI;
     const toSymbol = swapConfig.to.symbol;
     const toAddress = swapConfig.to.address;
-    const toChain = swapConfig.toChain;
-    const toTokenLogo = swapConfig.to.logoURI
+    const { toChain } = swapConfig;
+    const toTokenLogo = swapConfig.to.logoURI;
 
     list.push({
-      name: fromSymbol + '/' + toSymbol,
+      name: `${fromSymbol}/${toSymbol}`,
       fromSymbol,
       fromAddress,
       fromTokenLogo,
@@ -64,7 +66,7 @@ export default function TradingViewChart() {
       toChain
     });
     list.push({
-      name: toSymbol + '/' + fromSymbol,
+      name: `${toSymbol}/${fromSymbol}`,
       fromSymbol: toSymbol,
       fromAddress: toAddress,
       fromTokenLogo: toTokenLogo,
@@ -77,7 +79,7 @@ export default function TradingViewChart() {
     list.push({
       name: fromSymbol,
       fromSymbol,
-      fromAddress: fromAddress,
+      fromAddress,
       fromTokenLogo,
       fromChain,
     });
@@ -89,8 +91,8 @@ export default function TradingViewChart() {
       fromChain: toChain
     });
     return list;
-  }
-  let candleSeries = useRef(null);
+  };
+  const candleSeries = useRef(null);
   // init states
   const initTokenPair = createTokenPairList();
   const [isLoading, setIsLoading] = useState(false);
@@ -100,18 +102,18 @@ export default function TradingViewChart() {
   );
   const [selectedViewMode, setSelectedViewMode] = useState(viewModes[1]);
   const [selectedTimeRange, setSelectedTimeRange] = useState(
-    timeRangeList['line'][0],
+    timeRangeList.line[0],
   );
   const [isPair, setIsPair] = useState(true);
   const [priceDetails, setPriceDetails] = useState({
     price: 0,
     percent: 0,
-    from: timeRangeList['line'][0].from,
+    from: timeRangeList.line[0].from,
   });
   const [tokenPriceData, setTokenPriceData] = useState([]);
 
   useEffect(() => {
-    let subSwapConfigChange = EventManager.listenFor(
+    const subSwapConfigChange = EventManager.listenFor(
       'swapConfigUpdated',
       handleSwapConfigChange,
     );
@@ -155,9 +157,9 @@ export default function TradingViewChart() {
 
   useEffect(() => {
     if (
-      selectedViewMode === 'candlestick' &&
-      candleChartContainerRef.current &&
-      isValidCandleStickDataType
+      selectedViewMode === 'candlestick'
+      && candleChartContainerRef.current
+      && isValidCandleStickDataType
     ) {
       initCandleStickChart();
       chart.current = createChart(candleChartContainerRef.current, {
@@ -279,46 +281,44 @@ export default function TradingViewChart() {
         );
 
         fromTokenPrices = await fetchLinePrices(
-            platformOfFromChain,
-            fromAddress,
-            'usd',
-            fromTimestamp,
-            toTimestamp,
+          platformOfFromChain,
+          fromAddress,
+          'usd',
+          fromTimestamp,
+          toTimestamp,
         );
         tokenPrices = mergeLinePrices(fromTokenPrices, null);
       }
-    } else {
-      if (selectedPair.fromSymbol && selectedPair.toSymbol) {
-        const fromCoin = TokenListManager.findTokenBySymbolFromCoinGecko(
-            selectedPair.fromSymbol.toLowerCase(),
-        );
-        const toCoin = TokenListManager.findTokenBySymbolFromCoinGecko(
-            selectedPair.toSymbol.toLowerCase(),
-        );
+    } else if (selectedPair.fromSymbol && selectedPair.toSymbol) {
+      const fromCoin = TokenListManager.findTokenBySymbolFromCoinGecko(
+        selectedPair.fromSymbol.toLowerCase(),
+      );
+      const toCoin = TokenListManager.findTokenBySymbolFromCoinGecko(
+        selectedPair.toSymbol.toLowerCase(),
+      );
 
-        if (fromCoin && toCoin) {
-          fromTokenPrices = (await fetchCandleStickPrices(
-              fromCoin.id,
-              'usd',
-              timeRange.value,
-          )) || [];
-          toTokenPrices = (await fetchCandleStickPrices(
-              toCoin.id,
-              'usd',
-              timeRange.value,
-          )) || [];
-        }
-
-        tokenPrices = mergeCandleStickPrices(fromTokenPrices, toTokenPrices);
-      } else {
-        const coinId = TokenListManager.findTokenBySymbolFromCoinGecko(selectedPair.fromSymbol.toLowerCase());
-        if (coinId) {
-          fromTokenPrices = await fetchCandleStickPrices(coinId.id, 'usd', timeRange.value);
-        }
-        tokenPrices = mergeCandleStickPrices(fromTokenPrices, null);
+      if (fromCoin && toCoin) {
+        fromTokenPrices = (await fetchCandleStickPrices(
+          fromCoin.id,
+          'usd',
+          timeRange.value,
+        )) || [];
+        toTokenPrices = (await fetchCandleStickPrices(
+          toCoin.id,
+          'usd',
+          timeRange.value,
+        )) || [];
       }
+
+      tokenPrices = mergeCandleStickPrices(fromTokenPrices, toTokenPrices);
+    } else {
+      const coinId = TokenListManager.findTokenBySymbolFromCoinGecko(selectedPair.fromSymbol.toLowerCase());
+      if (coinId) {
+        fromTokenPrices = await fetchCandleStickPrices(coinId.id, 'usd', timeRange.value);
+      }
+      tokenPrices = mergeCandleStickPrices(fromTokenPrices, null);
     }
-    setTimeout(function () {
+    setTimeout(() => {
       setIsLoading(false);
       setTokenPriceData(tokenPrices);
       if (tokenPrices.length > 0) {
@@ -334,7 +334,7 @@ export default function TradingViewChart() {
   };
 
   const getPriceDetails = (prices, viewMode) => {
-    let length = prices.length;
+    const { length } = prices;
     let price = 0;
     let percent = 0;
     const firstItem = prices[0];
@@ -362,15 +362,14 @@ export default function TradingViewChart() {
   const getContractAddress = (contract, symbol, platform) => {
     if (wrapTokens.hasOwnProperty(symbol)) {
       return wrapTokens[symbol];
-    } else {
-      const coin = TokenListManager.findTokenBySymbolFromCoinGecko(
-        symbol.toLowerCase(),
-      );
-      if (coin && coin['platforms'].hasOwnProperty(platform)) {
-        return coin['platforms'][platform];
-      }
-      return contract;
     }
+    const coin = TokenListManager.findTokenBySymbolFromCoinGecko(
+      symbol.toLowerCase(),
+    );
+    if (coin && coin.platforms.hasOwnProperty(platform)) {
+      return coin.platforms[platform];
+    }
+    return contract;
   };
 
   const fetchLinePrices = async (
@@ -391,7 +390,6 @@ export default function TradingViewChart() {
       const url = `${platform}/contract/${contract.toLowerCase()}/market_chart/range?vs_currency=${currency}&from=${fromTimestamp}&to=${toTimestamp}`;
       result = await CoingeckoManager.fetchLinePrices(url);
       return result;
-
     } catch (err) {
       console.error('Failed to fetch price data', err);
       await fetchLinePrices(
@@ -425,10 +423,10 @@ export default function TradingViewChart() {
   const mergeLinePrices = (fromTokenPrices, toTokenPrices) => {
     const prices = [];
     if (
-      fromTokenPrices &&
-      toTokenPrices &&
-      fromTokenPrices.length > 0 &&
-      toTokenPrices.length > 0
+      fromTokenPrices
+      && toTokenPrices
+      && fromTokenPrices.length > 0
+      && toTokenPrices.length > 0
     ) {
       if (fromTokenPrices.length === toTokenPrices.length) {
         for (let i = 0; i < fromTokenPrices.length; i++) {
@@ -465,9 +463,9 @@ export default function TradingViewChart() {
         }
       }
     } else if (
-      fromTokenPrices &&
-      fromTokenPrices.length > 0 &&
-      toTokenPrices === null
+      fromTokenPrices
+      && fromTokenPrices.length > 0
+      && toTokenPrices === null
     ) {
       for (let i = 0; i < fromTokenPrices.length; i++) {
         prices.push({
@@ -482,15 +480,14 @@ export default function TradingViewChart() {
   const mergeCandleStickPrices = (fromTokenPrices, toTokenPrices) => {
     const prices = [];
     if (
-      fromTokenPrices &&
-      toTokenPrices &&
-      fromTokenPrices.length > 0 &&
-      toTokenPrices.length > 0
+      fromTokenPrices
+      && toTokenPrices
+      && fromTokenPrices.length > 0
+      && toTokenPrices.length > 0
     ) {
       const tempObj = {};
       for (let i = 0; i < fromTokenPrices.length; i++) {
-        tempObj[getFilteredTimestamp(fromTokenPrices[i][0])] =
-          fromTokenPrices[i];
+        tempObj[getFilteredTimestamp(fromTokenPrices[i][0])] = fromTokenPrices[i];
       }
 
       for (let j = 0; j < toTokenPrices.length; j++) {
@@ -542,7 +539,7 @@ export default function TradingViewChart() {
   const getTimestamps = (timeRange) => {
     let fromTimestamp = Date.now();
     const toTimestamp = Math.ceil(Date.now() / 1000);
-    let currentDate = new Date();
+    const currentDate = new Date();
     switch (timeRange.name) {
       case '1D':
         currentDate.setDate(currentDate.getDate() - 1);
@@ -565,8 +562,7 @@ export default function TradingViewChart() {
     return { fromTimestamp, toTimestamp };
   };
 
-  const dateFormatter = (item) =>
-    moment(item * 1000).format('h:mm A MMM. Do z');
+  const dateFormatter = (item) => moment(item * 1000).format('h:mm A MMM. Do z');
 
   const handleSwapConfigChange = () => {
     const updatedTokenPairList = createTokenPairList();
@@ -594,7 +590,9 @@ export default function TradingViewChart() {
   };
 
   const handleMove = (
-    { isTooltipActive, activePayload, activeTooltipIndex, activeLabel },
+    {
+      isTooltipActive, activePayload, activeTooltipIndex, activeLabel
+    },
     e,
   ) => {
     if (isTooltipActive && activePayload.length > 0) {
@@ -608,7 +606,7 @@ export default function TradingViewChart() {
 
   const handleLeave = (chartState, e) => {
     if (tokenPriceData.length > 0) {
-      const length = tokenPriceData.length;
+      const { length } = tokenPriceData;
       const lastItem = tokenPriceData[length - 1];
       setPriceDetails({ ...priceDetails, price: lastItem.value || 0 });
     }
@@ -634,58 +632,54 @@ export default function TradingViewChart() {
             <img src="/images/chart_line_animate.svg" />
           </span>
         );
-      } else {
-        return (
-          <span id="trading-chart-loading-bar">
-            <img src="/images/chart_cundle_animate.svg" />
-          </span>
-        );
       }
-    } else {
-      if (priceData.length === 0) {
-        return (
-          <div className="chart">
-            <div>
-              <img width={110} height={110} src="/images/no_data.svg" />
-            </div>
-            <div className="empty-primary-text">No Data</div>
-            <div className="empty-sub-text">
-              There's no historical data to display for this token.
-            </div>
-          </div>
-        );
-      } else {
-        if (viewMode === 'line') {
-          return (
-            <ResponsiveContainer width="100%" height={250}>
-              <AreaChart
-                data={priceData}
-                onMouseMove={handleMove}
-                onMouseLeave={handleLeave}
-              >
-                <defs>
-                  <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="10%" stopColor="#45C581" stopOpacity="0.1" />
-                    <stop offset="95%" stopColor="#FFFFFF" stopOpacity="0.1" />
-                  </linearGradient>
-                </defs>
-                <Tooltip position={{ y: 0 }} content={<CustomTooltip />} />
-                <Area
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#89c984"
-                  strokeWidth={1.5}
-                  fillOpacity={1}
-                  fill="url(#colorUv)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          );
-        } else {
-          return <div className="chart" ref={candleChartContainerRef} />;
-        }
-      }
+      return (
+        <span id="trading-chart-loading-bar">
+          <img src="/images/chart_cundle_animate.svg" />
+        </span>
+      );
     }
+    if (priceData.length === 0) {
+      return (
+        <div className="chart">
+          <div>
+            <img width={110} height={110} src="/images/no_data.svg" />
+          </div>
+          <div className="empty-primary-text">No Data</div>
+          <div className="empty-sub-text">
+            There's no historical data to display for this token.
+          </div>
+        </div>
+      );
+    }
+    if (viewMode === 'line') {
+      return (
+        <ResponsiveContainer width="100%" height={250}>
+          <AreaChart
+            data={priceData}
+            onMouseMove={handleMove}
+            onMouseLeave={handleLeave}
+          >
+            <defs>
+              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="10%" stopColor="#45C581" stopOpacity="0.1" />
+                <stop offset="95%" stopColor="#FFFFFF" stopOpacity="0.1" />
+              </linearGradient>
+            </defs>
+            <Tooltip position={{ y: 0 }} content={<CustomTooltip />} />
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke="#89c984"
+              strokeWidth={1.5}
+              fillOpacity={1}
+              fill="url(#colorUv)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      );
+    }
+    return <div className="chart" ref={candleChartContainerRef} />;
   };
 
   return (

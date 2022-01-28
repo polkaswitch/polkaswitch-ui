@@ -19,9 +19,9 @@ export default class GasPriceControl extends Component {
   }
 
   getStateFromStorage() {
-    let gasSpeedSetting = SwapFn.getSetting().gasSpeedSetting;
-    let isCustomGasPrice = SwapFn.getSetting().isCustomGasPrice;
-    let customGasPrice = SwapFn.getSetting().customGasPrice;
+    const { gasSpeedSetting } = SwapFn.getSetting();
+    const { isCustomGasPrice } = SwapFn.getSetting();
+    const { customGasPrice } = SwapFn.getSetting();
 
     return {
       custom: isCustomGasPrice,
@@ -68,10 +68,20 @@ export default class GasPriceControl extends Component {
       <div className="gas-price-control">
         <div className={classnames('select', { disabled: this.state.custom })}>
           <select value={gasSpeed} onChange={this.handleClick}>
-            <option value="safeLow">Auto (~{window.GAS_STATS.safeLow})</option>
-            <option value="fast">Fast (~{window.GAS_STATS.fast})</option>
+            <option value="safeLow">
+              Auto (~
+              {window.GAS_STATS.safeLow}
+              )
+            </option>
+            <option value="fast">
+              Fast (~
+              {window.GAS_STATS.fast}
+              )
+            </option>
             <option value="fastest">
-              Fastest (~{window.GAS_STATS.fastest})
+              Fastest (~
+              {window.GAS_STATS.fastest}
+              )
             </option>
           </select>
         </div>

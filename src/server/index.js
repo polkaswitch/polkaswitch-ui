@@ -1,18 +1,18 @@
 const express = require('express');
 const cookieSession = require('cookie-session');
 const helmet = require('helmet');
-var csrf = require('csurf');
+const csrf = require('csurf');
 const os = require('os');
 const path = require('path');
-var compression = require('compression');
-var morgan = require('morgan');
-var flash = require('connect-flash');
-var _ = require('underscore');
+const compression = require('compression');
+const morgan = require('morgan');
+const flash = require('connect-flash');
+const _ = require('underscore');
 
-var Sentry = require('@sentry/node');
-var Tracing = require('@sentry/tracing');
+const Sentry = require('@sentry/node');
+const Tracing = require('@sentry/tracing');
 
-var passport = require('./middleware/auth');
+const passport = require('./middleware/auth');
 // var redis = require('./middleware/redis');
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -29,7 +29,7 @@ Sentry.init({
     new Tracing.Integrations.Express({ app }),
   ],
   release:
-    process.env.HEROKU_APP_NAME + '-' + process.env.HEROKU_RELEASE_VERSION,
+    `${process.env.HEROKU_APP_NAME}-${process.env.HEROKU_RELEASE_VERSION}`,
 
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
@@ -50,7 +50,7 @@ if (isProduction) {
   app.use(helmet({ contentSecurityPolicy: false }));
 }
 
-var defaultCsp;
+let defaultCsp;
 
 if (isProduction) {
   defaultCsp = helmet.contentSecurityPolicy.getDefaultDirectives();
@@ -78,10 +78,10 @@ app.enable('trust proxy');
 
 // force HTTPS
 if (process.env.FORCE_HTTPS) {
-  app.use(function(request, response, next) {
+  app.use((request, response, next) => {
     if (isProduction && !request.secure) {
       return response.redirect(
-        "https://" + request.headers.host + request.url
+        `https://${request.headers.host}${request.url}`
       );
     }
 
@@ -89,19 +89,19 @@ if (process.env.FORCE_HTTPS) {
   });
 }
 
-app.set('views', __dirname + '/views');
+app.set('views', `${__dirname}/views`);
 app.set('view engine', 'ejs');
 
 // Bodyparser middleware, extended false does not allow nested payloads
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.get("/health", function(req, res) {
+app.get('/health', (req, res) => {
   const data = {
     uptime: process.uptime(),
     message: 'Ok',
     date: new Date()
-  }
+  };
 
   res.status(200).send(data);
 });
@@ -110,11 +110,11 @@ if (process.env.HTTP_PASSWORD) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  app.get('/debug', function (req, res) {
+  app.get('/debug', (req, res) => {
     throw new Error('Test Error');
   });
 
-  app.get('/login', function (req, res, next) {
+  app.get('/login', (req, res, next) => {
     res.render('pages/login', { messages: req.flash('error') });
   });
 
@@ -127,7 +127,7 @@ if (process.env.HTTP_PASSWORD) {
     }),
   );
 
-  app.get('*', function (req, res, next) {
+  app.get('*', (req, res, next) => {
     if (req.user) {
       next();
     } else {
@@ -135,7 +135,7 @@ if (process.env.HTTP_PASSWORD) {
     }
   });
 
-  app.use(function (req, res, next) {
+  app.use((req, res, next) => {
     if (req.user) {
       next();
     } else {
@@ -147,11 +147,11 @@ if (process.env.HTTP_PASSWORD) {
 app.use(express.static('dist'));
 app.use(express.static('public'));
 
-app.use('*', function (req, res) {
+app.use('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../../', '/dist/index.html'));
 });
 
-app.use(function onNotFound(req, res, next) {
+app.use((req, res, next) => {
   res.status(404).send({ error: 'not found' });
 });
 
@@ -159,12 +159,12 @@ app.use(function onNotFound(req, res, next) {
 // middleware and after all controllers
 app.use(Sentry.Handlers.errorHandler());
 
-app.use(function onError(err, req, res, next) {
+app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).send({ error: 'crash - (X_X)' });
 });
 
-var server = app.listen(process.env.PORT || 5000, () => {
+const server = app.listen(process.env.PORT || 5000, () => {
   console.log(`ENV: IS_MAIN_NETWORK: ${process.env.IS_MAIN_NETWORK}`);
   console.log(`ENV: ${process.env.HEROKU_APP_NAME}-${process.env.HEROKU_RELEASE_VERSION}`);
   console.log(`Listening on port ${process.env.PORT || 5000}!`);

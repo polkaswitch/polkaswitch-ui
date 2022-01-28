@@ -7,7 +7,9 @@ export default class CustomTokenDetails extends Component {
   }
 
   render() {
-    const { errored, symbol, name, decimals } = this.props;
+    const {
+      errored, symbol, name, decimals
+    } = this.props;
     return (
       <div
         style={{ marginTop: 10 }}

@@ -1,9 +1,10 @@
 import _ from 'underscore';
-import EventManager from './events';
 import * as ethers from 'ethers';
+import EventManager from './events';
 import Storage from './storage';
 
-let store = require('store');
+const store = require('store');
+
 const Utils = ethers.utils;
 
 window.TokenListManager = {
@@ -14,20 +15,16 @@ window.TokenListManager = {
   },
 
   _tokenLists: {},
-  initialize: async function () {
+  async initialize() {
     // pre-load all token lists
-    var filteredNetworks = _.filter(window.NETWORK_CONFIGS, (v) => {
-      return v.enabled;
-    });
+    const filteredNetworks = _.filter(window.NETWORK_CONFIGS, (v) => v.enabled);
 
-    for (var network of filteredNetworks) {
-      var tokenList = await (await fetch(network.tokenList)).json();
+    for (const network of filteredNetworks) {
+      let tokenList = await (await fetch(network.tokenList)).json();
 
       tokenList = _.map(
-        _.filter(tokenList, function (v) {
-          return v.native || (v.symbol && Utils.isAddress(v.address));
-        }),
-        function (v) {
+        _.filter(tokenList, (v) => v.native || (v.symbol && Utils.isAddress(v.address))),
+        (v) => {
           if (v.address) {
             v.address = Utils.getAddress(v.address);
           }
@@ -40,30 +37,30 @@ window.TokenListManager = {
     }
   },
 
-  getCurrentNetworkConfig: function () {
-    var network = _.findWhere(window.NETWORK_CONFIGS, {
+  getCurrentNetworkConfig() {
+    const network = _.findWhere(window.NETWORK_CONFIGS, {
       name: Storage.getNetwork(),
     });
     return network;
   },
 
-  getNetworkById: function (chainId) {
-    var network = _.findWhere(window.NETWORK_CONFIGS, {
-      chainId: '' + chainId,
+  getNetworkById(chainId) {
+    const network = _.findWhere(window.NETWORK_CONFIGS, {
+      chainId: `${chainId}`,
     });
     return network;
   },
 
-  getNetworkByName: function (name) {
-    var network = _.findWhere(window.NETWORK_CONFIGS, { name });
+  getNetworkByName(name) {
+    const network = _.findWhere(window.NETWORK_CONFIGS, { name });
     return network;
   },
 
-  updateNetwork: function (network, connectStrategy) {
+  updateNetwork(network, connectStrategy) {
     EventManager.emitEvent('networkPendingUpdate', 1);
     Storage.updateNetwork(network);
 
-    this.updateTokenList().then(function () {
+    this.updateTokenList().then(() => {
       // reset default settings because gas values are updated per network
       Storage.resetNetworkSensitiveSettings();
 
@@ -75,16 +72,16 @@ window.TokenListManager = {
     });
   },
 
-  updateTokenList: async function () {
-    var network = this.getCurrentNetworkConfig();
-    var tokenList = this.getTokenListForNetwork(network);
-    var gasStats;
+  async updateTokenList() {
+    const network = this.getCurrentNetworkConfig();
+    const tokenList = this.getTokenListForNetwork(network);
+    let gasStats;
 
     if (network.gasApi) {
       gasStats = await (await fetch(network.gasApi)).json();
     } else {
       const provider = new ethers.providers.JsonRpcProvider(network.nodeProviders[0]);
-      let defaultGasPrice = Math.ceil(Utils.formatUnits((await provider.getGasPrice()), "gwei"));
+      const defaultGasPrice = Math.ceil(Utils.formatUnits((await provider.getGasPrice()), 'gwei'));
 
       gasStats = { safeLow: defaultGasPrice, fast: defaultGasPrice, fastest: defaultGasPrice };
     }
@@ -104,9 +101,7 @@ window.TokenListManager = {
 
     window.GAS_STATS = _.mapObject(
       _.pick(gasStats, ['fast', 'fastest', 'safeLow']),
-      function (v, k) {
-        return Math.ceil(v * 1.1);
-      },
+      (v, k) => Math.ceil(v * 1.1),
     );
 
     window.TOKEN_LIST = tokenList;
@@ -129,28 +124,26 @@ window.TokenListManager = {
   },
 
   // TODO need to refactor this
-  updateSwapConfig: function (swap) {
+  updateSwapConfig(swap) {
     this.swap = _.extend(this.getSwapConfig(), swap);
     store.set('swap', this.swap);
     EventManager.emitEvent('swapConfigUpdated', 1);
   },
 
-  getSwapConfig: function () {
+  getSwapConfig() {
     return this.swap;
   },
 
-  findTokenById: function (tid, optionalNetwork) {
+  findTokenById(tid, optionalNetwork) {
     let tokenList = window.TOKEN_LIST;
     if (optionalNetwork) {
       tokenList = this.getTokenListForNetwork(optionalNetwork);
     }
 
-    const foundToken = _.find(tokenList, function (v) {
-      return (
-        v.address.toLowerCase() === tid.toLowerCase() ||
-        v.symbol.toLowerCase() === tid.toLowerCase()
-      );
-    });
+    const foundToken = _.find(tokenList, (v) => (
+      v.address.toLowerCase() === tid.toLowerCase()
+        || v.symbol.toLowerCase() === tid.toLowerCase()
+    ));
 
     if (!foundToken) {
       console.log(
@@ -162,13 +155,11 @@ window.TokenListManager = {
     return foundToken;
   },
 
-  findTokenBySymbolFromCoinGecko: function (symbol) {
-    return _.find(window.COINGECKO_TOKEN_LIST, function (v) {
-      return v.symbol.toLowerCase() === symbol;
-    });
+  findTokenBySymbolFromCoinGecko(symbol) {
+    return _.find(window.COINGECKO_TOKEN_LIST, (v) => v.symbol.toLowerCase() === symbol);
   },
 
-  updateTokenListwithCustom: function (network) {
+  updateTokenListwithCustom(network) {
     const customTokenAddresses = store.get('customTokenAddress');
 
     if (customTokenAddresses) {
@@ -183,10 +174,10 @@ window.TokenListManager = {
     }
   },
 
-  addCustomToken: function (token) {
+  addCustomToken(token) {
     const network = this.getCurrentNetworkConfig();
-    const chainId = network.chainId;
-    let customToken = token;
+    const { chainId } = network;
+    const customToken = token;
 
     if (chainId > 0) {
       customToken.chainId = Number(chainId);
@@ -195,8 +186,8 @@ window.TokenListManager = {
       let addresses = [];
 
       if (
-        !_.isEmpty(customTokenAddresses) &&
-        !_.isUndefined(customTokenAddresses[chainId])
+        !_.isEmpty(customTokenAddresses)
+        && !_.isUndefined(customTokenAddresses[chainId])
       ) {
         addresses = customTokenAddresses[chainId];
       }
@@ -207,7 +198,7 @@ window.TokenListManager = {
     }
   },
 
-  getTokenListForNetwork: function (network) {
+  getTokenListForNetwork(network) {
     return this._tokenLists[+network.chainId];
   },
 };

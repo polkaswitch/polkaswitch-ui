@@ -13,7 +13,7 @@ export default class BasicModal extends Component {
         <div
           onClick={this.props.handleClose}
           className="modal-background"
-        ></div>
+        />
         <div className="modal-content">
           <div
             className={classnames(
@@ -33,7 +33,7 @@ export default class BasicModal extends Component {
                     className="icon ion-icon clickable is-medium"
                     onClick={this.props.handleClose}
                   >
-                    <ion-icon name="close-outline"></ion-icon>
+                    <ion-icon name="close-outline" />
                   </span>
                 </div>
               </div>

@@ -1,11 +1,11 @@
 window.Metrics = {
-  identify: function (userid) {
+  identify(userid) {
     if (window.mixpanel) {
       window.mixpanel.identify(userid);
     }
   },
 
-  track: function (key, props) {
+  track(key, props) {
     if (window.mixpanel) {
       window.mixpanel.track(key, props);
     }

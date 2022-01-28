@@ -17,7 +17,7 @@ export default function EmptyBalances() {
                 Add assets to your wallet to display up to date prices and
                 balances..
               </h3>
-              <button class="button is-success">Start Trading</button>
+              <button className="button is-success">Start Trading</button>
             </div>
           </div>
         </div>

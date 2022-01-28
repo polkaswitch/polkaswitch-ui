@@ -1,12 +1,12 @@
-var redis = require('redis');
+const redis = require('redis');
 
-var redisClient = redis.createClient({
+const redisClient = redis.createClient({
   url: process.env.REDIS_URL,
 });
 
 ['ready', 'connect', 'reconnecting', 'error', 'end', 'warning'].forEach(
-  function (v) {
-    redisClient.on(v, function (err) {
+  (v) => {
+    redisClient.on(v, (err) => {
       console.log(`REDIS: ${v}: ${err || 'done'}`);
     });
   },

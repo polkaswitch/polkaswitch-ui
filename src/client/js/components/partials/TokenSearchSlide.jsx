@@ -8,31 +8,27 @@ export default class TokenSearchSlide extends Component {
   }
 
   render() {
-    var network =
-      this.props.network || TokenListManager.getCurrentNetworkConfig();
-    var crossChainTokens = _.map(
+    const network = this.props.network || TokenListManager.getCurrentNetworkConfig();
+    const crossChainTokens = _.map(
       network.supportedCrossChainTokens,
-      function (v) {
-        return TokenListManager.findTokenById(v, network);
-      },
+      (v) => TokenListManager.findTokenById(v, network),
     );
 
     // passing undefined, will default to the original network list.
     // we only want to show the cross-chain tokens from the sending chain
-    var tokenList =
-      this.props.isCrossChain && this.props.isFrom
-        ? crossChainTokens
-        : undefined;
+    const tokenList = this.props.isCrossChain && this.props.isFrom
+      ? crossChainTokens
+      : undefined;
 
     return (
       <div className="page page-stack page-view-search">
         <div className="page-inner">
           <TokenSearchBar
-            inline={true}
+            inline
             network={this.props.network}
             tokenList={tokenList}
             focused={this.props.showSearch}
-            placeholder={'Try DAI, USDT or Ethereum ... '}
+            placeholder="Try DAI, USDT or Ethereum ... "
             handleClose={this.props.handleSearchToggle('to')} // "to" is arbitary
             handleTokenChange={this.props.handleTokenChange}
           />

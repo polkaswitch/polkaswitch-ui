@@ -1,15 +1,16 @@
 import _ from 'underscore';
 import store from 'store';
 import BN from 'bignumber.js';
-import { BigNumber, constants, providers, Signer, utils } from 'ethers';
+import {
+  BigNumber, constants, providers, Signer, utils
+} from 'ethers';
 
+import { getRandomBytes32 } from '@connext/nxtp-utils';
 import Wallet from './wallet';
 import swapFn from './swapFn';
 import HopUtils from './hop';
 import Nxtp from './nxtp';
 import Storage from './storage';
-
-import { getRandomBytes32 } from '@connext/nxtp-utils';
 
 // hard-code for now. I could not find this easily as a function in HopSDK
 const HOP_SUPPORTED_BRIDGE_TOKENS = [
@@ -39,56 +40,52 @@ export default {
   _signerAddress: '',
   _queue: {},
 
-  initialize: async function () {},
+  async initialize() {},
 
-  getBridgeInterface: function (nonce) {
-    var tx = this.getTx(nonce);
-    var bridgeOption = Storage.swapSettings.bridgeOption;
+  getBridgeInterface(nonce) {
+    const tx = this.getTx(nonce);
+    let { bridgeOption } = Storage.swapSettings;
 
     if (tx?.bridge) {
       bridgeOption = tx.bridge;
     }
 
-    if ('hop' === bridgeOption) {
+    if (bridgeOption === 'hop') {
       return HopUtils;
-    } else {
-      return Nxtp;
     }
+    return Nxtp;
   },
 
-  isSupported: function (to, toChain, from, fromChain) {
-    var bridgeOption = Storage.swapSettings.bridgeOption;
+  isSupported(to, toChain, from, fromChain) {
+    const { bridgeOption } = Storage.swapSettings;
 
-    var targetChainIds = [+toChain.chainId, +fromChain.chainId];
+    const targetChainIds = [+toChain.chainId, +fromChain.chainId];
 
-    if ('hop' === bridgeOption) {
+    if (bridgeOption === 'hop') {
       if (!HOP_SUPPORTED_CHAINS.includes(+toChain.chainId)) {
         return [false, `${toChain.name} is not supported by Hop Bridge`];
-      } else if (!HOP_SUPPORTED_CHAINS.includes(+fromChain.chainId)) {
+      }
+      if (!HOP_SUPPORTED_CHAINS.includes(+fromChain.chainId)) {
         return [false, `${fromChain.name} is not supported by Hop Bridge`];
-      } else {
-        return [true, false];
       }
-    } else {
-      if (!CONNEXT_SUPPORTED_CHAINS.includes(+toChain.chainId)) {
-        return [false, `${toChain.name} is not supported by Connext Bridge`];
-      } else if (!CONNEXT_SUPPORTED_CHAINS.includes(+fromChain.chainId)) {
-        return [false, `${fromChain.name} is not supported by Connext Bridge`];
-      } else {
-        return [true, false];
-      }
+      return [true, false];
+    } if (!CONNEXT_SUPPORTED_CHAINS.includes(+toChain.chainId)) {
+      return [false, `${toChain.name} is not supported by Connext Bridge`];
+    } if (!CONNEXT_SUPPORTED_CHAINS.includes(+fromChain.chainId)) {
+      return [false, `${fromChain.name} is not supported by Connext Bridge`];
     }
+    return [true, false];
   },
 
-  supportedBridges: function (to, toChain, from, fromChain) {
-    var bridges = [];
-    var targetChainIds = [+toChain.chainId, +fromChain.chainId];
+  supportedBridges(to, toChain, from, fromChain) {
+    const bridges = [];
+    const targetChainIds = [+toChain.chainId, +fromChain.chainId];
 
     if (_.includes(CONNEXT_SUPPORTED_CHAINS, targetChainIds)) {
     }
   },
 
-  getEstimate: function (
+  getEstimate(
     sendingChainId,
     sendingAssetId,
     receivingChainId,
@@ -120,9 +117,9 @@ export default {
     );
   },
 
-  transferStepOne: function (transactionId) {
+  transferStepOne(transactionId) {
     const bridgeInterface = this.getBridgeInterface(transactionId);
-    var tx = this.getTx(transactionId);
+    const tx = this.getTx(transactionId);
     return bridgeInterface.transferStepOne(
       transactionId,
       tx.sendingChainId,
@@ -134,9 +131,9 @@ export default {
     );
   },
 
-  transferStepTwo: function (transactionId) {
+  transferStepTwo(transactionId) {
     const bridgeInterface = this.getBridgeInterface(transactionId);
-    var tx = this.getTx(transactionId);
+    const tx = this.getTx(transactionId);
     return bridgeInterface.transferStepTwo(
       transactionId,
       tx.sendingChainId,
@@ -148,16 +145,16 @@ export default {
     );
   },
 
-  twoStepTransferRequired: function (nonce) {
-    var tx = this.getTx(nonce);
+  twoStepTransferRequired(nonce) {
+    const tx = this.getTx(nonce);
     if (!tx) {
       return false;
     }
 
-    return 'connext' === tx.bridge;
+    return tx.bridge === 'connext';
   },
 
-  getTx: function (nonce) {
+  getTx(nonce) {
     return this._queue[nonce];
   },
 };

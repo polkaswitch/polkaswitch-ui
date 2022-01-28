@@ -1,25 +1,34 @@
 import React from 'react';
+
 export default function ChartPriceDetails(props) {
-  const priceDetails = props.priceDetails;
+  const { priceDetails } = props;
   const renderPrice = (price, isPair) => {
     if (isPair) {
       return <div className="price">{price}</div>;
-    } else {
-      return <div className="price">${price}</div>;
     }
+    return (
+      <div className="price">
+        $
+        {price}
+      </div>
+    );
   };
 
   const renderPercent = (percent) => {
     if (percent > 0) {
       return (
         <div className="percent" style={{ color: '#58B57E' }}>
-          +{percent}%
+          +
+          {percent}
+          %
         </div>
       );
-    } else if (percent < 0) {
+    }
+    if (percent < 0) {
       return (
         <div className="percent" style={{ color: '#E6007A' }}>
-          {percent}%
+          {percent}
+          %
         </div>
       );
     }

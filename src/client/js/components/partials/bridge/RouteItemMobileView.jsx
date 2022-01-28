@@ -4,12 +4,12 @@ import TokenIconImg from '../TokenIconImg';
 import Divider from './Divider';
 
 export default function RouteItemMobileView(props) {
-  const data = props.data;
+  const { data } = props;
 
   return (
     <div className="bridge-route-item-mobile">
-      {data.length > 0 &&
-        _.map(data, function (item, index) {
+      {data.length > 0
+        && _.map(data, (item, index) => {
           switch (item.type) {
             case 'token-network':
               return (

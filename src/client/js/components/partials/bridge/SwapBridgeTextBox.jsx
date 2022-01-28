@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 export default function SwapBridgeTextBox(props) {
-  const info = props.info;
+  const { info } = props;
 
   return (
     <div className="swap-bridge-route-box">
@@ -22,7 +22,8 @@ export default function SwapBridgeTextBox(props) {
           </div>
           <div className="fee-wrapper">
             <span className="text">
-              Fee:{' '}
+              Fee:
+              {' '}
               {info.type === 'swap'
                 ? `"$"${info.data.fee}`
                 : `${info.data.fee}"%"`}

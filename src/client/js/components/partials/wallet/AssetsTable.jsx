@@ -1,6 +1,6 @@
 import React from 'react';
-import AssetTableRow from './AssetTableRow';
 import classnames from 'classnames';
+import AssetTableRow from './AssetTableRow';
 
 export default function AssetsTable({ tokenData, loading }) {
   return (
@@ -20,15 +20,13 @@ export default function AssetsTable({ tokenData, loading }) {
         </div>
       </div>
 
-      {tokenData.map((t, i) => {
-        return <AssetTableRow key={i} data={t}></AssetTableRow>;
-      })}
+      {tokenData.map((t, i) => <AssetTableRow key={i} data={t} />)}
 
       <div
         className={classnames('wallets-page-loader', { 'is-hidden': !loading })}
       >
         <div className="loader-text">Loading balances</div>
-        <div className="loader is-loading"></div>
+        <div className="loader is-loading" />
       </div>
     </div>
   );

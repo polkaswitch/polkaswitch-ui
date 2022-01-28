@@ -8,7 +8,7 @@ const defaultCurrentValue = 0.5;
 export default class SwapSlippageControl extends Component {
   constructor(props) {
     super(props);
-    const slippage = SwapFn.getSetting().slippage;
+    const { slippage } = SwapFn.getSetting();
     if (tolerances.indexOf(slippage) > -1) {
       this.state = {
         custom: false,
@@ -59,21 +59,20 @@ export default class SwapSlippageControl extends Component {
     return (
       <div className="slippage-control">
         {tolerances.map(
-          function (v) {
-            return (
-              <span
-                key={v}
-                onClick={this.handleClick(v)}
-                className={classnames('button', {
-                  'is-info is-light is-outlined':
+          (v) => (
+            <span
+              key={v}
+              onClick={this.handleClick(v)}
+              className={classnames('button', {
+                'is-info is-light is-outlined':
                     !this.state.custom && +v === this.state.current,
-                  disabled: this.state.custom,
-                })}
-              >
-                {v}%
-              </span>
-            );
-          }.bind(this),
+                disabled: this.state.custom,
+              })}
+            >
+              {v}
+              %
+            </span>
+          ),
         )}
         <div className="control has-icons-right">
           <input

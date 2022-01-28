@@ -3,7 +3,7 @@ import Storage from './storage';
 export default {
   _baseURL: 'https://api.coingecko.com/api/v3',
 
-  fetchData: async function (url) {
+  async fetchData(url) {
     let result = null;
 
     try {
@@ -23,30 +23,28 @@ export default {
     }
   },
 
-  getCoinsFromContract: async function (network, address) {
+  async getCoinsFromContract(network, address) {
     const url = `coins/${network}/contract/${address.toLowerCase()}`;
     return await this.fetchData(url);
   },
 
-  fetchLinePrices: async function (url) {
+  async fetchLinePrices(url) {
     const data = await this.fetchData(`coins/${url}`);
     if (data && data.prices) {
       return data.prices;
-    } else {
-      return [];
     }
+    return [];
   },
 
-  fetchCandleStickPrices: async function (url) {
+  async fetchCandleStickPrices(url) {
     const data = await this.fetchData(`coins/${url}`);
     if (data) {
       return data;
-    } else {
-      return [];
     }
+    return [];
   },
 
-  getLogoURL: async function (network, address) {
+  async getLogoURL(network, address) {
     // check cached token logo urls at the first time.
     const imageUrl = Storage.getCachedTokenLogoUrl(address);
     if (imageUrl) {
@@ -58,8 +56,7 @@ export default {
     if (data && data.image && data.image.small) {
       Storage.updateCachedTokenLogoUrl(address, data.image.small);
       return data.image.small;
-    } else {
-      return null;
     }
+    return null;
   },
 };

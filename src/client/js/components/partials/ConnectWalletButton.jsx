@@ -37,14 +37,14 @@ export default class ConnectWalletButton extends Component {
   }
 
   getTruncWalletAddress() {
-    var address = Wallet.currentAddress();
+    const address = Wallet.currentAddress();
 
     if (!address) {
       return 'n/a';
     }
 
-    var first = address.substring(0, 7);
-    var last = address.substring(address.length - 5, address.length);
+    const first = address.substring(0, 7);
+    const last = address.substring(address.length - 5, address.length);
     return `${first}...${last}`;
   }
 
@@ -52,7 +52,7 @@ export default class ConnectWalletButton extends Component {
     if (Wallet.isConnectedToAnyNetwork()) {
       return (
         <>
-          <span className="dot"></span>
+          <span className="dot" />
           <img
             className="image-icon"
             width={20}
@@ -62,17 +62,16 @@ export default class ConnectWalletButton extends Component {
           <span className="wallet-address">{this.getTruncWalletAddress()}</span>
         </>
       );
-    } else {
-      return (
-        <>
-          <span>Connect Wallet</span>
-        </>
-      );
     }
+    return (
+      <>
+        <span>Connect Wallet</span>
+      </>
+    );
   }
 
   render() {
-    var isConnected = Wallet.isConnectedToAnyNetwork();
+    const isConnected = Wallet.isConnectedToAnyNetwork();
 
     return (
       <div
