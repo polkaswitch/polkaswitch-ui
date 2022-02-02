@@ -460,7 +460,8 @@ html, body {
 
 .bridge-column {
   flex: none;
-  width: 726px;
+  width: 100%;
+  max-width: 900px;
 }
 
 @media screen and (max-width: 768px) {
@@ -704,7 +705,7 @@ div.modal-basic-style {
 
   &.is-active {
     opacity: 0.9;
-    z-index: 1000;
+    z-index: 20;
   }
 }
 

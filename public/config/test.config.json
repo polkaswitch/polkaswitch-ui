@@ -138,8 +138,8 @@
   {
     "enabled": true,
     "name": "Smart Chain",
-    "aggregatorAddress": "0x08C1242F51a16f9451D873644ED4E29E224Da71e",
-    "crossChainAggregatorAddress": "0x7cfDd47854ccf321285f6A8726c9fA64bD621D9C",
+    "aggregatorAddress": "0x5b7B3aD0881d0c97642c1319F4E8e91852576044",
+    "crossChainAggregatorAddress": "0x5b7B3aD0881d0c97642c1319F4E8e91852576044",
     "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/info/logo.png",
     "bridgeURI": "https://app.nerve.fi/bridge",
     "tokenList": "/tokens/56.list.json",
@@ -149,9 +149,9 @@
     ],
     "explorerBaseUrl": "https://bscscan.com/tx/",
     "gasApi": false,
-    "desiredParts": 9,
+    "desiredParts": 30,
     "color": "#FCC413",
-    "abi": "oneSplitAbi",
+    "abi": "bscAbi",
     "chain": {
       "chainId": "0x38",
       "rpcUrls": ["https://bsc-dataseed.binance.org/"],
@@ -238,7 +238,7 @@
   {
     "enabled": true,
     "name": "xDai",
-    "aggregatorAddress": "0xF09ecB66eF88973eBE7B0B5B5d700050F200c85D",
+    "aggregatorAddress": "0xD64FA6080D6C480d5B7146CeC239641B92Bf7cbd",
     "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/xdai/info/logo.png",
     "bridgeURI": "https://bridge.xdaichain.com/",
     "tokenList": "/tokens/100.list.json",
@@ -336,7 +336,7 @@
   {
     "enabled": true,
     "name": "Moonriver",
-    "aggregatorAddress": "0x45886377b9930b1fDf0A16EE966F70A0240eD029",
+    "aggregatorAddress": "0xF554A77A1749cFDf5cBCe777B4b3A109692cF3F0",
     "logoURI": "https://assets.coingecko.com/coins/images/17984/small/9285.png",
     "bridgeURI": "https://app.solarbeam.io/bridge",
     "tokenList": "/tokens/1285.list.json",
@@ -371,6 +371,94 @@
     ],
     "coingecko": {
       "platform": "moonriver"
+    },
+    "singleChainSupported": true,
+    "crossChainSupported": false,
+    "supportedCrossChainTokens": [
+    ]
+  },
+  {
+    "enabled": true,
+    "name": "Harmony",
+    "aggregatorAddress": "0x81921F5881b4917b40aA75eC33F0b1c52BFdbae2",
+    "logoURI": "https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793",
+    "bridgeURI": "https://bridge.harmony.one/",
+    "tokenList": "/tokens/1666600000.list.json",
+    "chainId": "1666600000",
+    "nodeProviders": ["https://api.harmony.one"],
+    "explorerBaseUrl": "https://explorer.harmony.one/tx/",
+    "gasApi": false,
+    "desiredParts": 12,
+    "color": "#3164EE",
+    "abi": "harmonyAbi",
+    "chain": {
+      "chainId": "0x63564C40",
+      "rpcUrls": ["https://api.harmony.one"],
+      "chainName": "Harmony",
+      "nativeCurrency": {
+        "name": "ONE",
+        "symbol": "ONE",
+        "decimals": 18
+      }
+    },
+    "defaultPair": {
+      "to": "0xEf977d2f931C1978Db5F6747666fa1eACB0d0339",
+      "from": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+    },
+    "topTokens": [
+      "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "0xEf977d2f931C1978Db5F6747666fa1eACB0d0339",
+      "0x985458E523dB3d53125813eD68c274899e9DfAb4",
+      "0x3C2B8Be99c50593081EAA2A724F0B8285F5aba8f",
+      "0x3095c7557bCb296ccc6e363DE01b760bA031F2d9",
+      "0x6983D1E6DEf3690C4d616b13597A09e6193EA013"
+    ],
+    "coingecko": {
+      "platform": "harmony-shard-0"
+    },
+    "singleChainSupported": true,
+    "crossChainSupported": false,
+    "supportedCrossChainTokens": [
+    ]
+  },
+  {
+    "enabled": true,
+    "name": "Aurora",
+    "aggregatorAddress": "0x43A402E15fa6A3670beD6820891eD6b68298f303",
+    "logoURI": "https://assets.coingecko.com/coins/images/20582/small/aurora.jpeg?1637250883",
+    "bridgeURI": "https://rainbowbridge.app/transfer",
+    "tokenList": "/tokens/1313161554.list.json",
+    "chainId": "1313161554",
+    "nodeProviders": ["https://mainnet.aurora.dev"],
+    "explorerBaseUrl": "https://explorer.mainnet.aurora.dev/tx/",
+    "gasApi": false,
+    "desiredParts": 18,
+    "color": "#3164EE",
+    "abi": "auroraAbi",
+    "chain": {
+      "chainId": "0x4E454152",
+      "rpcUrls": ["https://mainnet.aurora.dev"],
+      "chainName": "Aurora",
+      "nativeCurrency": {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18
+      }
+    },
+    "defaultPair": {
+      "to": "0xb12bfca5a55806aaf64e99521918a4bf0fc40802",
+      "from": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+    },
+    "topTokens": [
+      "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "0xb12bfca5a55806aaf64e99521918a4bf0fc40802",
+      "0x4988a896b1227218e4a686fde5eabdcabd91571f",
+      "0x8bec47865ade3b172a928df8f990bc7f2a3b9f79",
+      "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d",
+      "0xe3520349f477a5f6eb06107066048508498a291b"
+    ],
+    "coingecko": {
+      "platform": "aurora"
     },
     "singleChainSupported": true,
     "crossChainSupported": false,

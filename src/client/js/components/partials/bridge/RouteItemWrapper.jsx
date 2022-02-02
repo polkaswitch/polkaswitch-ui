@@ -3,8 +3,7 @@ import RouteItemView from './RouteItemView';
 import RouteItemMobileView from './RouteItemMobileView';
 
 export default function RouteItemWrapper(props) {
-  const routeItem = props.data;
-  const handleChange = () => {};
+  const routeItem = props.data.route;
 
   return (
     <div className="bridge-route-item-wrapper">
@@ -12,8 +11,8 @@ export default function RouteItemWrapper(props) {
         type="radio"
         id={`control_${props.index}`}
         name="select"
-        value={routeItem}
-        onChange={handleChange}
+        value={props.data.transactionId}
+        onChange={props.handleChange}
         defaultChecked={props.index === 0}
       />
       <label htmlFor={`control_${props.index}`}>

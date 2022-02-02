@@ -1,10 +1,14 @@
 import _ from 'underscore';
+import * as ethers from 'ethers';
 import BN from 'bignumber.js';
-import { constants, providers } from 'ethers';
+import { BigNumber, constants, providers, Signer, utils } from 'ethers';
 import { Hop, Chain } from '@hop-protocol/sdk';
 import EventManager from './events';
 import Wallet from './wallet';
 import TokenListManager from './tokenList';
+import Storage from './storage';
+import swapFn from './swapFn';
+import { ApprovalState } from '../constants/Status';
 
 // never exponent
 BN.config({ EXPONENTIAL_AT: 1e9 });
@@ -15,7 +19,7 @@ window.HopUtils = {
   activeTxs: [],
   historicalTxs: [],
 
-  storeKey: () => `hop_${Wallet.currentAddress()}`,
+  _storeKey: () => `hop_${Wallet.currentAddress()}`,
 
   async initalize() {
     EventManager.listenFor('walletUpdated', this.resetSdk.bind(this));
@@ -26,15 +30,13 @@ window.HopUtils = {
   },
 
   isSdkInitalized() {
-    return !!this.sdk;
+    return !!this._sdk;
   },
 
   async initalizeSdk() {
     const signer = Wallet.getProvider().getSigner();
 
-    this.sdk = new Hop('mainnet').connect(signer);
-
-    const { sdk } = this;
+    const sdk = (this._sdk = new Hop('mainnet').connect(signer));
 
     sdk.setChainProviders({
       ethereum: new providers.StaticJsonRpcProvider('https://mainnet.infura.io/v3/84842078b09946638c03157f83405213'),
@@ -51,7 +53,7 @@ window.HopUtils = {
   resetSdk() {
     console.log('Nxtp SDK reset');
 
-    if (this.sdk) {
+    if (this._sdk) {
       // detach all listeners
       // TODO
       // this.sdk.removeAllListeners();
@@ -63,23 +65,32 @@ window.HopUtils = {
     this.historicalTxs = [];
   },
 
-  attachSdkListeners() {
-    //   if (!sdk) { return; }
+  _attachSdkListeners(_sdk) {
+    if (!_sdk) {
+    }
   },
 
-  isSupportedAsset() {
+  isSupportedAsset(sendingAssetId) {
     return true;
   },
 
   async isSupportedNetwork(network) {
-    if (!this.sdk) {
-      this.sdk = await this.initalizeSdk();
+    if (!this._sdk) {
+      this._sdk = await this.initalizeSdk();
     }
 
     return _.contains(this.sdk.supportedChains, network.name.toLowerCase());
   },
 
-  async getEstimate(transactionId, sendingChainId, sendingAssetId, receivingChainId, receivingAssetId, amountBN) {
+  async getEstimate(
+    transactionId,
+    sendingChainId,
+    sendingAssetId,
+    receivingChainId,
+    receivingAssetId,
+    amountBN,
+    receivingAddress,
+  ) {
     if (!Wallet.isConnected()) {
       console.error('Hop: Wallet not connected');
       return false;
@@ -92,13 +103,33 @@ window.HopUtils = {
     const sendingChain = TokenListManager.getNetworkById(sendingChainId);
     const receivingChain = TokenListManager.getNetworkById(receivingChainId);
     const sendingAsset = TokenListManager.findTokenById(sendingAssetId);
+    const bridgeAsset = TokenListManager.findTokenById(
+      sendingAsset.symbol,
+      receivingChain,
+    );
 
-    const hopSendingChain = new Chain(sendingChain.name, sendingChain.chainId, sendingChain.nodeProviders[0]);
-    const hopReceivingChain = new Chain(receivingChain.name, receivingChain.chainId, receivingChain.nodeProviders[0]);
-    const hopBridge = this.sdk.bridge(sendingAsset.symbol);
+    const hopSendingChain = new Chain(
+      sendingChain.name,
+      sendingChain.chainId,
+      sendingChain.nodeProviders[0],
+    );
+    const hopReceivingChain = new Chain(
+      receivingChain.name,
+      receivingChain.chainId,
+      receivingChain.nodeProviders[0],
+    );
+    const hopBridge = this._sdk.bridge(sendingAsset.symbol);
 
-    const amountOut = await hopBridge.getAmountOut(amountBN.toString(), hopSendingChain, hopReceivingChain);
-    const bonderFee = await hopBridge.getTotalFee(amountBN.toString(), hopSendingChain, hopReceivingChain);
+    const amountOut = await hopBridge.getAmountOut(
+      amountBN.toString(),
+      hopSendingChain,
+      hopReceivingChain,
+    );
+    const bonderFee = await hopBridge.getTotalFee(
+      amountBN.toString(),
+      hopSendingChain,
+      hopReceivingChain,
+    );
 
     console.log(amountOut, bonderFee);
 
@@ -109,7 +140,16 @@ window.HopUtils = {
     };
   },
 
-  async transferStepOne(transactionId, sendingChainId, sendingAssetId, receivingChainId, receivingAssetId, amountBN) {
+  async transferStepOne(
+    transactionId,
+    sendingChainId,
+    sendingAssetId,
+    receivingChainId,
+    receivingAssetId,
+    amountBN,
+    receivingAddress,
+    maxSlippage,
+  ) {
     if (!Wallet.isConnected()) {
       console.error('Hop: Wallet not connected');
       return false;
@@ -122,13 +162,28 @@ window.HopUtils = {
     const sendingChain = TokenListManager.getNetworkById(sendingChainId);
     const receivingChain = TokenListManager.getNetworkById(receivingChainId);
     const sendingAsset = TokenListManager.findTokenById(sendingAssetId);
+    const bridgeAsset = TokenListManager.findTokenById(
+      sendingAsset.symbol,
+      receivingChain,
+    );
 
-    const hopSendingChain = new Chain(sendingChain.name, sendingChain.chainId, sendingChain.nodeProviders[0]);
-    const hopReceivingChain = new Chain(receivingChain.name, receivingChain.chainId, receivingChain.nodeProviders[0]);
+    const hopSendingChain = new Chain(
+      sendingChain.name,
+      sendingChain.chainId,
+      sendingChain.nodeProviders[0],
+    );
+    const hopReceivingChain = new Chain(
+      receivingChain.name,
+      receivingChain.chainId,
+      receivingChain.nodeProviders[0],
+    );
 
-    const hopBridge = this.sdk.bridge(sendingAsset.symbol);
+    const hopBridge = this._sdk.bridge(sendingAsset.symbol);
 
-    const approvalAddress = await hopBridge.getSendApprovalAddress(hopSendingChain, hopReceivingChain);
+    const approvalAddress = await hopBridge.getSendApprovalAddress(
+      hopSendingChain,
+      hopReceivingChain,
+    );
     const token = hopBridge.getCanonicalToken(hopSendingChain);
     const amountToApprove = constants.MaxUint256;
     const approveTx = await token.approve(approvalAddress, amountToApprove);
@@ -150,11 +205,11 @@ window.HopUtils = {
   },
 
   getAllActiveTxs() {
-    return this.activeTxs.map((x) => x);
+    return this._activeTxs.map((x) => x);
   },
 
   getAllHistoricalTxs() {
-    return this.historicalTxs.map((x) => x);
+    return this._historicalTxs.map((x) => x);
   },
 };
 

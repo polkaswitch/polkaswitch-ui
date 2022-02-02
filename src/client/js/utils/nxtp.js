@@ -1,8 +1,15 @@
 import _ from 'underscore';
 import * as ethers from 'ethers';
 import BN from 'bignumber.js';
-import { BigNumber, constants, Signer, utils } from 'ethers';
-import { ActiveTransaction, NxtpSdk, NxtpSdkEvents, HistoricalTransaction } from '@connext/nxtp-sdk';
+import {
+  BigNumber, constants, Signer, utils
+} from 'ethers';
+import {
+  ActiveTransaction,
+  NxtpSdk,
+  NxtpSdkEvents,
+  HistoricalTransaction,
+} from '@connext/nxtp-sdk';
 import {
   AuctionResponse,
   ChainData,
@@ -58,7 +65,7 @@ window.NxtpUtils = {
 
         this._sdkConfig[e.chainId] = {
           providers: e.nodeProviders,
-          subgraph: connextData?.subgraph,
+          subgraph: connextData?.subgraph
         };
       }
     });
@@ -119,7 +126,9 @@ window.NxtpUtils = {
     }
     _sdk.attach(NxtpSdkEvents.SenderTransactionPrepared, (data) => {
       console.log('SenderTransactionPrepared:', data);
-      const { amount, expiry, preparedBlockNumber, ...invariant } = data.txData;
+      const {
+        amount, expiry, preparedBlockNumber, ...invariant
+      } = data.txData;
 
       const index = this._activeTxs.findIndex(
         (col) => col.crosschainTx.invariant.transactionId === invariant.transactionId,
@@ -171,7 +180,9 @@ window.NxtpUtils = {
 
     _sdk.attach(NxtpSdkEvents.ReceiverTransactionPrepared, (data) => {
       console.log('ReceiverTransactionPrepared:', data);
-      const { amount, expiry, preparedBlockNumber, ...invariant } = data.txData;
+      const {
+        amount, expiry, preparedBlockNumber, ...invariant
+      } = data.txData;
       const index = this._activeTxs.findIndex(
         (col) => col.crosschainTx.invariant.transactionId === invariant.transactionId,
       );
@@ -242,7 +253,9 @@ window.NxtpUtils = {
   },
 
   getHistoricalTx(transactionId) {
-    return this._historicalTxs.find((t) => t.crosschainTx.invariant.transactionId === transactionId);
+    return this._historicalTxs.find(
+      (t) => t.crosschainTx.invariant.transactionId === transactionId,
+    );
   },
 
   isActiveTxFinishable(transactionId) {
@@ -261,7 +274,9 @@ window.NxtpUtils = {
   },
 
   getActiveTx(transactionId) {
-    return this._activeTxs.find((t) => t.crosschainTx.invariant.transactionId === transactionId);
+    return this._activeTxs.find(
+      (t) => t.crosschainTx.invariant.transactionId === transactionId,
+    );
   },
 
   updateActiveTx(transactionId, status, event, crosschainTx) {
@@ -316,23 +331,25 @@ window.NxtpUtils = {
     const sendingAsset = TokenListManager.findTokenById(sendingAssetId);
     const bridgeAsset = TokenListManager.findTokenById(sendingAsset.symbol, receivingChain);
 
-    let callToAddr;
-    let callData;
-    let expectedReturn;
+    let callToAddr; let callData; let
+      expectedReturn;
 
     // if same token on both chains, don't do getExpectedReturn
     if (bridgeAsset.address !== receivingAsset.address) {
       callToAddr = receivingChain.crossChainAggregatorAddress;
       console.log(`callToAddr = ${callToAddr}`);
 
-      const aggregator = new utils.Interface(window.crossChainOneSplitAbi);
+      const aggregator = new utils.Interface(window.ABIS.crossChainOneSplitAbi);
 
       // NXTP has a 0.05% flat fee
       const o1 = BN(utils.formatUnits(amountBN, sendingAsset.decimals))
         .times(0.9995)
         .times(10 ** bridgeAsset.decimals)
         .toString();
-      const estimatedOutputBN = utils.parseUnits(swapFn.validateEthValue(bridgeAsset, o1), 0);
+      const estimatedOutputBN = utils.parseUnits(
+        swapFn.validateEthValue(bridgeAsset, o1),
+        0,
+      );
 
       expectedReturn = await swapFn.getExpectedReturn(bridgeAsset, receivingAsset, estimatedOutputBN, receivingChainId);
 
@@ -405,13 +422,12 @@ window.NxtpUtils = {
       ...sending,
     };
 
-    const receivingTxData =
-      typeof receiving === 'object'
-        ? {
-            ...invariant,
-            ...receiving,
-          }
-        : undefined;
+    const receivingTxData = typeof receiving === 'object'
+      ? {
+        ...invariant,
+        ...receiving,
+      }
+      : undefined;
 
     const finish = await this._sdk.fulfillTransfer({
       bidSignature,
@@ -422,7 +438,10 @@ window.NxtpUtils = {
 
     console.log('finish: ', finish);
 
-    if (finish.metaTxResponse?.transactionHash || finish.metaTxResponse?.transactionHash === '') {
+    if (
+      finish.metaTxResponse?.transactionHash
+      || finish.metaTxResponse?.transactionHash === ''
+    ) {
       this.removeActiveTx(receivingTxData.transactionId);
     }
 

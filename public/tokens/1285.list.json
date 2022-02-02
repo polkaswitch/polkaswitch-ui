@@ -180,7 +180,7 @@
     "name": "USDC Coin",
     "address": "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
     "symbol": "USDC",
-    "decimals": 18,
+    "decimals": 6,
     "chainId": 1285,
     "logoURI": "https://assets.coingecko.com/coins/images/6319/small/USD_Coin_icon.png?1547042389"
   },

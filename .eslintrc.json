@@ -8,6 +8,8 @@
   "rules": {
     "no-console": "off",
     "comma-dangle": "off",
-    "react/jsx-filename-extension": "off"
+    "react/jsx-filename-extension": "off",
+    "react/sort-comp": "off",
+    "react/destructuring-assignment": "off"
   }
 }

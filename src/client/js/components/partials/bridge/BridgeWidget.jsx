@@ -21,12 +21,28 @@ export default class BridgeWidget extends Component {
 
     this.box = React.createRef();
     this.orderPage = React.createRef();
-    this.NETWORKS = window.NETWORK_CONFIGS;
-    this.CROSS_CHAIN_NETWORKS = _.filter(this.NETWORKS, (v) => v.crossChainSupported);
+    this.CROSS_CHAIN_NETWORKS = _.filter(
+      window.NETWORK_CONFIGS,
+      (v) => v.enabled && v.crossChainSupported,
+    );
+
+    /*
+    // Move ETH to last, it has too high of fees
+    this.CROSS_CHAIN_NETWORKS.push(
+      this.CROSS_CHAIN_NETWORKS.splice(
+        _.findIndex(this.CROSS_CHAIN_NETWORKS, (v) => {
+          return +v.chainId === 1;
+        }),
+        1
+      )[0]
+    );
+    */
 
     const network = TokenListManager.getCurrentNetworkConfig();
     let mergeState = {};
-    const toChain = this.CROSS_CHAIN_NETWORKS.find((v) => v.chainId !== network.chainId);
+    const toChain = this.CROSS_CHAIN_NETWORKS.find(
+      (v) => v.chainId !== network.chainId,
+    );
     const fromChain = network;
 
     mergeState = _.extend(mergeState, {
@@ -85,6 +101,10 @@ export default class BridgeWidget extends Component {
     this.subscribers.push(EventManager.listenFor('txQueueUpdated', this.handleWalletChange));
     window.addEventListener('resize', this.updateBoxHeight);
     this.updateBoxHeight();
+
+    // trigger a network change if needed, if current network is not supported.
+    // 'networkUpdated' event will be triggered.
+    Wallet.changeNetworkForSwapOrBridge(false);
   }
 
   componentWillUnmount() {
@@ -102,14 +122,21 @@ export default class BridgeWidget extends Component {
 
   handleNetworkChange(e) {
     const network = TokenListManager.getCurrentNetworkConfig();
-    const toChain = this.CROSS_CHAIN_NETWORKS.find((v) => v.chainId != network.chainId);
+    const toChain = this.state.toChain?.chainId == network.chainId ?
+      this.CROSS_CHAIN_NETWORKS.find(v => v.chainId != network.chainId) :
+      this.state.toChain;
     const fromChain = network;
 
     this.setState({
       loading: false,
       crossChainEnabled: true,
-      to: TokenListManager.findTokenById(toChain.supportedCrossChainTokens[0], toChain),
-      from: TokenListManager.findTokenById(network.supportedCrossChainTokens[0]),
+      to: TokenListManager.findTokenById(
+        toChain.supportedCrossChainTokens[0],
+        toChain,
+      ),
+      from: TokenListManager.findTokenById(
+        network.supportedCrossChainTokens[0],
+      ),
       toChain,
       fromChain,
       availableBalance: undefined,
@@ -170,7 +197,9 @@ export default class BridgeWidget extends Component {
     if (this.state.approveStatus === approveStatus) {
       return;
     }
-    this.setState({ approveStatus });
+    this.setState({
+      approveStatus,
+    });
   }
 
   onSwapTokens() {
@@ -196,7 +225,8 @@ export default class BridgeWidget extends Component {
         showSearch: false,
       },
       () => {
-        const connectStrategy = Wallet.isConnectedToAnyNetwork() && Wallet.getConnectionStrategy();
+        const connectStrategy =
+          Wallet.isConnectedToAnyNetwork() && Wallet.getConnectionStrategy();
         TokenListManager.updateNetwork(this.state.fromChain, connectStrategy);
       },
     );
@@ -219,7 +249,10 @@ export default class BridgeWidget extends Component {
     };
 
     // try to find the current token on the new network if available
-    const parallelToken = TokenListManager.findTokenById(this.state[target].symbol, network);
+    const parallelToken = TokenListManager.findTokenById(
+      this.state[target].symbol,
+      network,
+    );
 
     if (parallelToken) {
       _s[target] = parallelToken;
@@ -233,7 +266,8 @@ export default class BridgeWidget extends Component {
     this.setState(_s);
 
     if (isFrom) {
-      const connectStrategy = Wallet.isConnectedToAnyNetwork() && Wallet.getConnectionStrategy();
+      const connectStrategy =
+        Wallet.isConnectedToAnyNetwork() && Wallet.getConnectionStrategy();
       TokenListManager.updateNetwork(network, connectStrategy);
     }
   }
@@ -314,9 +348,10 @@ export default class BridgeWidget extends Component {
     const alt = this.state.searchTarget === 'from' ? 'to' : 'from';
 
     // if you select the same token pair, do a swap instead
-    if (this.state[alt].address === token.address) {
-      return this.onSwapTokens();
-    }
+    // TODO disable this for now.
+    //if (this.state[alt].address === token.address) {
+    //return this.onSwapTokens();
+    //}
 
     const _s = {
       showSearch: false,
@@ -325,6 +360,13 @@ export default class BridgeWidget extends Component {
     };
 
     _s[this.state.searchTarget] = token;
+
+    // TODO temporarily match the same token pair on the opposite network for the reduced
+    // stable coin token list
+    let foundToken = TokenListManager.findTokenById(token.symbol, this.state[alt + 'Chain']);
+    if (foundToken) {
+      _s[alt] = foundToken;
+    }
 
     if (this.state.searchTarget === 'from') {
       _s.fromAmount = SwapFn.validateEthValue(token, this.state.fromAmount);

@@ -33,7 +33,7 @@ export default class TokenSwapDistribution extends Component {
     let parts;
     let totalParts;
 
-    if (network.name === 'Ethereum') {
+    if (network.chainId === '1') {
       parts = this.props.parts || [0, 0, 0, 0, 0, 0, 0];
 
       /*
@@ -54,7 +54,7 @@ export default class TokenSwapDistribution extends Component {
         icon: TokenListManager.findTokenById(this.state.pools[i]),
         size: totalParts === 0 ? 0 : v / totalParts,
       }));
-    } else if (network.name === 'Polygon') {
+    } else if (network.chainId === '137') {
       parts = this.props.parts || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
       /*
@@ -72,72 +72,88 @@ export default class TokenSwapDistribution extends Component {
       sumFive = parts[16] + parts[17] + parts[18] + parts[19]; // Apeswap
       totalParts = sumOne + sumTwo + sumThree + sumFour + sumFive;
 
+      pools = [{
+        name: 'Quickswap',
+        icon: TokenListManager.findTokenById('QUICK'),
+        size: sumOne / totalParts
+      }, {
+        name: 'Sushiswap',
+        icon: TokenListManager.findTokenById('SUSHI'),
+        size: sumTwo / totalParts
+      }, {
+        name: 'Dfyn',
+        icon: TokenListManager.findTokenById('Dfyn'),
+        size: sumThree / totalParts
+      }, {
+        name: 'Dinoswap',
+        icon: { logoURI: 'https://dinoswap.exchange/images/dino.png' },
+        size: sumFour / totalParts
+      }, {
+        name: 'Apeswap',
+        icon: { logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/8497.png' },
+        size: sumFive / totalParts
+      }];
+    } else if (network.chainId === '56') {
+      parts = this.props.parts || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      /*
+        This returns the destToken output amount and the optimized list of distributions accross different liquidity pools.
+        There are 30 pools: pool 0 - 5 are Pancakeswap pools,
+        pool 6 - 11 are Sushiswap pools, pool 12 - 17 are Mdex exchange pools,
+        pool 18 - 23 are Biswap pools, and pool 24 - 29 are Apeswap pools.
+        For example, the distribution [0,0,10,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0] means
+        1/3 of the swap amount will route to Pancakeswap and 2/3 will route to Apeswap.
+      */
+
+      sumOne = parts[0] + parts[1] + parts[2] + parts[3] + parts[4] + parts[5];
+      sumTwo = parts[6] + parts[7] + parts[8] + parts[9] + parts[10] + parts[11];
+      sumThree = parts[12] + parts[13] + parts[14] + parts[15] + parts[16] + parts[17];
+      sumFour = parts[18] + parts[19] + parts[20] + parts[21] + parts[22] + parts[23];
+      sumFive = parts[24] + parts[25] + parts[26] + parts[27] + parts[28] + parts[29];
+      totalParts = sumOne + sumTwo + sumThree + sumFour + sumFive;
+
       pools = [
         {
-          name: 'Quickswap',
-          icon: TokenListManager.findTokenById('QUICK'),
+          name: 'Pancakeswap',
+          icon: {
+            logoURI:
+              'https://assets.coingecko.com/coins/images/12632/small/pancakeswap-cake-logo_%281%29.png?1629359065',
+          },
           size: sumOne / totalParts,
         },
         {
           name: 'Sushiswap',
-          icon: TokenListManager.findTokenById('SUSHI'),
+          icon: {
+            logoURI:
+              'https://assets.coingecko.com/coins/images/12271/small/512x512_Logo_no_chop.png?1606986688',
+          },
           size: sumTwo / totalParts,
         },
         {
-          name: 'Dfyn',
-          icon: TokenListManager.findTokenById('Dfyn'),
+          name: 'Mdex',
+          icon: {
+            logoURI:
+              'https://assets.coingecko.com/coins/images/13775/small/mdex.png?1611739676',
+          },
           size: sumThree / totalParts,
         },
         {
-          name: 'Dinoswap',
-          icon: { logoURI: 'https://dinoswap.exchange/images/dino.png' },
+          name: 'Biswap',
+          icon: {
+            logoURI:
+              'https://assets.coingecko.com/coins/images/16845/small/biswap.png?1625388985',
+          },
           size: sumFour / totalParts,
         },
         {
           name: 'Apeswap',
           icon: {
-            logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/8497.png',
+            logoURI:
+              'https://assets.coingecko.com/coins/images/14870/small/banana.png?1638884287',
           },
           size: sumFive / totalParts,
         },
       ];
-    } else if (network.name === 'Smart Chain') {
-      parts = this.props.parts || [0, 0, 0, 0, 0, 0, 0, 0, 0];
-      /*
-        This returns the destToken output amount and the optimized
-        list of distributions accross different liquidity pools.
-        There are 6 pools: pool 1 and 2 are Pancakeswap pools,
-        pool 3 and 4 are Sushiswap pools, and pool 5 - 6 are
-        Mdex exchange pools. For example, the distribution
-        [1, 0, 2, 0, 0, 0] means 1/3 of the swap amount will route
-        to Pancakeswap and 2/3 will route to Sushiswap.[1, 0, 0, 0, 3]
-        means 1/3 of amount will route to Pancakeswap and 2/3 will
-        route to Mdex.
-      */
-
-      sumOne = parts[0] + parts[1] + parts[2];
-      sumTwo = parts[3] + parts[4] + parts[5];
-      sumThree = parts[6] + parts[7] + parts[8];
-      totalParts = sumOne + sumTwo + sumThree;
-
-      pools = [
-        {
-          name: 'Pancakeswap',
-          icon: TokenListManager.findTokenById('CAKE'),
-          size: sumOne / totalParts,
-        },
-        {
-          name: 'Sushiswap',
-          icon: TokenListManager.findTokenById('SUSHI'),
-          size: sumTwo / totalParts,
-        },
-        {
-          name: 'Mdex',
-          icon: TokenListManager.findTokenById('MDX'),
-          size: sumThree / totalParts,
-        },
-      ];
-    } else if (network.name === 'Avalanche') {
+    } else if (network.chainId === '43114') {
       parts = this.props.parts || [0, 0, 0, 0, 0, 0];
 
       /*
@@ -174,8 +190,8 @@ export default class TokenSwapDistribution extends Component {
           size: sumThree / totalParts,
         },
       ];
-    } else if (network.name === 'xDai') {
-      parts = this.props.parts || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    } else if (network.chainId === '100') {
+      parts = this.props.parts || [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
       /*
         This returns the destToken output amount and the optimized list of distributions accross different liquidity pools.
@@ -200,7 +216,7 @@ export default class TokenSwapDistribution extends Component {
           size: sumTwo / totalParts,
         },
       ];
-    } else if (network.name === 'Fantom') {
+    } else if (network.chainId === '250') {
       parts = this.props.parts || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
       /*
@@ -235,7 +251,7 @@ export default class TokenSwapDistribution extends Component {
           size: sumThree / totalParts,
         },
       ];
-    } else if (network.name === 'Moonriver') {
+    } else if (network.chainId === '1285') {
       parts = this.props.parts || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
       /*
         This returns the destToken output amount and the optimized list of distributions accross different liquidity pools.
@@ -268,6 +284,63 @@ export default class TokenSwapDistribution extends Component {
           },
           size: sumThree / totalParts,
         },
+      ];
+    } else if (network.chainId === '1666600000') {
+      parts = this.props.parts || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      /*
+        This returns the destToken output amount and the optimized list of distributions accross different liquidity pools.
+        There are 12 pools: pool 0 - 3 are Mochiswap pools, pool 4-7 are Sushiswap pools, pool 8-11 are Viper Exchange pools.
+        For example, the distribution [3,0,3,0,0,0,0,0,3,0,3,0] means 2/3 of the swap amount will route to Mochiswap and 1/3 will route to Sushiswap.
+        [0,0,0,0,2,0,0,0,3,3,2,2] means 1/6 of amount will route to Sushiswap and 5/6 will route to Viper Exchange.
+      */
+      sumOne = parts[0] + parts[1] + parts[2] + parts[3];
+      sumTwo = parts[4] + parts[5] + parts[6] + parts[7];
+      sumThree = parts[8] + parts[9] + parts[10] + parts[11];
+      totalParts = sumOne + sumTwo + sumThree;
+      pools = [
+        {
+          name: 'Mochiswap',
+          icon: { logoURI: 'https://assets.coingecko.com/coins/images/14565/small/mochi.png?1617030087'},
+          size: sumOne / totalParts
+        },
+        {
+          name: 'Sushiswap',
+          icon: { logoURI: 'https://assets.coingecko.com/coins/images/12271/small/512x512_Logo_no_chop.png?1606986688' },
+          size: sumTwo / totalParts
+        },
+        {
+          name: 'Viper Exchange',
+          icon: TokenListManager.findTokenById('VIPER'),
+          size: sumThree / totalParts
+        }
+      ];
+    } else if (network.chainId === '1313161554') {
+      parts = this.props.parts || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      /*
+        This returns the destToken output amount and the optimized list of distributions accross different liquidity pools.
+        There are 18 pools: pool 0 - 5 are Trisolaris pools, pool 6 - 11 are Wannaswap pools, pool 12 - 17 are auroraswap pools.
+        For example, the distribution [6,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0] means 2/3 of the swap amount will route to Trisolaris and 1/3 will route to Wannaswap.
+      */
+      sumOne = parts[0] + parts[1] + parts[2] + parts[3] + parts[4] + parts[5];
+      sumTwo = parts[6] + parts[7] + parts[8] + parts[9] + parts[10] + parts[11];
+      sumThree = parts[12] + parts[13] + parts[14] + parts[15] + parts[16] + parts[17];
+      totalParts = sumOne + sumTwo + sumThree;
+      pools = [
+        {
+          name: 'Trisolaris',
+          icon: { logoURI: 'https://assets.coingecko.com/coins/images/20607/small/logo_-_2021-11-19T104946.772.png?1637290197' },
+          size: sumOne / totalParts
+        },
+        {
+          name: 'Wannaswap',
+          icon: { logoURI: 'https://assets.coingecko.com/coins/images/21955/small/wannaswap.PNG?1640337839' },
+          size: sumTwo / totalParts
+        },
+        {
+          name: 'Auroraswap',
+          icon: { logoURI: 'https://assets.coingecko.com/markets/images/758/small/auroraswap.png?1640773986' },
+          size: sumThree / totalParts
+        }
       ];
     }
 

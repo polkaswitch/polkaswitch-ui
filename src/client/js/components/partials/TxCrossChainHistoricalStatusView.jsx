@@ -3,7 +3,10 @@ import _ from 'underscore';
 import classnames from 'classnames';
 import * as ethers from 'ethers';
 import numeral from 'numeral';
-import moment from 'moment';
+import dayjs from 'dayjs';
+
+var relativeTime = require('dayjs/plugin/relativeTime')
+dayjs.extend(relativeTime)
 
 import TokenListManager from '../../utils/tokenList';
 
@@ -75,7 +78,9 @@ export default class TxCrossChainHistoricalStatusView extends Component {
                 View on Explorer <ion-icon name="open-outline" />
               </TxExplorerLink>
             </div>
-            <div className="tx-meta">{moment(this.props.data.preparedTimestamp * 1000).fromNow()}</div>
+            <div className="tx-meta">
+              {dayjs(this.props.data.preparedTimestamp * 1000).fromNow()}
+            </div>
           </div>
         </div>
       </div>

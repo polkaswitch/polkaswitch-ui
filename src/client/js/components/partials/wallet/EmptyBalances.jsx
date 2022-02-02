@@ -13,7 +13,10 @@ export default function EmptyBalances() {
             <div className="column data-na-container">
               <img src="/images/group.svg" alt="Connect Wallet" />
               <h2>Your crypto assets will show up here.</h2>
-              <h3>Add assets to your wallet to display up to date prices and balances..</h3>
+              <h3>
+                Add assets to your wallet to display up to date prices and
+                balances..
+              </h3>
               <button className="button is-success">Start Trading</button>
             </div>
           </div>

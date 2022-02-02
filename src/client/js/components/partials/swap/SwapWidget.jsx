@@ -8,19 +8,20 @@ import TokenSearchSlide from '../TokenSearchSlide';
 import SwapConfirmSlide from './SwapConfirmSlide';
 import AdvancedSettingsSlide from '../AdvancedSettingsSlide';
 import SwapFinalResultSlide from './SwapFinalResultSlide';
+import Wallet from '../../../utils/wallet';
 import TokenListManager from '../../../utils/tokenList';
 import Metrics from '../../../utils/metrics';
 import EventManager from '../../../utils/events';
 import { ApprovalState } from '../../../constants/Status';
 
-export default class SwapOrderWidget extends Component {
+export default class SwapWidget extends Component {
   constructor(props) {
     super(props);
     this.box = React.createRef();
     this.orderPage = React.createRef();
-    this.NETWORKS = window.NETWORK_CONFIGS;
     const network = TokenListManager.getCurrentNetworkConfig();
-    let mergeState = {};
+
+    var mergeState = {};
     mergeState = _.extend(mergeState, {
       toChain: network,
       fromChain: network,
@@ -69,6 +70,10 @@ export default class SwapOrderWidget extends Component {
     this.subscribers.push(EventManager.listenFor('txQueueUpdated', this.handleWalletChange));
     window.addEventListener('resize', this.updateBoxHeight);
     this.updateBoxHeight();
+
+    // trigger a network change if needed, if current network is not supported.
+    // 'networkUpdated' event will be triggered.
+    Wallet.changeNetworkForSwapOrBridge(true);
   }
 
   componentWillUnmount() {

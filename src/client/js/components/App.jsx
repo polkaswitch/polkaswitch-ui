@@ -1,79 +1,84 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 
 import classnames from 'classnames';
 import SwapHome from './pages/SwapHome';
 import TokenClaimHome from './pages/TokenClaimHome';
 import BridgeHome from './pages/BridgeHome';
+import StatusHome from './pages/StatusHome';
 import WalletHome from './pages/WalletHome';
 import StakeHome from './pages/StakeHome';
 import Footer from './partials/Footer';
 import { keepTheme } from '../utils/theme';
+import { BalanceProvider } from '../context/balance';
+import useLoadBalances from './pages/useLoadBalance';
 
 require('../../css/index.scss');
 
-export default class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { fullscreen: false };
-  }
+const App = () => {
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
-  componentDidMount() {
+  const handleFullScreenOn = () => setIsFullScreen(true);
+
+  const handleFullScreenOff = () => setIsFullScreen(false);
+
+  useEffect(() => {
     keepTheme();
-    this.handleFullScreenOn = this.handleFullScreenOn.bind(this);
-    this.handleFullScreenOff = this.handleFullScreenOff.bind(this);
-    window.document.addEventListener('fullScreenOn', this.handleFullScreenOn);
-    window.document.addEventListener('fullScreenOff', this.handleFullScreenOff);
-  }
+    window.document.addEventListener('fullScreenOn', handleFullScreenOn);
+    window.document.addEventListener('fullScreenOff', handleFullScreenOff);
+  }, []);
 
-  componentWillUnmount() {
-    window.document.removeEventListener('fullScreenOn', this.handleFullScreenOn);
-    window.document.removeEventListener('fullScreenOff', this.handleFullScreenOff);
-  }
+  useEffect(
+    () => () => {
+      window.document.removeEventListener('fullScreenOn', handleFullScreenOn);
+      window.document.removeEventListener('fullScreenOff', handleFullScreenOff);
+    },
+    [],
+  );
 
-  handleFullScreenOn() {
-    this.setState({
-      fullscreen: true,
-    });
-  }
+  const { myApplicationState, setMyApplicationState, loadBalances } =
+    useLoadBalances();
 
-  handleFullScreenOff() {
-    this.setState({
-      fullscreen: false,
-    });
-  }
+  return (
+    <BalanceProvider
+      value={{ ...myApplicationState, setMyApplicationState, loadBalances }}
+    >
+      {myApplicationState && (
+        <Router>
+          <div className={classnames({ fullscreen: isFullScreen })}>
+            <Switch>
+              <Route exact path="/">
+                <Redirect to="/swap" />
+              </Route>
+              <Route path="/swap">
+                <SwapHome />
+              </Route>
+              <Route path="/bridge">
+                <BridgeHome />
+              </Route>
+              <Route path="/claim">
+                <TokenClaimHome />
+              </Route>
+              <Route path="/stake">
+                <StakeHome />
+              </Route>
+              <Route path="/wallet">
+                <WalletHome />
+              </Route>
+              <Route path="/status">
+                <StatusHome />
+              </Route>
+              <Route>
+                <Redirect to="/swap" />
+              </Route>
+            </Switch>
+            <Footer />
+          </div>
+        </Router>
+      )}
+    </BalanceProvider>
+  );
+};
 
-  render() {
-    return (
-      <Router>
-        <div className={classnames({ fullscreen: this.state.fullscreen })}>
-          <Switch>
-            <Route exact path="/">
-              <Redirect to="/swap" />
-            </Route>
-            <Route path="/swap">
-              <SwapHome />
-            </Route>
-            <Route path="/bridge">
-              <BridgeHome />
-            </Route>
-            <Route path="/claim">
-              <TokenClaimHome />
-            </Route>
-            <Route path="/stake">
-              <StakeHome />
-            </Route>
-            <Route path="/wallet">
-              <WalletHome />
-            </Route>
-            <Route>
-              <Redirect to="/swap" />
-            </Route>
-          </Switch>
-          <Footer />
-        </div>
-      </Router>
-    );
-  }
-}
+export default App;

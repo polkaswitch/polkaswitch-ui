@@ -28,10 +28,6 @@ export default class CrossSwapProcessSlide extends Component {
     this.subNxtpUpdated = EventManager.listenFor('nxtpEventUpdated', this.handleNxtpEvent.bind(this));
   }
 
-  componentWillUnmount() {
-    this.subNxtpUpdated.unsubscribe();
-  }
-
   componentDidUpdate(prevProps) {
     if (prevProps.crossChainTransactionId !== this.props.crossChainTransactionId) {
       this.setState({
@@ -41,6 +37,10 @@ export default class CrossSwapProcessSlide extends Component {
         complete: false,
       });
     }
+  }
+
+  componentWillUnmount() {
+    this.subNxtpUpdated.unsubscribe();
   }
 
   completeProcess(hash) {
@@ -88,10 +88,14 @@ export default class CrossSwapProcessSlide extends Component {
               fromChain: this.props.fromChain,
               from: this.props.from,
               to: this.props.to,
-              fromAmount: this.props.fromAmount,
+              fromAmont: this.props.fromAmount,
             });
 
-            if (TxBridgeManager.twoStepTransferRequired(this.props.crossChainTransactionId)) {
+            if (
+              TxBridgeManager.twoStepTransferRequired(
+                this.props.crossChainTransactionId,
+              )
+            ) {
               // do nothing.
               // Waiting for events to indicate ready for Step2
             } else {
@@ -125,7 +129,7 @@ export default class CrossSwapProcessSlide extends Component {
               fromChain: this.props.fromChain,
               from: this.props.from,
               to: this.props.to,
-              fromAmount: this.props.fromAmount,
+              fromAmont: this.props.fromAmount,
             });
 
             this.setState({
@@ -204,7 +208,7 @@ export default class CrossSwapProcessSlide extends Component {
         <hr />
 
         <div className="text-gray-stylized">
-          <span>You Recieve</span>
+          <span>You Receive</span>
         </div>
 
         <div className="level is-mobile">
@@ -236,6 +240,9 @@ export default class CrossSwapProcessSlide extends Component {
       <div className={classnames('centered-view')}>
         <div className="icon">
           <ion-icon name="hourglass-outline" />
+        </div>
+        <div className="title">
+          {this.state.finishable ? 'Finalizing Transfer' : 'Starting Transfer'}
         </div>
         <div className="title">{this.state.finishable ? 'Finalizing Transfer' : 'Starting Transfer'}</div>
         <div className="details">
@@ -273,7 +280,10 @@ export default class CrossSwapProcessSlide extends Component {
             <div className="level-left">
               <div className="level-item">
                 <div className="level-item">
-                  <span className="icon ion-icon clickable" onClick={this.handleBack}>
+                  <span
+                    className="icon ion-icon clickable"
+                    onClick={this.handleBack}
+                  >
                     <ion-icon name="arrow-back-outline" />
                   </span>
                 </div>
@@ -290,9 +300,13 @@ export default class CrossSwapProcessSlide extends Component {
 
           <div>
             <button
-              className={classnames('button is-primary is-fullwidth is-medium', {
-                'is-loading': this.state.loading,
-              })}
+              type="button"
+              className={classnames(
+                'button is-primary is-fullwidth is-medium',
+                {
+                  'is-loading': this.state.loading,
+                },
+              )}
               disabled={!this.allowSwap()}
               onClick={this.state.finishable ? this.handleFinish : this.handleTransfer}
             >

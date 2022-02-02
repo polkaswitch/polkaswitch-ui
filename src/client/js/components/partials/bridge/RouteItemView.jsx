@@ -1,6 +1,7 @@
 import React from 'react';
 import TokenNetworkRouteBox from './TokenNetworkRouteBox';
-import SwapBridgeTextBox from './SwapBridgeTextBox';
+import BridgeRouteBox from './BridgeRouteBox';
+import SwapRouteBox from './SwapRouteBox';
 import AdditionalInfoItem from './AdditionalInfoItem';
 import DashedDivider from './DashedDivider';
 
@@ -21,15 +22,21 @@ export default function RouteItemView(props) {
               );
             case 'swap':
               return (
-                <div key={index} className="is-flex is-flex-direction-row is-align-items-center">
-                  <SwapBridgeTextBox info={item} />
+                <div
+                  key={index}
+                  className="is-flex is-flex-direction-row is-align-items-center"
+                >
+                  <SwapRouteBox info={item} />
                   {data.length - 2 !== index && <DashedDivider />}
                 </div>
               );
             case 'bridge':
               return (
-                <div key={index} className="is-flex is-flex-direction-row is-align-items-center">
-                  <SwapBridgeTextBox info={item} />
+                <div
+                  key={index}
+                  className="is-flex is-flex-direction-row is-align-items-center"
+                >
+                  <SwapRouteBox info={item} />
                   {data.length - 2 !== index && <DashedDivider />}
                 </div>
               );

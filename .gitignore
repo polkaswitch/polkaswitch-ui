@@ -7,3 +7,4 @@ dist-swap
 yarn.lock
 .env
 .idea
+dotenv

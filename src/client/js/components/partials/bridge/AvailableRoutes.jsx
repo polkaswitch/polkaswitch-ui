@@ -1,124 +1,126 @@
 import React from 'react';
 import _ from 'underscore';
+import classnames from 'classnames';
+import { BigNumber, constants, providers, Signer, utils } from 'ethers';
 import TokenListManager from '../../../utils/tokenList';
 import RouteItemWrapper from './RouteItemWrapper';
 
 export default function AvailableRoutes(props) {
   const network = TokenListManager.getCurrentNetworkConfig();
-  // const routes = props.routes
+  const GENERIC_SUPPORTED_BRIDGE_TOKENS = ["USDC", "USDT", "DAI"];
 
-  const routes = [
-    [
-      {
-        type: 'token-network',
-        token: {
-          amount: 23.9744,
-          name: 'AVAX',
-          logoURI: 'https://assets.coingecko.com/coins/images/12559/large/coin-round-red.png',
+  const routes = _.map(props.routes, function(v, i) {
+    var route = [];
+    var bridgeType = v.bridge;
+    var targetBridgeToken = 'USDC';
+
+    route.push({
+      type: 'token-network',
+      token: props.from,
+      amount: props.fromAmount,
+      network: props.fromChain
+    });
+
+    if (bridgeType === "connext" &&
+      !GENERIC_SUPPORTED_BRIDGE_TOKENS.includes(props.from.symbol.toUpperCase())) {
+      route = route.concat([
+        {
+          type: "swap",
+          data: {
+            fee: 0.39
+          }
         },
-        network: {
-          name: 'Polygon',
-        },
-      },
-      {
-        type: 'swap',
+        {
+          type: 'token-network',
+          // DEFAULT to using USDC as a the bridge
+          token: TokenListManager.findTokenById('USDC', props.fromChain),
+          amount: props.fromAmount,
+          network: props.fromChain
+        }
+      ]);
+    } else {
+      targetBridgeToken = props.from.symbol.toUpperCase();
+    }
+
+    route.push({
+      type: "bridge",
+      data: {
+        name: bridgeType[0].toUpperCase() + bridgeType.substring(1),
+        fee: 0.05
+      }
+    });
+
+    if (bridgeType === "connext" &&
+      targetBridgeToken != props.to.symbol.toUpperCase()) {
+      route.push({
+        type: "swap",
         data: {
-          fee: 0.39,
-        },
-      },
+          fee: 0.39
+        }
+      });
+    }
+
+    route = route.concat([
       {
         type: 'token-network',
-        token: {
-          amount: 1475.27,
-          name: 'USDC',
-          logoURI:
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
-        },
-        network: {
-          name: 'Polygon',
-        },
-      },
-      {
-        type: 'bridge',
-        data: {
-          fee: 0.05,
-        },
-      },
-      {
-        type: 'token-network',
-        token: {
-          amount: 12775.271,
-          name: 'UNI',
-          logoURI: 'https://cloudflare-ipfs.com/ipfs/QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg/',
-        },
-        network: {
-          name: 'Polygon',
-        },
+        amount: utils.formatUnits(
+          v.estimate?.returnAmount ?? constants.Zero,
+          props.to.decimals,
+        ),
+        token: props.to,
+        network: props.toChain
       },
       {
         type: 'additional',
-        fee: 0.0051232,
-        duration: '-5 Minutes',
-      },
-    ],
-    [
-      {
-        type: 'token-network',
-        token: {
-          amount: 23.9744,
-          name: 'AVAX',
-          logoURI: 'https://assets.coingecko.com/coins/images/12559/large/coin-round-red.png',
-        },
-        network: {
-          name: 'Polygon',
-        },
-      },
-      {
-        type: 'swap',
-        data: {
-          fee: 0.39,
-        },
-      },
-      {
-        type: 'token-network',
-        token: {
-          amount: 1475.27,
-          name: 'USDC',
-          logoURI:
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
-        },
-        network: {
-          name: 'Polygon',
-        },
-      },
-      {
-        type: 'bridge',
-        data: {
-          fee: 0.05,
-        },
-      },
-      {
-        type: 'token-network',
-        token: {
-          amount: 12775.271,
-          name: 'UNI',
-          logoURI: 'https://cloudflare-ipfs.com/ipfs/QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg/',
-        },
-        network: {
-          name: 'Polygon',
-        },
-      },
-      {
-        type: 'additional',
-        fee: 0.0051232,
-        duration: '-5 Minutes',
-      },
-    ],
-  ];
+        fee: bridgeType === "connext" ? "High" : "Low",
+        duration: bridgeType === "connext" ? '~15 Minutes' : '~10 Minutes'
+      }
+    ]);
+
+    return {
+      transactionId: v.estimate?.id,
+      route: route,
+      bridgeType: bridgeType
+    };
+  });
 
   return (
-    <div className="token-dist-wrapper control" aria-label="Available routes for the swap">
-      {routes.length > 0 && _.map(routes, (item, i) => <RouteItemWrapper key={i} data={item} index={i} />)}
-    </div>
+    <div
+      className={classnames("available-routes-wrapper control", {
+        "is-hidden": !props.showRoutes
+      })}
+      aria-label="Available routes for the swap"
+    >
+      <div
+        className={classnames('loader-wrapper', {
+          'is-active': props.loading,
+        })}
+      >
+        <div className="loader is-loading"></div>
+      </div>
+      <div
+        className={classnames("unavailable-warning-wrapper", {
+          "is-hidden": !props.showUnavailable
+        })}
+      >
+        <div className='centered-view'>
+          <div className="icon">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+          </div>
+          <div className="details">
+            No routes available at this time
+          </div>
+        </div>
+      </div>
+      {routes.length > 0 &&
+          _.map(routes, function (item, i) {
+            return (
+              <RouteItemWrapper
+                handleChange={props.handleChange}
+                key={i} data={item} index={i}
+              ></RouteItemWrapper>
+            );
+          })}
+        </div>
   );
 }

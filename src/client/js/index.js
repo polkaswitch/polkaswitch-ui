@@ -45,10 +45,23 @@ if (IS_MAIN_NETWORK) {
 
 const config = await fetch(IS_MAIN_NETWORK ? '/config/main.config.json' : '/config/test.config.json');
 window.NETWORK_CONFIGS = await config.json();
-
-// initialize TokenList
-window.COINGECKO_TOKEN_LIST = await (await fetch('/tokens/coingecko.list.json')).json();
 window.MAX_RETRIES = process.env.IS_PRODUCTION ? 3 : 1;
+
+// import after NETWORK_CONFIGs is initialized
+import Wallet from './utils/wallet';
+import TokenListManager from './utils/tokenList';
+import SwapFn from './utils/swapFn';
+import Nxtp from './utils/nxtp';
+import HopUtils from './utils/hop';
+import TxQueue from './utils/txQueue';
+import Storage from './utils/storage';
+
+// pre-load and collase/parallelize all our external JSON config loading
+// to reduce initial app load times
+await Promise.all([
+  Wallet.initializeAbis(),
+  TokenListManager.initializeTokenLists()
+]);
 
 await Storage.initialize();
 await TokenListManager.initialize();

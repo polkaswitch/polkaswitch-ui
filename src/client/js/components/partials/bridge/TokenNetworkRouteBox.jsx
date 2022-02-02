@@ -9,17 +9,18 @@ export default function TokenNetworkRouteBox(props) {
       {info && (
         <div>
           <div className="token-wrapper">
-            <TokenIconImg size={16} mr={4} imgSrc={info.token.logoURI} />
+            <TokenIconImg size={16} mr={7} token={info.token} />
             <div>
-              <div className="symbol">{info.token.name}</div>
-              <div className="amount">{info.token.amount}</div>
+              <div className="symbol">{info.token.symbol}</div>
+              <div className="amount">{info.amount}</div>
             </div>
           </div>
-          <div className="network-name">
+          <div className="network-name" style={{ backgroundColor: info.network.color }}>
             <div className="text">{info.network.name}</div>
           </div>
         </div>
       )}
+
     </div>
   );
 }

@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import _ from 'underscore';
 import classnames from 'classnames';
@@ -40,13 +42,22 @@ export default class SwapConfirmSlide extends Component {
       },
       () => {
         console.log('Debug Crash: ', this.props.fromAmount, this.props.from);
-
-        const fromAmountBN = window.ethers.utils.parseUnits(this.props.fromAmount, this.props.from.decimals);
+        const fromAmountBN = window.ethers.utils.parseUnits(
+          this.props.fromAmount,
+          this.props.from.decimals,
+        );
 
         if (this.props.approveStatus === ApprovalState.APPROVED) {
-          const distBN = _.map(this.props.swapDistribution, (e) => window.ethers.utils.parseUnits(`${e}`, 'wei'));
+          const distBN = _.map(this.props.swapDistribution, (e) =>
+            window.ethers.utils.parseUnits(`${e}`, 'wei'),
+          );
 
-          SwapFn.performSwap(this.props.from, this.props.to, fromAmountBN, distBN)
+          SwapFn.performSwap(
+            this.props.from,
+            this.props.to,
+            fromAmountBN,
+            distBN,
+          )
             .then((nonce) => {
               console.log(nonce);
 
@@ -55,7 +66,7 @@ export default class SwapConfirmSlide extends Component {
               Metrics.track('swap-complete', {
                 from: this.props.from,
                 to: this.props.to,
-                fromAmount: this.props.fromAmount,
+                fromAmont: this.props.fromAmount,
               });
 
               this.setState({
@@ -125,7 +136,10 @@ export default class SwapConfirmSlide extends Component {
             <div className="level-left">
               <div className="level-item">
                 <div className="level-item">
-                  <span className="icon ion-icon clickable" onClick={this.handleBack}>
+                  <span
+                    className="icon ion-icon clickable"
+                    onClick={this.handleBack}
+                  >
                     <ion-icon name="arrow-back-outline" />
                   </span>
                 </div>
@@ -169,7 +183,7 @@ export default class SwapConfirmSlide extends Component {
           <hr />
 
           <div className="text-gray-stylized">
-            <span>You Recieve</span>
+            <span>You Receive</span>
           </div>
 
           <div className="level is-mobile">
@@ -209,9 +223,13 @@ export default class SwapConfirmSlide extends Component {
           </div>
           <div>
             <button
-              className={classnames('button is-primary is-fullwidth is-medium', {
-                'is-loading': this.state.loading,
-              })}
+              type="button"
+              className={classnames(
+                'button is-primary is-fullwidth is-medium',
+                {
+                  'is-loading': this.state.loading,
+                },
+              )}
               disabled={!this.allowSwap()}
               onClick={this.handleConfirm}
             >

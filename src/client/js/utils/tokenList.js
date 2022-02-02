@@ -15,26 +15,34 @@ window.TokenListManager = {
   },
 
   _tokenLists: {},
-  async initialize() {
+  initialize: async function () {},
+
+  initializeTokenLists: function() {
     // pre-load all token lists
     const filteredNetworks = _.filter(window.NETWORK_CONFIGS, (v) => v.enabled);
 
-    for (const network of filteredNetworks) {
-      let tokenList = await (await fetch(network.tokenList)).json();
+    return Promise.all(filteredNetworks.map((network) => {
+      return fetch(network.tokenList).then((response) => {
+        return response.json();
+      }).then((tokenList) => {
+        tokenList = _.map(
+          _.filter(tokenList, function (v) {
+            return v.native || (v.symbol && Utils.isAddress(v.address));
+          }),
+          function (v) {
+            if (v.address) {
+              v.address = Utils.getAddress(v.address);
+            }
+            return v;
+          },
+        );
 
-      tokenList = _.map(
-        _.filter(tokenList, (v) => v.native || (v.symbol && Utils.isAddress(v.address))),
-        (v) => {
-          if (v.address) {
-            v.address = Utils.getAddress(v.address);
-          }
-          return v;
-        },
-      );
+        this._tokenLists[+network.chainId] = tokenList;
+        this.updateTokenListwithCustom(network);
 
-      this._tokenLists[+network.chainId] = tokenList;
-      this.updateTokenListwithCustom(network);
-    }
+        return tokenList;
+      });
+    }));
   },
 
   getCurrentNetworkConfig() {
@@ -91,11 +99,11 @@ window.TokenListManager = {
     }
 
     // xDai GasAPI has different fields
-    if (network.name === 'xDai') {
+    if (+network.chainId === 100) {
       gasStats.fastest = gasStats.fast;
       gasStats.safeLow = gasStats.slow;
       gasStats.fast = gasStats.average;
-    } else if (network.name === 'Smart Chain') {
+    } else if (+network.chainId === 56) {
       // Binance Smart Chain GasAPI has different fields
       if (!_.has(gasStats, 'safeLow')) {
         gasStats.safeLow = gasStats.standard;
@@ -152,8 +160,17 @@ window.TokenListManager = {
     return foundToken;
   },
 
-  findTokenBySymbolFromCoinGecko(symbol) {
-    return _.find(window.COINGECKO_TOKEN_LIST, (v) => v.symbol.toLowerCase() === symbol);
+  findTokenBySymbolFromCoinGecko: async function (symbol) {
+    if (!window.COINGECKO_TOKEN_LIST) {
+      window.COINGECKO_TOKEN_LIST = [{ temp: true }];
+      window.COINGECKO_TOKEN_LIST = await (
+        await fetch('/tokens/coingecko.list.json')
+      ).json();
+    }
+
+    return _.find(window.COINGECKO_TOKEN_LIST, function (v) {
+      return v.symbol?.toLowerCase() === symbol;
+    });
   },
 
   updateTokenListwithCustom(network) {

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import _ from 'underscore';
 import classnames from 'classnames';
 import BN from 'bignumber.js';
+import { BigNumber, constants, Signer, utils } from 'ethers';
 import * as Sentry from '@sentry/react';
 import TokenIconBalanceGroupView from '../TokenIconBalanceGroupView';
 import NetworkDropdown from '../NetworkDropdown';
@@ -19,6 +20,10 @@ export default class BridgeOrderSlide extends Component {
     this.state = {
       calculatingSwap: false,
       errored: false,
+      allEstimates: [],
+      showRoutes: false,
+      availableRoutes: [],
+      selectedRouteId: false,
       errorMsg: false,
     };
     this.calculatingSwapTimestamp = Date.now();
@@ -28,6 +33,7 @@ export default class BridgeOrderSlide extends Component {
     this.fetchCrossChainEstimate = this.fetchCrossChainEstimate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleMax = this.handleMax.bind(this);
+    this.handleRouteChange = this.handleRouteChange.bind(this);
     this.handleTokenSwap = this.handleTokenSwap.bind(this);
   }
 
@@ -54,6 +60,7 @@ export default class BridgeOrderSlide extends Component {
         calculatingSwap: false,
         errored: true,
         errorMsg: false,
+        showRoutes: true
       });
       console.error('Swap Failure: MAX RETRIES REACHED');
       return;
@@ -76,7 +83,7 @@ export default class BridgeOrderSlide extends Component {
     this.setState(
       {
         errored: false,
-        calculatingSwap: true,
+        calculatingSwap: true
       },
       function (_timeNow, _attempt, _cb) {
         const fromAmountBN = window.ethers.utils.parseUnits(fromAmount, this.props.from.decimals);
@@ -101,40 +108,39 @@ export default class BridgeOrderSlide extends Component {
   fetchCrossChainEstimate(origFromAmount, fromAmountBN, _timeNow2, _attempt2, _cb2) {
     if (!Wallet.isConnected()) {
       // not supported in cross-chain mode
-      console.error('SwapOrderSlide: Wallet not connected, skipping crossChainEstimate');
-      return false;
-    }
+      console.error(
+        'SwapOrderSlide: Wallet not connected, skipping crossChainEstimate',
+      );
 
-    const bridgeSupported = TxBridgeManager.isSupported(
-      this.props.to,
-      this.props.toChain,
-      this.props.from,
-      this.props.fromChain,
-    );
-
-    if (!bridgeSupported[0]) {
       this.setState({
         calculatingSwap: false,
         errored: true,
-        errorMsg: bridgeSupported[1],
+        errorMsg: 'Please connect wallet first',
       });
 
       return false;
     }
 
-    TxBridgeManager.getEstimate(
-      +this.props.fromChain.chainId,
-      this.props.from.address,
-      +this.props.toChain.chainId,
-      this.props.to.address,
+    var allEstimatesFn = TxBridgeManager.getAllEstimates(
+      this.props.to,
+      this.props.toChain,
+      this.props.from,
+      this.props.fromChain,
       fromAmountBN,
       Wallet.currentAddress(),
-    )
+    );
+
+    Promise.allSettled(allEstimatesFn)
       .then(
-        function (_timeNow3, _cb3, response) {
+        function (_timeNow3, _cb3, results) {
           if (this.calculatingSwapTimestamp !== _timeNow3) {
             return;
           }
+
+          var successfulEstimates = _.map(_.where(results, { status: "fulfilled" }), function(v) {
+            return v.value;
+          });
+          var response = successfulEstimates[0].estimate;
 
           Wallet.getBalance(this.props.from)
             .then((bal) => {
@@ -142,14 +148,15 @@ export default class BridgeOrderSlide extends Component {
                 origFromAmount,
                 window.ethers.utils.formatUnits(response?.returnAmount ?? constants.Zero, this.props.to.decimals),
                 false,
-                window.ethers.utils.formatUnits(bal, this.props.from.decimals),
-                status,
+                window.ethers.utils.formatUnits(bal, this.props.from.decimals)
               );
 
               this.props.onCrossChainEstimateComplete(response.id);
 
               this.setState(
                 {
+                  availableRoutes: successfulEstimates,
+                  showRoutes: true,
                   calculatingSwap: false,
                 },
                 () => {
@@ -284,6 +291,28 @@ export default class BridgeOrderSlide extends Component {
     }
   }
 
+  handleRouteChange(e) {
+    var transactionId = e.target.value;
+    const estimateTx = TxBridgeManager.getTx(transactionId).estimate;
+
+    this.setState({
+      selectedRouteId: transactionId
+    });
+
+    this.props.onSwapEstimateComplete(
+      this.props.fromAmount,
+      window.ethers.utils.formatUnits(
+        estimateTx.returnAmount ?? constants.Zero,
+        this.props.to.decimals,
+      ),
+      false,
+      this.props.availableBalance
+    );
+
+    this.props.onCrossChainEstimateComplete(transactionId);
+  }
+
+
   renderTokenInput(target, token) {
     if (!token) {
       return <div />;
@@ -402,19 +431,31 @@ export default class BridgeOrderSlide extends Component {
           </div>
 
           <div
-            className={classnames('hint--large is-hidden', 'token-dist-expand-wrapper expand', {
-              // "hint--top": this.props.swapDistribution,
-              // "expand": this.props.swapDistribution
-            })}
+            className={classnames(
+              'hint--large',
+              'available-routes-expand-wrapper',
+              {
+                "hint--top": this.state.showRoutes,
+                "expand": this.state.showRoutes
+              },
+            )}
+            aria-label="We have queried multiple bridges to find the best possible routes for this swap. Choose a route that either favours speed or pricing"
           >
-            <div
-              className="token-dist-hint-text"
-              aria-label="We have queried multiple exchanges to find the best possible pricing for this swap. The below routing chart shows which exchanges we used to achieve the best swap."
-            >
+            <div className="hint-text">
               <span>Available Routes</span>
               <span className="hint-icon">?</span>
             </div>
-            <AvailableRoutes routes={this.props.swapDistribution} />
+            <AvailableRoutes
+              showRoutes={this.state.showRoutes}
+              showUnavailable={this.state.errored}
+              loading={this.state.calculatingSwap}
+              to={this.props.to}
+              from={this.props.from}
+              toChain={this.props.toChain}
+              fromChain={this.props.fromChain}
+              fromAmount={this.props.fromAmount}
+              handleChange={this.handleRouteChange}
+              routes={this.state.availableRoutes} />
           </div>
 
           <div className="bridge-order-btn-wrapper">
