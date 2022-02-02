@@ -1,7 +1,7 @@
 import Wallet from './wallet';
 
 export default {
-  baseUrl: 'http://192.168.3.199:3000',
+  baseUrl: 'https://api.swing.xyz',
 
   async sendGet(url, params = {}) {
     let result = null;
