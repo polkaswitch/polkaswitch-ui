@@ -7,15 +7,6 @@ import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
 import App from './components/App';
 
-// import after NETWORK_CONFIGs is initialized
-import Wallet from './utils/wallet';
-import TokenListManager from './utils/tokenList';
-import SwapFn from './utils/swapFn';
-import Nxtp from './utils/nxtp';
-import HopUtils from './utils/hop';
-import TxQueue from './utils/txQueue';
-import Storage from './utils/storage';
-
 const IS_MAIN_NETWORK = process.env.IS_MAIN_NETWORK === 'true';
 
 if (process.env.IS_PRODUCTION) {
