@@ -56,9 +56,7 @@ export default class TxStatusNotificationView extends Component {
             </div>
           </div>
         </div>
-        <div className="level-item tx-meta">
-          {dayjs(this.props.data.lastUpdated).format('LT')}
-        </div>
+        <div className="level-item tx-meta">{dayjs(this.props.data.lastUpdated).format('LT')}</div>
       </div>
     );
   }

@@ -42,22 +42,12 @@ export default class SwapConfirmSlide extends Component {
       },
       () => {
         console.log('Debug Crash: ', this.props.fromAmount, this.props.from);
-        const fromAmountBN = window.ethers.utils.parseUnits(
-          this.props.fromAmount,
-          this.props.from.decimals,
-        );
+        const fromAmountBN = window.ethers.utils.parseUnits(this.props.fromAmount, this.props.from.decimals);
 
         if (this.props.approveStatus === ApprovalState.APPROVED) {
-          const distBN = _.map(this.props.swapDistribution, (e) =>
-            window.ethers.utils.parseUnits(`${e}`, 'wei'),
-          );
+          const distBN = _.map(this.props.swapDistribution, (e) => window.ethers.utils.parseUnits(`${e}`, 'wei'));
 
-          SwapFn.performSwap(
-            this.props.from,
-            this.props.to,
-            fromAmountBN,
-            distBN,
-          )
+          SwapFn.performSwap(this.props.from, this.props.to, fromAmountBN, distBN)
             .then((nonce) => {
               console.log(nonce);
 
@@ -136,10 +126,7 @@ export default class SwapConfirmSlide extends Component {
             <div className="level-left">
               <div className="level-item">
                 <div className="level-item">
-                  <span
-                    className="icon ion-icon clickable"
-                    onClick={this.handleBack}
-                  >
+                  <span className="icon ion-icon clickable" onClick={this.handleBack}>
                     <ion-icon name="arrow-back-outline" />
                   </span>
                 </div>
@@ -224,12 +211,9 @@ export default class SwapConfirmSlide extends Component {
           <div>
             <button
               type="button"
-              className={classnames(
-                'button is-primary is-fullwidth is-medium',
-                {
-                  'is-loading': this.state.loading,
-                },
-              )}
+              className={classnames('button is-primary is-fullwidth is-medium', {
+                'is-loading': this.state.loading,
+              })}
               disabled={!this.allowSwap()}
               onClick={this.handleConfirm}
             >

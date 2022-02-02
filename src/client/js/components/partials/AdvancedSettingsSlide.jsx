@@ -11,7 +11,7 @@ export default class AdvancedSettingsSlide extends Component {
     super(props);
 
     this.state = {
-      refresh: Date.now()
+      refresh: Date.now(),
     };
     this.handleSlippage = this.handleSlippage.bind(this);
     this.handleSettingsChange = this.handleSettingsChange.bind(this);

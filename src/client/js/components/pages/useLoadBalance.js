@@ -32,8 +32,7 @@ const useLoadBalances = () => {
         networksEnabled.map(
           (network) =>
             new Promise(async (resolve) => {
-              const tokenList =
-                TokenListManager.getTokenListForNetwork(network);
+              const tokenList = TokenListManager.getTokenListForNetwork(network);
 
               let isRPCNodeActive;
 
@@ -44,10 +43,7 @@ const useLoadBalances = () => {
                   isRPCNodeActive = true;
                 }
               } catch (e) {
-                console.error(
-                  'Failed to fetch balances from network: ',
-                  network.name,
-                );
+                console.error('Failed to fetch balances from network: ', network.name);
                 console.error(e);
 
                 isRPCNodeActive = false;
@@ -62,18 +58,14 @@ const useLoadBalances = () => {
 
                 const p = Wallet.getBalance(token, network).then(
                   ((tk, net, balance) => {
-                    if (
-                      myApplicationState.refresh === localRefresh &&
-                      !balance.isZero()
-                    ) {
+                    if (myApplicationState.refresh === localRefresh && !balance.isZero()) {
                       setMyApplicationState((prevState) => ({
                         ...prevState,
                         balances: [
                           ...prevState.balances,
                           {
                             ...tk,
-                            balance:
-                              +balance.toString() / Math.pow(10, tk.decimals),
+                            balance: +balance.toString() / Math.pow(10, tk.decimals),
                             balanceBN: balance,
                             price: 1,
                           },

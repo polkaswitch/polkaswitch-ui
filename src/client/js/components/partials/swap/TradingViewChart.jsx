@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createChart, CrosshairMode } from 'lightweight-charts';
-import {
-  ResponsiveContainer, AreaChart, Area, Tooltip, XAxis, YAxis
-} from 'recharts';
+import { ResponsiveContainer, AreaChart, Area, Tooltip, XAxis, YAxis } from 'recharts';
 import BN from 'bignumber.js';
 import TokenPairSelector from './TokenPairSelector';
 import ChartPriceDetails from './ChartPriceDetails';
@@ -12,7 +10,6 @@ import EventManager from '../../../utils/events';
 import TokenListManager from '../../../utils/tokenList';
 import CoingeckoManager from '../../../utils/coingecko';
 import dayjs from 'dayjs';
-
 
 export default function TradingViewChart() {
   const DECIMAL_PLACES = 4;
@@ -37,7 +34,7 @@ export default function TradingViewChart() {
     xDai: '0xe91d153e0b41518a2ce8dd3d7944fa863463a97d',
     FTM: '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83',
     MOVR: '0x98878B06940aE243284CA214f92Bb71a2b032B8A',
-    ETH: '0xc9bdeed33cd01541e1eed10f90519d2c06fe3feb'
+    ETH: '0xc9bdeed33cd01541e1eed10f90519d2c06fe3feb',
   };
   const viewModes = ['candlestick', 'line'];
   const candleChartContainerRef = useRef();
@@ -99,9 +96,7 @@ export default function TradingViewChart() {
   const [tokenPairs, setTokenPairs] = useState(initTokenPair);
   const [selectedPair, setSelectedPair] = useState(initTokenPair[0] || undefined);
   const [selectedViewMode, setSelectedViewMode] = useState(viewModes[1]);
-  const [selectedTimeRange, setSelectedTimeRange] = useState(
-    timeRangeList.line[0],
-  );
+  const [selectedTimeRange, setSelectedTimeRange] = useState(timeRangeList.line[0]);
   const [isPair, setIsPair] = useState(true);
   const [priceDetails, setPriceDetails] = useState({
     price: 0,
@@ -154,9 +149,7 @@ export default function TradingViewChart() {
     if (wrapTokens.hasOwnProperty(symbol)) {
       return wrapTokens[symbol];
     }
-    const coin = await TokenListManager.findTokenBySymbolFromCoinGecko(
-      symbol.toLowerCase(),
-    );
+    const coin = await TokenListManager.findTokenBySymbolFromCoinGecko(symbol.toLowerCase());
     if (coin && coin.platforms.hasOwnProperty(platform)) {
       return coin.platforms[platform];
     }
@@ -182,19 +175,12 @@ export default function TradingViewChart() {
 
   const mergeLinePrices = (fromTokenPrices, toTokenPrices) => {
     const prices = [];
-    if (
-      fromTokenPrices
-      && toTokenPrices
-      && fromTokenPrices.length > 0
-      && toTokenPrices.length > 0
-    ) {
+    if (fromTokenPrices && toTokenPrices && fromTokenPrices.length > 0 && toTokenPrices.length > 0) {
       if (fromTokenPrices.length === toTokenPrices.length) {
         for (let i = 0; i < fromTokenPrices.length; i++) {
           prices.push({
             time: getFilteredTimestamp(fromTokenPrices[i][0]),
-            value: parseFloat(BN(fromTokenPrices[i][1])
-              .div(toTokenPrices[i][1])
-              .toFixed(DECIMAL_PLACES)),
+            value: parseFloat(BN(fromTokenPrices[i][1]).div(toTokenPrices[i][1]).toFixed(DECIMAL_PLACES)),
           });
         }
       } else {
@@ -209,9 +195,7 @@ export default function TradingViewChart() {
             const fromTokenItem = tempObj[timeStampOfTotoken];
             tempObj[timeStampOfTotoken] = {
               time: timeStampOfTotoken,
-              value: parseFloat(BN(fromTokenItem[1])
-                .div(toTokenPrices[j][1])
-                .toFixed(DECIMAL_PLACES)),
+              value: parseFloat(BN(fromTokenItem[1]).div(toTokenPrices[j][1]).toFixed(DECIMAL_PLACES)),
             };
           }
         }
@@ -222,11 +206,7 @@ export default function TradingViewChart() {
           }
         }
       }
-    } else if (
-      fromTokenPrices
-      && fromTokenPrices.length > 0
-      && toTokenPrices === null
-    ) {
+    } else if (fromTokenPrices && fromTokenPrices.length > 0 && toTokenPrices === null) {
       for (let i = 0; i < fromTokenPrices.length; i++) {
         prices.push({
           time: getFilteredTimestamp(fromTokenPrices[i][0]),
@@ -256,12 +236,7 @@ export default function TradingViewChart() {
 
   const mergeCandleStickPrices = (fromTokenPrices, toTokenPrices) => {
     const prices = [];
-    if (
-      fromTokenPrices
-      && toTokenPrices
-      && fromTokenPrices.length > 0
-      && toTokenPrices.length > 0
-    ) {
+    if (fromTokenPrices && toTokenPrices && fromTokenPrices.length > 0 && toTokenPrices.length > 0) {
       const tempObj = {};
       for (let i = 0; i < fromTokenPrices.length; i++) {
         tempObj[getFilteredTimestamp(fromTokenPrices[i][0])] = fromTokenPrices[i];
@@ -276,7 +251,7 @@ export default function TradingViewChart() {
             open: parseFloat(BN(fromTokenItem[1]).div(toTokenPrices[j][1]).toFixed(DECIMAL_PLACES)),
             high: parseFloat(BN(fromTokenItem[2]).div(toTokenPrices[j][2]).toFixed(DECIMAL_PLACES)),
             low: parseFloat(BN(fromTokenItem[3]).div(toTokenPrices[j][3]).toFixed(DECIMAL_PLACES)),
-            close: parseFloat(BN(fromTokenItem[4]).div(toTokenPrices[j][4]).toFixed(DECIMAL_PLACES))
+            close: parseFloat(BN(fromTokenItem[4]).div(toTokenPrices[j][4]).toFixed(DECIMAL_PLACES)),
           };
         }
       }
@@ -308,18 +283,10 @@ export default function TradingViewChart() {
     const lastItem = prices[length - 1];
 
     if (viewMode === 'line') {
-      percent = new BN(lastItem.value)
-        .div(new BN(firstItem.value))
-        .times(100)
-        .minus(100)
-        .toFixed(2);
+      percent = new BN(lastItem.value).div(new BN(firstItem.value)).times(100).minus(100).toFixed(2);
       price = lastItem.value;
     } else {
-      percent = new BN(lastItem.open)
-        .div(new BN(firstItem.open))
-        .times(100)
-        .minus(100)
-        .toFixed(2);
+      percent = new BN(lastItem.open).div(new BN(firstItem.open)).times(100).minus(100).toFixed(2);
       price = lastItem.open;
     }
 
@@ -342,67 +309,25 @@ export default function TradingViewChart() {
 
       if (pair.fromSymbol && pair.toSymbol) {
         const platformOfToChain = toChain.coingecko.platform;
-        const fromAddress = await getContractAddress(
-          pair.fromAddress,
-          pair.fromSymbol,
-          platformOfFromChain,
-        );
-        const toAddress = await getContractAddress(
-          pair.toAddress,
-          pair.toSymbol,
-          platformOfToChain,
-        );
+        const fromAddress = await getContractAddress(pair.fromAddress, pair.fromSymbol, platformOfFromChain);
+        const toAddress = await getContractAddress(pair.toAddress, pair.toSymbol, platformOfToChain);
 
-        fromTokenPrices = await fetchLinePrices(
-          platformOfFromChain,
-          fromAddress,
-          'usd',
-          fromTimestamp,
-          toTimestamp,
-        );
-        toTokenPrices = (await fetchLinePrices(
-          platformOfToChain,
-          toAddress,
-          'usd',
-          fromTimestamp,
-          toTimestamp,
-        )) || [];
+        fromTokenPrices = await fetchLinePrices(platformOfFromChain, fromAddress, 'usd', fromTimestamp, toTimestamp);
+        toTokenPrices = (await fetchLinePrices(platformOfToChain, toAddress, 'usd', fromTimestamp, toTimestamp)) || [];
         tokenPrices = mergeLinePrices(fromTokenPrices, toTokenPrices);
       } else {
-        const fromAddress = await getContractAddress(
-          pair.fromAddress,
-          pair.fromSymbol,
-          platformOfFromChain,
-        );
+        const fromAddress = await getContractAddress(pair.fromAddress, pair.fromSymbol, platformOfFromChain);
 
-        fromTokenPrices = await fetchLinePrices(
-          platformOfFromChain,
-          fromAddress,
-          'usd',
-          fromTimestamp,
-          toTimestamp,
-        );
+        fromTokenPrices = await fetchLinePrices(platformOfFromChain, fromAddress, 'usd', fromTimestamp, toTimestamp);
         tokenPrices = mergeLinePrices(fromTokenPrices, null);
       }
     } else if (pair.fromSymbol && pair.toSymbol) {
-      const fromCoin = await TokenListManager.findTokenBySymbolFromCoinGecko(
-        pair.fromSymbol.toLowerCase(),
-      );
-      const toCoin = await TokenListManager.findTokenBySymbolFromCoinGecko(
-        pair.toSymbol.toLowerCase(),
-      );
+      const fromCoin = await TokenListManager.findTokenBySymbolFromCoinGecko(pair.fromSymbol.toLowerCase());
+      const toCoin = await TokenListManager.findTokenBySymbolFromCoinGecko(pair.toSymbol.toLowerCase());
 
       if (fromCoin && toCoin) {
-        fromTokenPrices = (await fetchCandleStickPrices(
-          fromCoin.id,
-          'usd',
-          timeRange.value,
-        )) || [];
-        toTokenPrices = (await fetchCandleStickPrices(
-          toCoin.id,
-          'usd',
-          timeRange.value,
-        )) || [];
+        fromTokenPrices = (await fetchCandleStickPrices(fromCoin.id, 'usd', timeRange.value)) || [];
+        toTokenPrices = (await fetchCandleStickPrices(toCoin.id, 'usd', timeRange.value)) || [];
       }
 
       tokenPrices = mergeCandleStickPrices(fromTokenPrices, toTokenPrices);
@@ -417,10 +342,7 @@ export default function TradingViewChart() {
       setIsLoading(false);
       setTokenPriceData(tokenPrices);
       if (tokenPrices.length > 0) {
-        const { price, percent } = getPriceDetails(
-          tokenPrices,
-          selectedViewMode,
-        );
+        const { price, percent } = getPriceDetails(tokenPrices, selectedViewMode);
         setPriceDetails({ price, percent, from: selectedTimeRange.from });
       } else {
         setPriceDetails({ price: 0, percent: 0, from: selectedTimeRange.from });
@@ -451,10 +373,7 @@ export default function TradingViewChart() {
   const dateFormatter = (item) => dayjs(item * 1000).format('h:mm A MMM. Do z');
 
   useEffect(() => {
-    const subSwapConfigChange = EventManager.listenFor(
-      'swapConfigUpdated',
-      handleSwapConfigChange,
-    );
+    const subSwapConfigChange = EventManager.listenFor('swapConfigUpdated', handleSwapConfigChange);
 
     return () => {
       subSwapConfigChange.unsubscribe();
@@ -476,10 +395,7 @@ export default function TradingViewChart() {
 
       if (candleChartContainerRef.current) {
         window.addEventListener('resize', () => {
-          handleResize(
-            candleChartContainerRef.current.clientWidth,
-            candleChartContainerRef.current.clientHeight,
-          );
+          handleResize(candleChartContainerRef.current.clientWidth, candleChartContainerRef.current.clientHeight);
         });
       }
       return () => {
@@ -490,16 +406,11 @@ export default function TradingViewChart() {
 
   // Fetch Data
   useEffect(() => {
-    fetchData(selectedPair, selectedTimeRange, selectedViewMode).then(() => {
-    });
+    fetchData(selectedPair, selectedTimeRange, selectedViewMode).then(() => {});
   }, [selectedPair, selectedTimeRange, selectedViewMode]);
 
   useEffect(() => {
-    if (
-      selectedViewMode === 'candlestick'
-      && candleChartContainerRef.current
-      && isValidCandleStickDataType
-    ) {
+    if (selectedViewMode === 'candlestick' && candleChartContainerRef.current && isValidCandleStickDataType) {
       initCandleStickChart();
       chart.current = createChart(candleChartContainerRef.current, {
         width: candleChartContainerRef.current.clientWidth,
@@ -618,21 +529,14 @@ export default function TradingViewChart() {
             <img width={110} height={110} src="/images/no_data.svg" alt="no data" />
           </div>
           <div className="empty-primary-text">No Data</div>
-          <div className="empty-sub-text">
-            There is no historical data to display for this token.
-          </div>
+          <div className="empty-sub-text">There is no historical data to display for this token.</div>
         </div>
       );
     }
     if (viewMode === 'line') {
       return (
         <ResponsiveContainer width="100%" height={250}>
-          <AreaChart
-            data={priceData}
-            stackOffset="monotone"
-            onMouseMove={handleMove}
-            onMouseLeave={handleLeave}
-          >
+          <AreaChart data={priceData} stackOffset="monotone" onMouseMove={handleMove} onMouseLeave={handleLeave}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="10%" stopColor="#45C581" stopOpacity="0.1" />

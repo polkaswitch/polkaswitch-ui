@@ -103,33 +103,14 @@ window.HopUtils = {
     const sendingChain = TokenListManager.getNetworkById(sendingChainId);
     const receivingChain = TokenListManager.getNetworkById(receivingChainId);
     const sendingAsset = TokenListManager.findTokenById(sendingAssetId);
-    const bridgeAsset = TokenListManager.findTokenById(
-      sendingAsset.symbol,
-      receivingChain,
-    );
+    const bridgeAsset = TokenListManager.findTokenById(sendingAsset.symbol, receivingChain);
 
-    const hopSendingChain = new Chain(
-      sendingChain.name,
-      sendingChain.chainId,
-      sendingChain.nodeProviders[0],
-    );
-    const hopReceivingChain = new Chain(
-      receivingChain.name,
-      receivingChain.chainId,
-      receivingChain.nodeProviders[0],
-    );
+    const hopSendingChain = new Chain(sendingChain.name, sendingChain.chainId, sendingChain.nodeProviders[0]);
+    const hopReceivingChain = new Chain(receivingChain.name, receivingChain.chainId, receivingChain.nodeProviders[0]);
     const hopBridge = this._sdk.bridge(sendingAsset.symbol);
 
-    const amountOut = await hopBridge.getAmountOut(
-      amountBN.toString(),
-      hopSendingChain,
-      hopReceivingChain,
-    );
-    const bonderFee = await hopBridge.getTotalFee(
-      amountBN.toString(),
-      hopSendingChain,
-      hopReceivingChain,
-    );
+    const amountOut = await hopBridge.getAmountOut(amountBN.toString(), hopSendingChain, hopReceivingChain);
+    const bonderFee = await hopBridge.getTotalFee(amountBN.toString(), hopSendingChain, hopReceivingChain);
 
     console.log(amountOut, bonderFee);
 
@@ -162,28 +143,14 @@ window.HopUtils = {
     const sendingChain = TokenListManager.getNetworkById(sendingChainId);
     const receivingChain = TokenListManager.getNetworkById(receivingChainId);
     const sendingAsset = TokenListManager.findTokenById(sendingAssetId);
-    const bridgeAsset = TokenListManager.findTokenById(
-      sendingAsset.symbol,
-      receivingChain,
-    );
+    const bridgeAsset = TokenListManager.findTokenById(sendingAsset.symbol, receivingChain);
 
-    const hopSendingChain = new Chain(
-      sendingChain.name,
-      sendingChain.chainId,
-      sendingChain.nodeProviders[0],
-    );
-    const hopReceivingChain = new Chain(
-      receivingChain.name,
-      receivingChain.chainId,
-      receivingChain.nodeProviders[0],
-    );
+    const hopSendingChain = new Chain(sendingChain.name, sendingChain.chainId, sendingChain.nodeProviders[0]);
+    const hopReceivingChain = new Chain(receivingChain.name, receivingChain.chainId, receivingChain.nodeProviders[0]);
 
     const hopBridge = this._sdk.bridge(sendingAsset.symbol);
 
-    const approvalAddress = await hopBridge.getSendApprovalAddress(
-      hopSendingChain,
-      hopReceivingChain,
-    );
+    const approvalAddress = await hopBridge.getSendApprovalAddress(hopSendingChain, hopReceivingChain);
     const token = hopBridge.getCanonicalToken(hopSendingChain);
     const amountToApprove = constants.MaxUint256;
     const approveTx = await token.approve(approvalAddress, amountToApprove);

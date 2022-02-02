@@ -16,13 +16,7 @@ import TokenListManager from '../../utils/tokenList';
 import EventManager from '../../utils/events';
 
 const WalletHome = () => {
-  const {
-    currentNetwork,
-    balances,
-    loading,
-    setMyApplicationState,
-    loadBalances,
-  } = useContext(balanceContext);
+  const { currentNetwork, balances, loading, setMyApplicationState, loadBalances } = useContext(balanceContext);
 
   let subWalletChange;
 
@@ -50,10 +44,7 @@ const WalletHome = () => {
   };
 
   useEffect(() => {
-    subWalletChange = EventManager.listenFor(
-      'walletUpdated',
-      handleWalletChange,
-    );
+    subWalletChange = EventManager.listenFor('walletUpdated', handleWalletChange);
 
     return () => subWalletChange.unsubscribe();
   }, []);
@@ -86,15 +77,7 @@ const WalletHome = () => {
 
     return Object.keys(bMap).map((netId) => {
       const network = TokenListManager.getNetworkById(netId);
-      return (
-        <NetworkPrice
-          key={netId}
-          logoURI={network.logoURI}
-          name={network.name}
-          value={bMap[netId]}
-          change={0}
-        />
-      );
+      return <NetworkPrice key={netId} logoURI={network.logoURI} name={network.name} value={bMap[netId]} change={0} />;
     });
   };
 
@@ -108,9 +91,7 @@ const WalletHome = () => {
             </div>
           </div>
 
-          <div className="columns is-hidden-mobile portfolio-makeup">
-            {renderBalancesAccrossNetworks()}
-          </div>
+          <div className="columns is-hidden-mobile portfolio-makeup">{renderBalancesAccrossNetworks()}</div>
         </>
       );
     }
@@ -129,23 +110,16 @@ const WalletHome = () => {
               <div className="card wallets-page-card">
                 <div className="portfolio-balance level is-mobile">
                   <div className="level-left">
-                    <h6 className="portfolio-balance__main-heading">
-                      Portfolio Overview
-                    </h6>
+                    <h6 className="portfolio-balance__main-heading">Portfolio Overview</h6>
                   </div>
                   <div className="is-hidden level-right">
-                    <NetworkDropdown
-                      handleDropdownClick={handleNetworkChange}
-                      selected={currentNetwork}
-                    />
+                    <NetworkDropdown handleDropdownClick={handleNetworkChange} selected={currentNetwork} />
                   </div>
                 </div>
 
                 <div className="is-hidden columns total-balance">
                   <div className="column">
-                    <h6 className="total-balance__sub-heading">
-                      Total Balance
-                    </h6>
+                    <h6 className="total-balance__sub-heading">Total Balance</h6>
                     <h2 className="total-balance__main-heading">
                       {balances
                         .reduce((p, t) => (p += t.price * t.balance), 0)
@@ -165,12 +139,8 @@ const WalletHome = () => {
             <div className="column card-container">
               <div className="card wallets-page-card">
                 <div className="tokens-table-title-container">
-                  <span className="tokens-table-title-container__main">
-                    Assets
-                  </span>
-                  <span className="is-hidden tokens-table-title-container__sub">
-                    Don't see your assets?
-                  </span>
+                  <span className="tokens-table-title-container__main">Assets</span>
+                  <span className="is-hidden tokens-table-title-container__sub">Don't see your assets?</span>
                 </div>
 
                 <AssetsTable tokenData={balances} loading={loading} />

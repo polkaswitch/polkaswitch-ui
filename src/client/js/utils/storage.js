@@ -16,7 +16,7 @@ const DEFAULT_SWAP_SETTINGS = Object.freeze({
   isCustomGasPrice: false,
   slippage: 0.5,
   // TODO this is deprecated
-  bridgeOption: 'cbridge'
+  bridgeOption: 'cbridge',
 });
 
 window.Storage = {

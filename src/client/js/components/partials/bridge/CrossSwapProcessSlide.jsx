@@ -91,11 +91,7 @@ export default class CrossSwapProcessSlide extends Component {
               fromAmont: this.props.fromAmount,
             });
 
-            if (
-              TxBridgeManager.twoStepTransferRequired(
-                this.props.crossChainTransactionId,
-              )
-            ) {
+            if (TxBridgeManager.twoStepTransferRequired(this.props.crossChainTransactionId)) {
               // do nothing.
               // Waiting for events to indicate ready for Step2
             } else {
@@ -241,9 +237,7 @@ export default class CrossSwapProcessSlide extends Component {
         <div className="icon">
           <ion-icon name="hourglass-outline" />
         </div>
-        <div className="title">
-          {this.state.finishable ? 'Finalizing Transfer' : 'Starting Transfer'}
-        </div>
+        <div className="title">{this.state.finishable ? 'Finalizing Transfer' : 'Starting Transfer'}</div>
         <div className="title">{this.state.finishable ? 'Finalizing Transfer' : 'Starting Transfer'}</div>
         <div className="details">
           <div>
@@ -280,10 +274,7 @@ export default class CrossSwapProcessSlide extends Component {
             <div className="level-left">
               <div className="level-item">
                 <div className="level-item">
-                  <span
-                    className="icon ion-icon clickable"
-                    onClick={this.handleBack}
-                  >
+                  <span className="icon ion-icon clickable" onClick={this.handleBack}>
                     <ion-icon name="arrow-back-outline" />
                   </span>
                 </div>
@@ -301,12 +292,9 @@ export default class CrossSwapProcessSlide extends Component {
           <div>
             <button
               type="button"
-              className={classnames(
-                'button is-primary is-fullwidth is-medium',
-                {
-                  'is-loading': this.state.loading,
-                },
-              )}
+              className={classnames('button is-primary is-fullwidth is-medium', {
+                'is-loading': this.state.loading,
+              })}
               disabled={!this.allowSwap()}
               onClick={this.state.finishable ? this.handleFinish : this.handleTransfer}
             >

@@ -60,7 +60,7 @@ export default class BridgeOrderSlide extends Component {
         calculatingSwap: false,
         errored: true,
         errorMsg: false,
-        showRoutes: true
+        showRoutes: true,
       });
       console.error('Swap Failure: MAX RETRIES REACHED');
       return;
@@ -83,7 +83,7 @@ export default class BridgeOrderSlide extends Component {
     this.setState(
       {
         errored: false,
-        calculatingSwap: true
+        calculatingSwap: true,
       },
       function (_timeNow, _attempt, _cb) {
         const fromAmountBN = window.ethers.utils.parseUnits(fromAmount, this.props.from.decimals);
@@ -108,9 +108,7 @@ export default class BridgeOrderSlide extends Component {
   fetchCrossChainEstimate(origFromAmount, fromAmountBN, _timeNow2, _attempt2, _cb2) {
     if (!Wallet.isConnected()) {
       // not supported in cross-chain mode
-      console.error(
-        'SwapOrderSlide: Wallet not connected, skipping crossChainEstimate',
-      );
+      console.error('SwapOrderSlide: Wallet not connected, skipping crossChainEstimate');
 
       this.setState({
         calculatingSwap: false,
@@ -137,7 +135,7 @@ export default class BridgeOrderSlide extends Component {
             return;
           }
 
-          var successfulEstimates = _.map(_.where(results, { status: "fulfilled" }), function(v) {
+          var successfulEstimates = _.map(_.where(results, { status: 'fulfilled' }), function (v) {
             return v.value;
           });
           var response = successfulEstimates[0].estimate;
@@ -148,7 +146,7 @@ export default class BridgeOrderSlide extends Component {
                 origFromAmount,
                 window.ethers.utils.formatUnits(response?.returnAmount ?? constants.Zero, this.props.to.decimals),
                 false,
-                window.ethers.utils.formatUnits(bal, this.props.from.decimals)
+                window.ethers.utils.formatUnits(bal, this.props.from.decimals),
               );
 
               this.props.onCrossChainEstimateComplete(response.id);
@@ -296,22 +294,18 @@ export default class BridgeOrderSlide extends Component {
     const estimateTx = TxBridgeManager.getTx(transactionId).estimate;
 
     this.setState({
-      selectedRouteId: transactionId
+      selectedRouteId: transactionId,
     });
 
     this.props.onSwapEstimateComplete(
       this.props.fromAmount,
-      window.ethers.utils.formatUnits(
-        estimateTx.returnAmount ?? constants.Zero,
-        this.props.to.decimals,
-      ),
+      window.ethers.utils.formatUnits(estimateTx.returnAmount ?? constants.Zero, this.props.to.decimals),
       false,
-      this.props.availableBalance
+      this.props.availableBalance,
     );
 
     this.props.onCrossChainEstimateComplete(transactionId);
   }
-
 
   renderTokenInput(target, token) {
     if (!token) {
@@ -431,14 +425,10 @@ export default class BridgeOrderSlide extends Component {
           </div>
 
           <div
-            className={classnames(
-              'hint--large',
-              'available-routes-expand-wrapper',
-              {
-                "hint--top": this.state.showRoutes,
-                "expand": this.state.showRoutes
-              },
-            )}
+            className={classnames('hint--large', 'available-routes-expand-wrapper', {
+              'hint--top': this.state.showRoutes,
+              expand: this.state.showRoutes,
+            })}
             aria-label="We have queried multiple bridges to find the best possible routes for this swap. Choose a route that either favours speed or pricing"
           >
             <div className="hint-text">
@@ -455,7 +445,8 @@ export default class BridgeOrderSlide extends Component {
               fromChain={this.props.fromChain}
               fromAmount={this.props.fromAmount}
               handleChange={this.handleRouteChange}
-              routes={this.state.availableRoutes} />
+              routes={this.state.availableRoutes}
+            />
           </div>
 
           <div className="bridge-order-btn-wrapper">

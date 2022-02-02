@@ -34,32 +34,33 @@ window.WalletJS = {
       // TODO init WalletConnect
     }
 
-    EventManager.listenFor(
-      'initiateWalletConnect',
-      this._connectWalletHandler.bind(this),
-    );
+    EventManager.listenFor('initiateWalletConnect', this._connectWalletHandler.bind(this));
   },
 
-  initializeAbis: function() {
+  initializeAbis: function () {
     window.ABIS = {};
 
-    return Promise.all([
-      ['erc20Abi', '/abi/erc20_standard.json'],
-      ['oneSplitAbi', '/abi/test/OneSplit.json'],
-      ['crossChainOneSplitAbi', '/abi/cross-chain/cross-chain-aggregator.json'],
-      ['polygonAbi', '/abi/test/Polygon.json'],
-      ['moonriverAbi', '/abi/test/Moonriver.json'],
-      ['xDaiAbi', '/abi/test/Xdai.json'],
-      ['harmonyAbi', '/abi/test/Harmony.json'],
-      ['auroraAbi', '/abi/test/Aurora.json'],
-      ['bscAbi', '/abi/test/Bsc.json']
-    ].map((data) => {
-      fetch(data[1]).then((resp) => {
-        return resp.json();
-      }).then((abiJson) => {
-        window.ABIS[data[0]] = abiJson;
-      });
-    }));
+    return Promise.all(
+      [
+        ['erc20Abi', '/abi/erc20_standard.json'],
+        ['oneSplitAbi', '/abi/test/OneSplit.json'],
+        ['crossChainOneSplitAbi', '/abi/cross-chain/cross-chain-aggregator.json'],
+        ['polygonAbi', '/abi/test/Polygon.json'],
+        ['moonriverAbi', '/abi/test/Moonriver.json'],
+        ['xDaiAbi', '/abi/test/Xdai.json'],
+        ['harmonyAbi', '/abi/test/Harmony.json'],
+        ['auroraAbi', '/abi/test/Aurora.json'],
+        ['bscAbi', '/abi/test/Bsc.json'],
+      ].map((data) => {
+        fetch(data[1])
+          .then((resp) => {
+            return resp.json();
+          })
+          .then((abiJson) => {
+            window.ABIS[data[0]] = abiJson;
+          });
+      }),
+    );
   },
 
   initListeners: function (provider) {
@@ -71,10 +72,7 @@ window.WalletJS = {
         if (accounts.length === 0) {
           this.disconnect();
           EventManager.emitEvent('walletUpdated', 1);
-        } else if (
-          accounts[0] != this.currentAddress() &&
-          this._cachedWeb3Provider
-        ) {
+        } else if (accounts[0] != this.currentAddress() && this._cachedWeb3Provider) {
           this._saveConnection(this._cachedWeb3Provider, this._cachedStrategy);
         }
       }.bind(this),
@@ -105,18 +103,14 @@ window.WalletJS = {
     );
   },
 
-  getReadOnlyProvider: function(chainId) {
-    var network = chainId ?
-      TokenListManager.getNetworkById(chainId) :
-      TokenListManager.getCurrentNetworkConfig();
+  getReadOnlyProvider: function (chainId) {
+    var network = chainId ? TokenListManager.getNetworkById(chainId) : TokenListManager.getCurrentNetworkConfig();
     const provider = new ethers.providers.JsonRpcProvider(network.nodeProviders[0]);
     return provider;
   },
 
   getProvider: function (strictCheck) {
-    var condition = strictCheck
-      ? this.isConnected()
-      : this.isConnectedToAnyNetwork();
+    var condition = strictCheck ? this.isConnected() : this.isConnectedToAnyNetwork();
 
     if (condition) {
       return this._cachedWeb3Provider;
@@ -125,7 +119,7 @@ window.WalletJS = {
     }
   },
 
-  getBalance: function(token, optionalNetwork) {
+  getBalance: function (token, optionalNetwork) {
     // if network specified, as long as we connected to any network is fine,
     // if it's not provided, we need to be on the right network to get the right balance
     if ((!!optionalNetwork && this.isConnectedToAnyNetwork()) || this.isConnected()) {
@@ -157,21 +151,13 @@ window.WalletJS = {
       provider = this.getProvider();
     }
 
-    const contract = new Contract(
-      tokenContractAddress,
-      window.ABIS.erc20Abi,
-      provider,
-    );
+    const contract = new Contract(tokenContractAddress, window.ABIS.erc20Abi, provider);
     return await contract.balanceOf(this.currentAddress());
   },
 
   getName: async function (tokenAddr) {
     if (this.isConnected() && tokenAddr) {
-      const contract = new Contract(
-        tokenAddr,
-        window.ABIS.erc20Abi,
-        this.getProvider(),
-      );
+      const contract = new Contract(tokenAddr, window.ABIS.erc20Abi, this.getProvider());
       return await contract.name();
     } else {
       return Promise.resolve('');
@@ -180,11 +166,7 @@ window.WalletJS = {
 
   getDecimals: async function (tokenAddr) {
     if (this.isConnected() && tokenAddr) {
-      const contract = new Contract(
-        tokenAddr,
-        window.ABIS.erc20Abi,
-        this.getProvider(),
-      );
+      const contract = new Contract(tokenAddr, window.ABIS.erc20Abi, this.getProvider());
       return await contract.decimals();
     } else {
       return Promise.reject();
@@ -193,11 +175,7 @@ window.WalletJS = {
 
   getSymbol: async function (tokenAddr) {
     if (this.isConnected() && tokenAddr) {
-      const contract = new Contract(
-        tokenAddr,
-        window.ABIS.erc20Abi,
-        this.getProvider(),
-      );
+      const contract = new Contract(tokenAddr, window.ABIS.erc20Abi, this.getProvider());
       return await contract.symbol();
     } else {
       return Promise.reject();
@@ -222,8 +200,7 @@ window.WalletJS = {
   },
 
   isConnected: function (strategy) {
-    var connected =
-      this.isConnectedToAnyNetwork() && this.isMatchingConnectedNetwork();
+    var connected = this.isConnectedToAnyNetwork() && this.isMatchingConnectedNetwork();
 
     // scope to connection strategy if supplied
     if (strategy) {
@@ -263,36 +240,23 @@ window.WalletJS = {
     EventManager.emitEvent('walletUpdated', 1);
   },
 
-  changeNetworkForSwapOrBridge: async function(isSingleSwap) {
-    const CROSS_CHAIN_NETWORKS = _.filter(
-      window.NETWORK_CONFIGS,
-      (v) => v.enabled && v.crossChainSupported,
-    );
-    const SINGLE_CHAIN_NETWORKS = _.filter(
-      window.NETWORK_CONFIGS,
-      v => v.enabled && v.singleChainSupported
-    );
+  changeNetworkForSwapOrBridge: async function (isSingleSwap) {
+    const CROSS_CHAIN_NETWORKS = _.filter(window.NETWORK_CONFIGS, (v) => v.enabled && v.crossChainSupported);
+    const SINGLE_CHAIN_NETWORKS = _.filter(window.NETWORK_CONFIGS, (v) => v.enabled && v.singleChainSupported);
 
     const currNetwork = TokenListManager.getCurrentNetworkConfig();
 
     // we should change if:
     // A) if current network is NOT singleSwap supported && isSwap page
     // B) if current network is NOT crossChain supported && is not isSwap page
-    const shouldChangeNetwork = (
-      (!isSingleSwap && !currNetwork.crossChainSupported) ||
-      (isSingleSwap && !currNetwork.singleChainSupported)
-    );
+    const shouldChangeNetwork =
+      (!isSingleSwap && !currNetwork.crossChainSupported) || (isSingleSwap && !currNetwork.singleChainSupported);
 
-    const potentialDefaultNetwork = isSingleSwap
-      ? SINGLE_CHAIN_NETWORKS[0]
-      : CROSS_CHAIN_NETWORKS[0];
-    const targetNetwork = !shouldChangeNetwork
-      ? currNetwork
-      : potentialDefaultNetwork;
+    const potentialDefaultNetwork = isSingleSwap ? SINGLE_CHAIN_NETWORKS[0] : CROSS_CHAIN_NETWORKS[0];
+    const targetNetwork = !shouldChangeNetwork ? currNetwork : potentialDefaultNetwork;
 
     if (shouldChangeNetwork) {
-      const connectStrategy =
-        this.isConnectedToAnyNetwork() && this.getConnectionStrategy();
+      const connectStrategy = this.isConnectedToAnyNetwork() && this.getConnectionStrategy();
       TokenListManager.updateNetwork(targetNetwork, connectStrategy);
     }
 
@@ -363,14 +327,10 @@ window.WalletJS = {
                     // Metamask currently only ever provide a single account
                     const account = accounts[0];
 
-                    var web3Provider = new ethers.providers.Web3Provider(
-                      window.ethereum,
-                    );
-                    return this._saveConnection(web3Provider, 'metamask').then(
-                      function () {
-                        resolve(account);
-                      },
-                    );
+                    var web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+                    return this._saveConnection(web3Provider, 'metamask').then(function () {
+                      resolve(account);
+                    });
                   }.bind(this),
                 )
                 .catch(function (e) {

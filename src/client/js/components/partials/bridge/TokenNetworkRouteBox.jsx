@@ -20,7 +20,6 @@ export default function TokenNetworkRouteBox(props) {
           </div>
         </div>
       )}
-
     </div>
   );
 }

@@ -38,8 +38,7 @@ export default class SwapOrderSlide extends Component {
       from?.address !== prevProps.from?.address ||
       to?.address !== prevProps.to?.address ||
       refresh !== prevProps.refresh ||
-      (this.props.fromAmount !== prevProps.fromAmount &&
-        !calculatingSwap)
+      (this.props.fromAmount !== prevProps.fromAmount && !calculatingSwap)
     ) {
       if (fromAmount) {
         this.fetchSwapEstimate(fromAmount);

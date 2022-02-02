@@ -37,13 +37,10 @@ const App = () => {
     [],
   );
 
-  const { myApplicationState, setMyApplicationState, loadBalances } =
-    useLoadBalances();
+  const { myApplicationState, setMyApplicationState, loadBalances } = useLoadBalances();
 
   return (
-    <BalanceProvider
-      value={{ ...myApplicationState, setMyApplicationState, loadBalances }}
-    >
+    <BalanceProvider value={{ ...myApplicationState, setMyApplicationState, loadBalances }}>
       {myApplicationState && (
         <Router>
           <div className={classnames({ fullscreen: isFullScreen })}>

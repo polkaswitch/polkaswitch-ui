@@ -30,9 +30,7 @@ window.CBridgeUtils = {
 
   async initializeClient() {
     // Test celer hostname: https://cbridge-v2-test.celer.network
-    const client = (this._client = HttpUtilis.initHttp(
-      'https://cbridge-prod2.celer.network',
-    ));
+    const client = (this._client = HttpUtilis.initHttp('https://cbridge-prod2.celer.network'));
     this._attachClientListeners(client);
     return client;
   },
@@ -68,9 +66,7 @@ window.CBridgeUtils = {
 
     const config = await this.getTransferConfig();
     const { chains } = JSON.parse(config);
-    return chains.some(
-      (e) => e.name.toLowerCase() === network.name.toLowerCase(),
-    );
+    return chains.some((e) => e.name.toLowerCase() === network.name.toLowerCase());
   },
 
   async getTransferConfig() {
@@ -85,10 +81,7 @@ window.CBridgeUtils = {
 
     // const request = new GetTransferConfigsRequest();
     // return await this._client.getTransferConfigs(request, null);
-    const transferConfig = await this._client.get(
-      '/v1/getTransferConfigs',
-      null,
-    );
+    const transferConfig = await this._client.get('/v1/getTransferConfigs', null);
     return transferConfig.data;
   },
 
@@ -110,15 +103,9 @@ window.CBridgeUtils = {
       this._client = await this.initializeClient();
     }
 
-    const receivingAsset = TokenListManager.findTokenById(
-      receivingAssetId,
-      receivingChainId,
-    );
+    const receivingAsset = TokenListManager.findTokenById(receivingAssetId, receivingChainId);
     const sendingAsset = TokenListManager.findTokenById(sendingAssetId);
-    const bridgeAsset = TokenListManager.findTokenById(
-      sendingAssetId,
-      receivingChainId,
-    );
+    const bridgeAsset = TokenListManager.findTokenById(sendingAssetId, receivingChainId);
     const slippage = 500; // convert percent to int eg: 0.05% = 500; 0.1 = 1000
 
     const config = {
@@ -173,24 +160,16 @@ window.CBridgeUtils = {
     console.log(sendingAsset.address);
 
     const tokenContract = new Contract(sendingAsset.address, TokenABI, signer);
-    const bridgeContractAddr = await this.findBridgeContractAddress(
-      sendingChainId,
-    );
+    const bridgeContractAddr = await this.findBridgeContractAddress(sendingChainId);
 
     console.debug('CBridge: start approving token');
     /// STEP 1.1: Approve token
     const ownerAddress = await signer.getAddress();
 
-    const allowance = await tokenContract.allowance(
-      ownerAddress,
-      bridgeContractAddr,
-    );
+    const allowance = await tokenContract.allowance(ownerAddress, bridgeContractAddr);
     let approveTx;
     if (BigNumber.from(allowance).lt(BigNumber.from(amountBN))) {
-      approveTx = await tokenContract.approve(
-        bridgeContractAddr,
-        amountToApprove,
-      );
+      approveTx = await tokenContract.approve(bridgeContractAddr, amountToApprove);
     }
 
     console.log('Cbridge Approved TX: ', approveTx);
@@ -211,15 +190,7 @@ window.CBridgeUtils = {
     );
 
     const transfer_id = window.ethers.utils.solidityKeccak256(
-      [
-        'address',
-        'address',
-        'address',
-        'uint256',
-        'uint64',
-        'uint64',
-        'uint64',
-      ],
+      ['address', 'address', 'address', 'uint256', 'uint64', 'uint64', 'uint64'],
       [
         Wallet.currentAddress(), /// User's wallet address,
         Wallet.currentAddress(), /// User's wallet address,
@@ -239,10 +210,7 @@ window.CBridgeUtils = {
   async findBridgeContractAddress(sendingChainId) {
     const transferConfig = await this.getTransferConfig();
     const chainInfos = transferConfig.chains;
-    const chainInfo = _.find(
-      chainInfos,
-      (c) => c.id === parseInt(sendingChainId),
-    );
+    const chainInfo = _.find(chainInfos, (c) => c.id === parseInt(sendingChainId));
     if (!chainInfo) {
       console.error('WARN: Cannot find celer bridge contract address');
     }

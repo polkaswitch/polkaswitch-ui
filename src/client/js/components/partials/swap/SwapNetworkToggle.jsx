@@ -25,16 +25,9 @@ export default class SwapNetworkToggle extends Component {
   }
 
   componentDidMount() {
-    this.subscribers.push(
-      EventManager.listenFor(
-        'networkHoverableUpdated',
-        this.handleNetworkHoverable,
-      ),
-    );
+    this.subscribers.push(EventManager.listenFor('networkHoverableUpdated', this.handleNetworkHoverable));
 
-    this.subscribers.push(
-      EventManager.listenFor('networkUpdated', this.handleNetworkChange),
-    );
+    this.subscribers.push(EventManager.listenFor('networkUpdated', this.handleNetworkChange));
   }
 
   componentWillUnmount() {
@@ -48,7 +41,7 @@ export default class SwapNetworkToggle extends Component {
   handleNetworkChange(event) {
     var network = TokenListManager.getCurrentNetworkConfig();
     this.setState({
-      selected: network
+      selected: network,
     });
   }
 

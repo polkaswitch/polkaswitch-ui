@@ -5,8 +5,8 @@ import * as ethers from 'ethers';
 import numeral from 'numeral';
 import dayjs from 'dayjs';
 
-var relativeTime = require('dayjs/plugin/relativeTime')
-dayjs.extend(relativeTime)
+var relativeTime = require('dayjs/plugin/relativeTime');
+dayjs.extend(relativeTime);
 
 import TokenListManager from '../../utils/tokenList';
 
@@ -78,9 +78,7 @@ export default class TxCrossChainActiveStatusView extends Component {
             <div>
               {sendingChain.name} &gt; {receivingChain.name}
             </div>
-            <div className="tx-meta">
-              {dayjs(this.props.data.preparedTimestamp * 1000).fromNow()}
-            </div>
+            <div className="tx-meta">{dayjs(this.props.data.preparedTimestamp * 1000).fromNow()}</div>
             <div className="tx-meta">{moment(this.props.data.preparedTimestamp * 1000).fromNow()}</div>
           </div>
         </div>

@@ -14,8 +14,7 @@ import { balanceContext } from '../../context/balance';
 import EventManager from '../../utils/events';
 
 const StatusHome = () => {
-  const { networks, loadBalances, loading, setMyApplicationState } =
-    useContext(balanceContext);
+  const { networks, loadBalances, loading, setMyApplicationState } = useContext(balanceContext);
 
   let subWalletChange;
 
@@ -42,10 +41,7 @@ const StatusHome = () => {
   };
 
   useEffect(() => {
-    subWalletChange = EventManager.listenFor(
-      'walletUpdated',
-      handleWalletChange,
-    );
+    subWalletChange = EventManager.listenFor('walletUpdated', handleWalletChange);
 
     return () => subWalletChange.unsubscribe();
   }, []);
@@ -66,9 +62,7 @@ const StatusHome = () => {
         <div className="column card-container">
           <div className="card wallets-page-card">
             <div className="tokens-table-title-container status-title">
-              <span className="tokens-table-title-container__main status-main">
-                Status
-              </span>
+              <span className="tokens-table-title-container__main status-main">Status</span>
             </div>
 
             <div className="wallets-page-tokens-table">
@@ -95,10 +89,7 @@ const StatusHome = () => {
                 </div>
               ) : networks.length > 1 ? (
                 networks.map((node) => (
-                  <div
-                    key={`network-${node.name}`}
-                    className="columns wallets-page-tokens-table__row is-mobile"
-                  >
+                  <div key={`network-${node.name}`} className="columns wallets-page-tokens-table__row is-mobile">
                     <div className="column is-half">
                       <span>{node.name}</span>
                     </div>
@@ -107,10 +98,7 @@ const StatusHome = () => {
                         {node.isRPCNodeActive ? (
                           <span className="network-status-online"> Online</span>
                         ) : (
-                          <span className="network-status-offline">
-                            {' '}
-                            Offline
-                          </span>
+                          <span className="network-status-offline"> Offline</span>
                         )}
                       </h4>
                     </div>
@@ -118,9 +106,7 @@ const StatusHome = () => {
                 ))
               ) : (
                 <div className="column data-na-container">
-                  <h2 className="status-main-description">
-                    Please reconnect the RPC's
-                  </h2>
+                  <h2 className="status-main-description">Please reconnect the RPC's</h2>
 
                   <button onClick={handleConnect} className="button is-success">
                     Connect Wallet

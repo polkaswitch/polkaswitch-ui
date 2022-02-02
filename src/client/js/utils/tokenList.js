@@ -17,32 +17,36 @@ window.TokenListManager = {
   _tokenLists: {},
   initialize: async function () {},
 
-  initializeTokenLists: function() {
+  initializeTokenLists: function () {
     // pre-load all token lists
     const filteredNetworks = _.filter(window.NETWORK_CONFIGS, (v) => v.enabled);
 
-    return Promise.all(filteredNetworks.map((network) => {
-      return fetch(network.tokenList).then((response) => {
-        return response.json();
-      }).then((tokenList) => {
-        tokenList = _.map(
-          _.filter(tokenList, function (v) {
-            return v.native || (v.symbol && Utils.isAddress(v.address));
-          }),
-          function (v) {
-            if (v.address) {
-              v.address = Utils.getAddress(v.address);
-            }
-            return v;
-          },
-        );
+    return Promise.all(
+      filteredNetworks.map((network) => {
+        return fetch(network.tokenList)
+          .then((response) => {
+            return response.json();
+          })
+          .then((tokenList) => {
+            tokenList = _.map(
+              _.filter(tokenList, function (v) {
+                return v.native || (v.symbol && Utils.isAddress(v.address));
+              }),
+              function (v) {
+                if (v.address) {
+                  v.address = Utils.getAddress(v.address);
+                }
+                return v;
+              },
+            );
 
-        this._tokenLists[+network.chainId] = tokenList;
-        this.updateTokenListwithCustom(network);
+            this._tokenLists[+network.chainId] = tokenList;
+            this.updateTokenListwithCustom(network);
 
-        return tokenList;
-      });
-    }));
+            return tokenList;
+          });
+      }),
+    );
   },
 
   getCurrentNetworkConfig() {
@@ -163,9 +167,7 @@ window.TokenListManager = {
   findTokenBySymbolFromCoinGecko: async function (symbol) {
     if (!window.COINGECKO_TOKEN_LIST) {
       window.COINGECKO_TOKEN_LIST = [{ temp: true }];
-      window.COINGECKO_TOKEN_LIST = await (
-        await fetch('/tokens/coingecko.list.json')
-      ).json();
+      window.COINGECKO_TOKEN_LIST = await (await fetch('/tokens/coingecko.list.json')).json();
     }
 
     return _.find(window.COINGECKO_TOKEN_LIST, function (v) {

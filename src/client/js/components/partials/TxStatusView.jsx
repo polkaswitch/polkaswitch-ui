@@ -69,9 +69,7 @@ export default class TxStatusView extends Component {
           <div className="item-1">
             <span>{lang}</span>
           </div>
-          <div className="item-2">
-            {dayjs(data.lastUpdated).format('MM/DD/YYYY h:mm A')}
-          </div>
+          <div className="item-2">{dayjs(data.lastUpdated).format('MM/DD/YYYY h:mm A')}</div>
         </div>
       </div>
     );

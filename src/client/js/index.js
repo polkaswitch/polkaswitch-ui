@@ -58,10 +58,7 @@ import Storage from './utils/storage';
 
 // pre-load and collase/parallelize all our external JSON config loading
 // to reduce initial app load times
-await Promise.all([
-  Wallet.initializeAbis(),
-  TokenListManager.initializeTokenLists()
-]);
+await Promise.all([Wallet.initializeAbis(), TokenListManager.initializeTokenLists()]);
 
 await Storage.initialize();
 await TokenListManager.initialize();

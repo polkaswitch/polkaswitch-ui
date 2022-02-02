@@ -41,7 +41,7 @@ const HOP_SUPPORTED_BRIDGE_TOKENS = [
 
 const CBRIDGE_SUPPORTED_BRIDGE_TOKENS = [
   'USDC',
-  'USDT'
+  'USDT',
   // TODO This is list is longer and is dynamically available per network pair.
   // Let's keep it simple for now
   // ... "MATIC", "ETH", "WBTC"
@@ -90,9 +90,9 @@ export default {
 
     // This also controls the order they appear in the UI
 
-    if (targetChainIds.every(e => CBRIDGE_SUPPORTED_CHAINS.includes(e))) {
-      if (to.symbol === from.symbol && targetTokenIds.every(e => CBRIDGE_SUPPORTED_BRIDGE_TOKENS.includes(e))) {
-        bridges.push("cbridge");
+    if (targetChainIds.every((e) => CBRIDGE_SUPPORTED_CHAINS.includes(e))) {
+      if (to.symbol === from.symbol && targetTokenIds.every((e) => CBRIDGE_SUPPORTED_BRIDGE_TOKENS.includes(e))) {
+        bridges.push('cbridge');
       }
       return [true, false];
     }
@@ -103,29 +103,22 @@ export default {
       return [false, `${fromChain.name} is not supported by Connext Bridge`];
     }
 
-    if (targetChainIds.every(e => HOP_SUPPORTED_CHAINS.includes(e))) {
-      if (to.symbol === from.symbol && targetTokenIds.every(e => HOP_SUPPORTED_BRIDGE_TOKENS.includes(e))) {
-        bridges.push("hop");
+    if (targetChainIds.every((e) => HOP_SUPPORTED_CHAINS.includes(e))) {
+      if (to.symbol === from.symbol && targetTokenIds.every((e) => HOP_SUPPORTED_BRIDGE_TOKENS.includes(e))) {
+        bridges.push('hop');
       }
     }
 
-    if (targetChainIds.every(e => CONNEXT_SUPPORTED_CHAINS.includes(e))) {
+    if (targetChainIds.every((e) => CONNEXT_SUPPORTED_CHAINS.includes(e))) {
       // Connext always supported regardless of token due to the extra swap steps
-      bridges.push("connext");
+      bridges.push('connext');
     }
 
     return bridges;
   },
 
   // TODO this is deprecated
-  async getEstimate(
-    sendingChainId,
-    sendingAssetId,
-    receivingChainId,
-    receivingAssetId,
-    amountBN,
-    receivingAddress,
-  ) {
+  async getEstimate(sendingChainId, sendingAssetId, receivingChainId, receivingAssetId, amountBN, receivingAddress) {
     const transactionId = getRandomBytes32();
     const bridgeInterface = this.getBridgeInterface();
     const { bridgeOption } = Storage.swapSettings;
@@ -181,7 +174,7 @@ export default {
 
     var supportedBridges = this.supportedBridges(to, toChain, from, fromChain);
 
-    return supportedBridges.map(bridgeType => {
+    return supportedBridges.map((bridgeType) => {
       var txData = {
         bridge: bridgeType,
         sendingChainId: +fromChain.chainId,
@@ -189,27 +182,29 @@ export default {
         receivingChainId: +toChain.chainId,
         receivingAssetId: to.address,
         amountBN,
-        receivingAddress
-      }
+        receivingAddress,
+      };
 
       const childTransactionId = getRandomBytes32();
       this._routes[parentTransactionId][bridgeType] = _.extend({}, txData);
       this._queue[childTransactionId] = _.extend({}, txData);
 
-      return this.getBridge(bridgeType).getEstimate(
-        childTransactionId,
-        +fromChain.chainId,
-        from.address,
-        +toChain.chainId,
-        to.address,
-        amountBN,
-        receivingAddress
-      ).then((estimate) => {
-        this._routes[parentTransactionId][bridgeType].estimate = estimate;
-        this._queue[childTransactionId].estimate = estimate;
+      return this.getBridge(bridgeType)
+        .getEstimate(
+          childTransactionId,
+          +fromChain.chainId,
+          from.address,
+          +toChain.chainId,
+          to.address,
+          amountBN,
+          receivingAddress,
+        )
+        .then((estimate) => {
+          this._routes[parentTransactionId][bridgeType].estimate = estimate;
+          this._queue[childTransactionId].estimate = estimate;
 
-        return this._routes[parentTransactionId][bridgeType];
-      });
+          return this._routes[parentTransactionId][bridgeType];
+        });
     });
   },
 

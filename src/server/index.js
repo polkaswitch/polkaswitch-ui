@@ -150,7 +150,9 @@ app.use('*', function (req, res) {
 
       return res.status(404).send({
         status: 404,
-        error: !isProduction ? '/dist/index.html not found. Please make sure to run `npm run watch` for local development' : '/dist/index.html not found'
+        error: !isProduction
+          ? '/dist/index.html not found. Please make sure to run `npm run watch` for local development'
+          : '/dist/index.html not found',
       });
     }
 
@@ -161,7 +163,7 @@ app.use('*', function (req, res) {
 app.use(function onNotFound(req, res, next) {
   res.status(404).send({
     status: 404,
-    error: 'not found'
+    error: 'not found',
   });
 });
 
@@ -174,7 +176,7 @@ app.use((err, req, res, next) => {
   res.status(500).send({
     status: 500,
     error: 'crash - (X_X)',
-    message: !isProduction ? err : 'n/a'
+    message: !isProduction ? err : 'n/a',
   });
 });
 

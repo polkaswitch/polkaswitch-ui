@@ -22,20 +22,14 @@ export default function RouteItemView(props) {
               );
             case 'swap':
               return (
-                <div
-                  key={index}
-                  className="is-flex is-flex-direction-row is-align-items-center"
-                >
+                <div key={index} className="is-flex is-flex-direction-row is-align-items-center">
                   <SwapRouteBox info={item} />
                   {data.length - 2 !== index && <DashedDivider />}
                 </div>
               );
             case 'bridge':
               return (
-                <div
-                  key={index}
-                  className="is-flex is-flex-direction-row is-align-items-center"
-                >
+                <div key={index} className="is-flex is-flex-direction-row is-align-items-center">
                   <SwapRouteBox info={item} />
                   {data.length - 2 !== index && <DashedDivider />}
                 </div>
