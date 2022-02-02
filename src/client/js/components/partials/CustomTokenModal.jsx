@@ -33,10 +33,7 @@ export default class CustomTokenModal extends Component {
   }
 
   componentDidMount() {
-    this.customTokenPrompt = EventManager.listenFor(
-      'addCustomToken',
-      this.handleOpen,
-    );
+    this.customTokenPrompt = EventManager.listenFor('addCustomToken', this.handleOpen);
   }
 
   componentWillUnmount() {
@@ -63,9 +60,7 @@ export default class CustomTokenModal extends Component {
   }
 
   handleCustomBtn = (e) => {
-    const {
-      symbol, name, decimals, customTokenAddr
-    } = this.state;
+    const { symbol, name, decimals, customTokenAddr } = this.state;
     const customToken = {
       symbol,
       name,
@@ -142,23 +137,17 @@ export default class CustomTokenModal extends Component {
       return;
     }
     Wallet.getSymbol(tokenAddr)
-      .then(
-        (symbol) => {
-          this.setState({ symbol });
-          this.fetchName(0, tokenAddr);
-        },
-      )
-      .catch(
-        (e) => {
-          // try again
-          console.error('Failed to fetch symbol', e);
-          _.defer(
-            () => {
-              this.fetchSymbol(attempt + 1, tokenAddr);
-            },
-          );
-        },
-      );
+      .then((symbol) => {
+        this.setState({ symbol });
+        this.fetchName(0, tokenAddr);
+      })
+      .catch((e) => {
+        // try again
+        console.error('Failed to fetch symbol', e);
+        _.defer(() => {
+          this.fetchSymbol(attempt + 1, tokenAddr);
+        });
+      });
   }
 
   fetchName(attempt, tokenAddr) {
@@ -173,23 +162,17 @@ export default class CustomTokenModal extends Component {
       return;
     }
     Wallet.getName(tokenAddr)
-      .then(
-        (name) => {
-          this.setState({ name });
-          this.fetchDecimals(0, tokenAddr);
-        },
-      )
-      .catch(
-        (e) => {
-          // try again
-          console.error('Failed to fetch name', e);
-          _.defer(
-            () => {
-              this.fetchName(attempt + 1, tokenAddr);
-            },
-          );
-        },
-      );
+      .then((name) => {
+        this.setState({ name });
+        this.fetchDecimals(0, tokenAddr);
+      })
+      .catch((e) => {
+        // try again
+        console.error('Failed to fetch name', e);
+        _.defer(() => {
+          this.fetchName(attempt + 1, tokenAddr);
+        });
+      });
   }
 
   fetchDecimals(attempt, tokenAddr) {
@@ -204,39 +187,24 @@ export default class CustomTokenModal extends Component {
       return;
     }
     Wallet.getDecimals(tokenAddr)
-      .then(
-        (decimals) => {
-          this.setState({
-            fetchingTokenInfo: false,
-            decimals,
-            errored: false,
-          });
-        },
-      )
-      .catch(
-        (e) => {
-          // try again
-          console.error('Failed to fetch decimals', e);
-          _.defer(
-            () => {
-              this.fetchDecimals(attempt + 1, tokenAddr);
-            },
-          );
-        },
-      );
+      .then((decimals) => {
+        this.setState({
+          fetchingTokenInfo: false,
+          decimals,
+          errored: false,
+        });
+      })
+      .catch((e) => {
+        // try again
+        console.error('Failed to fetch decimals', e);
+        _.defer(() => {
+          this.fetchDecimals(attempt + 1, tokenAddr);
+        });
+      });
   }
 
   render() {
-    const {
-      open,
-      errored,
-      customTokenAddr,
-      symbol,
-      name,
-      decimals,
-      errorMsg,
-      fetchingTokenInfo,
-    } = this.state;
+    const { open, errored, customTokenAddr, symbol, name, decimals, errorMsg, fetchingTokenInfo } = this.state;
     return (
       <div className={classnames('modal', { 'is-active': open })}>
         <div onClick={this.handleClose} className="modal-background" />
@@ -245,10 +213,7 @@ export default class CustomTokenModal extends Component {
             <div className="level is-mobile">
               <div className="level-left">
                 <div className="level-item">
-                  <span
-                    className="icon ion-icon clickable is-medium"
-                    onClick={this.handleClose}
-                  >
+                  <span className="icon ion-icon clickable is-medium" onClick={this.handleClose}>
                     <ion-icon name="close-outline" />
                   </span>
                 </div>
@@ -277,20 +242,12 @@ export default class CustomTokenModal extends Component {
             >
               {errorMsg}
             </div>
-            <CustomTokenDetails
-              errored={errored}
-              symbol={symbol}
-              name={name}
-              decimals={decimals}
-            />
+            <CustomTokenDetails errored={errored} symbol={symbol} name={name} decimals={decimals} />
             <div>
               <button
-                className={classnames(
-                  'button is-primary is-fullwidth is-medium',
-                  {
-                    'is-loading': fetchingTokenInfo,
-                  },
-                )}
+                className={classnames('button is-primary is-fullwidth is-medium', {
+                  'is-loading': fetchingTokenInfo,
+                })}
                 disabled={!Wallet.isConnected() || errored}
                 onClick={this.handleCustomBtn.bind(this)}
               >

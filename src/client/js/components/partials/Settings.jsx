@@ -38,10 +38,7 @@ export default class Settings extends Component {
 
     return (
       <div>
-        <span
-          className="icon clickable settings-icon"
-          onClick={this.handleClick}
-        >
+        <span className="icon clickable settings-icon" onClick={this.handleClick}>
           <ion-icon name="settings-outline" />
         </span>
         {showing && (

@@ -27,14 +27,14 @@ window.Storage = {
   initialize() {
     const cachedSettings = store.get('settings');
     if (_.has(cachedSettings, 'gasSpeedSetting')) {
-      this.swapSettings = _.extend(
-        this.swapSettings,
-        _.pick(cachedSettings, _.keys(DEFAULT_SWAP_SETTINGS)),
-      );
+      this.swapSettings = _.extend(this.swapSettings, _.pick(cachedSettings, _.keys(DEFAULT_SWAP_SETTINGS)));
     }
 
     // initialize the Network
-    const defaultNetwork = _.findWhere(window.NETWORK_CONFIGS, { enabled: true, singleChainSupported: true }).name;
+    const defaultNetwork = _.findWhere(window.NETWORK_CONFIGS, {
+      enabled: true,
+      singleChainSupported: true,
+    }).name;
     const storedNetwork = _.findWhere(window.NETWORK_CONFIGS, {
       name: store.get('selectedNetwork'),
       enabled: true,
@@ -65,12 +65,7 @@ window.Storage = {
   resetNetworkSensitiveSettings() {
     this.swapSettings = _.extend(
       this.swapSettings,
-      _.pick(
-        DEFAULT_SWAP_SETTINGS,
-        'gasSpeedSetting',
-        'customGasPrice',
-        'isCustomGasPrice',
-      ),
+      _.pick(DEFAULT_SWAP_SETTINGS, 'gasSpeedSetting', 'customGasPrice', 'isCustomGasPrice'),
     );
     store.set('settings', this.swapSettings);
     EventManager.emitEvent('swapSettingsUpdated', 1);

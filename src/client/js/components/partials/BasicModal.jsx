@@ -10,17 +10,9 @@ export default class BasicModal extends Component {
   render() {
     return (
       <div className={classnames('modal', { 'is-active': this.props.open })}>
-        <div
-          onClick={this.props.handleClose}
-          className="modal-background"
-        />
+        <div onClick={this.props.handleClose} className="modal-background" />
         <div className="modal-content">
-          <div
-            className={classnames(
-              'box modal-basic-style',
-              this.props.modalClasses,
-            )}
-          >
+          <div className={classnames('box modal-basic-style', this.props.modalClasses)}>
             <div className="modal-title-wrapper level is-mobile">
               <div className="level-left">
                 <div className="level-item">
@@ -29,10 +21,7 @@ export default class BasicModal extends Component {
               </div>
               <div className="level-right">
                 <div className="level-item">
-                  <span
-                    className="icon ion-icon clickable is-medium"
-                    onClick={this.props.handleClose}
-                  >
+                  <span className="icon ion-icon clickable is-medium" onClick={this.props.handleClose}>
                     <ion-icon name="close-outline" />
                   </span>
                 </div>

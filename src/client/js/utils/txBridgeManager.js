@@ -1,9 +1,7 @@
 import _ from 'underscore';
 import store from 'store';
 import BN from 'bignumber.js';
-import {
-  BigNumber, constants, providers, Signer, utils
-} from 'ethers';
+import { BigNumber, constants, providers, Signer, utils } from 'ethers';
 
 import { getRandomBytes32 } from '@connext/nxtp-utils';
 import Wallet from './wallet';
@@ -69,9 +67,11 @@ export default {
         return [false, `${fromChain.name} is not supported by Hop Bridge`];
       }
       return [true, false];
-    } if (!CONNEXT_SUPPORTED_CHAINS.includes(+toChain.chainId)) {
+    }
+    if (!CONNEXT_SUPPORTED_CHAINS.includes(+toChain.chainId)) {
       return [false, `${toChain.name} is not supported by Connext Bridge`];
-    } if (!CONNEXT_SUPPORTED_CHAINS.includes(+fromChain.chainId)) {
+    }
+    if (!CONNEXT_SUPPORTED_CHAINS.includes(+fromChain.chainId)) {
       return [false, `${fromChain.name} is not supported by Connext Bridge`];
     }
     return [true, false];
@@ -85,14 +85,7 @@ export default {
     }
   },
 
-  getEstimate(
-    sendingChainId,
-    sendingAssetId,
-    receivingChainId,
-    receivingAssetId,
-    amountBN,
-    receivingAddress,
-  ) {
+  getEstimate(sendingChainId, sendingAssetId, receivingChainId, receivingAssetId, amountBN, receivingAddress) {
     const transactionId = getRandomBytes32();
     const bridgeInterface = this.getBridgeInterface();
 

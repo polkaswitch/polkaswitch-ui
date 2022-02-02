@@ -9,35 +9,26 @@ export default function RouteItemView(props) {
 
   return (
     <div className="bridge-route-item">
-      {data.length > 0
-        && _.map(data, (item, index) => {
+      {data.length > 0 &&
+        _.map(data, (item, index) => {
           switch (item.type) {
             case 'token-network':
               return (
-                <div
-                  key={index}
-                  className="is-flex is-flex-direction-row is-align-items-center"
-                >
+                <div key={index} className="is-flex is-flex-direction-row is-align-items-center">
                   <TokenNetworkRouteBox info={item} />
                   {data.length - 2 !== index && <DashedDivider />}
                 </div>
               );
             case 'swap':
               return (
-                <div
-                  key={index}
-                  className="is-flex is-flex-direction-row is-align-items-center"
-                >
+                <div key={index} className="is-flex is-flex-direction-row is-align-items-center">
                   <SwapBridgeTextBox info={item} />
                   {data.length - 2 !== index && <DashedDivider />}
                 </div>
               );
             case 'bridge':
               return (
-                <div
-                  key={index}
-                  className="is-flex is-flex-direction-row is-align-items-center"
-                >
+                <div key={index} className="is-flex is-flex-direction-row is-align-items-center">
                   <SwapBridgeTextBox info={item} />
                   {data.length - 2 !== index && <DashedDivider />}
                 </div>

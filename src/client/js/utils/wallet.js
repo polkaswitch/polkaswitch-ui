@@ -36,74 +36,53 @@ window.WalletJS = {
 
     window.erc20Abi = await (await fetch('/abi/erc20_standard.json')).json();
     window.oneSplitAbi = await (await fetch('/abi/test/OneSplit.json')).json();
-    window.crossChainOneSplitAbi = await (
-      await fetch('/abi/cross-chain/cross-chain-aggregator.json')
-    ).json();
+    window.crossChainOneSplitAbi = await (await fetch('/abi/cross-chain/cross-chain-aggregator.json')).json();
     window.polygonAbi = await (await fetch('/abi/test/Polygon.json')).json();
     window.moonriverAbi = await (await fetch('/abi/test/Moonriver.json')).json();
     window.xDaiAbi = await (await fetch('/abi/test/Xdai.json')).json();
 
-    EventManager.listenFor(
-      'initiateWalletConnect',
-      this._connectWalletHandler.bind(this),
-    );
+    EventManager.listenFor('initiateWalletConnect', this._connectWalletHandler.bind(this));
   },
 
   initListeners(provider) {
-    provider.on(
-      'accountsChanged',
-      (accounts) => {
-        // Time to reload your interface with accounts[0]!
-        console.log('event - accountsChanged:', accounts);
-        if (accounts.length === 0) {
-          this.disconnect();
-          EventManager.emitEvent('walletUpdated', 1);
-        } else if (
-          accounts[0] != this.currentAddress()
-          && this._cachedWeb3Provider
-        ) {
-          this._saveConnection(this._cachedWeb3Provider, this._cachedStrategy);
-        }
-      },
-    );
-
-    provider.on(
-      'disconnect',
-      (providerRpcError) => {
-        console.log('event - disconnect:', providerRpcError);
+    provider.on('accountsChanged', (accounts) => {
+      // Time to reload your interface with accounts[0]!
+      console.log('event - accountsChanged:', accounts);
+      if (accounts.length === 0) {
         this.disconnect();
         EventManager.emitEvent('walletUpdated', 1);
-      },
-    );
+      } else if (accounts[0] != this.currentAddress() && this._cachedWeb3Provider) {
+        this._saveConnection(this._cachedWeb3Provider, this._cachedStrategy);
+      }
+    });
 
-    provider.on(
-      'chainChanged',
-      (chainId) => {
-        console.log('event - chainChanged:', chainId);
-        // if chain changes due to manual user change, not via connect change:
-        // just wipe clean, too hard to manage otherwise
-        this._cachedNetworkId = chainId;
-        if (!this.isMatchingConnectedNetwork()) {
-          this.disconnect();
-        }
+    provider.on('disconnect', (providerRpcError) => {
+      console.log('event - disconnect:', providerRpcError);
+      this.disconnect();
+      EventManager.emitEvent('walletUpdated', 1);
+    });
 
-        EventManager.emitEvent('walletUpdated', 1);
-      },
-    );
+    provider.on('chainChanged', (chainId) => {
+      console.log('event - chainChanged:', chainId);
+      // if chain changes due to manual user change, not via connect change:
+      // just wipe clean, too hard to manage otherwise
+      this._cachedNetworkId = chainId;
+      if (!this.isMatchingConnectedNetwork()) {
+        this.disconnect();
+      }
+
+      EventManager.emitEvent('walletUpdated', 1);
+    });
   },
 
   getReadOnlyProvider(chainId) {
-    const network = chainId
-      ? TokenListManager.getNetworkById(chainId)
-      : TokenListManager.getCurrentNetworkConfig();
+    const network = chainId ? TokenListManager.getNetworkById(chainId) : TokenListManager.getCurrentNetworkConfig();
     const provider = new ethers.providers.JsonRpcProvider(network.nodeProviders[0]);
     return provider;
   },
 
   getProvider(strictCheck) {
-    const condition = strictCheck
-      ? this.isConnected()
-      : this.isConnectedToAnyNetwork();
+    const condition = strictCheck ? this.isConnected() : this.isConnectedToAnyNetwork();
 
     if (condition) {
       return this._cachedWeb3Provider;
@@ -117,7 +96,8 @@ window.WalletJS = {
     if ((!!optionalNetwork && this.isConnectedToAnyNetwork()) || this.isConnected()) {
       if (token.native) {
         return this.getDefaultBalance(optionalNetwork);
-      } if (token.address) {
+      }
+      if (token.address) {
         return this.getERC20Balance(token.address, optionalNetwork);
       }
     } else {
@@ -142,21 +122,13 @@ window.WalletJS = {
       provider = this.getProvider();
     }
 
-    const contract = new Contract(
-      tokenContractAddress,
-      window.erc20Abi,
-      provider,
-    );
+    const contract = new Contract(tokenContractAddress, window.erc20Abi, provider);
     return await contract.balanceOf(this.currentAddress());
   },
 
   async getName(tokenAddr) {
     if (this.isConnected() && tokenAddr) {
-      const contract = new Contract(
-        tokenAddr,
-        window.erc20Abi,
-        this.getProvider(),
-      );
+      const contract = new Contract(tokenAddr, window.erc20Abi, this.getProvider());
       return await contract.name();
     }
     return Promise.resolve('');
@@ -164,11 +136,7 @@ window.WalletJS = {
 
   async getDecimals(tokenAddr) {
     if (this.isConnected() && tokenAddr) {
-      const contract = new Contract(
-        tokenAddr,
-        window.erc20Abi,
-        this.getProvider(),
-      );
+      const contract = new Contract(tokenAddr, window.erc20Abi, this.getProvider());
       return await contract.decimals();
     }
     return Promise.reject();
@@ -176,11 +144,7 @@ window.WalletJS = {
 
   async getSymbol(tokenAddr) {
     if (this.isConnected() && tokenAddr) {
-      const contract = new Contract(
-        tokenAddr,
-        window.erc20Abi,
-        this.getProvider(),
-      );
+      const contract = new Contract(tokenAddr, window.erc20Abi, this.getProvider());
       return await contract.symbol();
     }
     return Promise.reject();
@@ -275,13 +239,11 @@ window.WalletJS = {
 
     provider
       .enable()
-      .then(
-        (v) => {
-          const web3Provider = new ethers.providers.Web3Provider(provider);
+      .then((v) => {
+        const web3Provider = new ethers.providers.Web3Provider(provider);
 
-          return this._saveConnection(web3Provider, 'walletConnect');
-        },
-      )
+        return this._saveConnection(web3Provider, 'walletConnect');
+      })
       .catch((e) => {
         console.error(e);
       });
@@ -290,74 +252,59 @@ window.WalletJS = {
   },
 
   _connectProviderMetamask() {
-    return new Promise(
-      (async (resolve, reject) => {
-        const network = TokenListManager.getCurrentNetworkConfig();
+    return new Promise(async (resolve, reject) => {
+      const network = TokenListManager.getCurrentNetworkConfig();
 
-        const requestAccount = function () {
-          _.delay(
-            () => {
-              window.ethereum
-                .request({ method: 'eth_requestAccounts' })
-                .then(
-                  (accounts) => {
-                    // Metamask currently only ever provide a single account
-                    const account = accounts[0];
+      const requestAccount = function () {
+        _.delay(() => {
+          window.ethereum
+            .request({ method: 'eth_requestAccounts' })
+            .then((accounts) => {
+              // Metamask currently only ever provide a single account
+              const account = accounts[0];
 
-                    const web3Provider = new ethers.providers.Web3Provider(
-                      window.ethereum,
-                    );
-                    return this._saveConnection(web3Provider, 'metamask').then(
-                      () => {
-                        resolve(account);
-                      },
-                    );
-                  },
-                )
-                .catch((e) => {
-                  console.error(e);
-                  reject(e);
-                });
-            },
-            1000,
-          );
-        }.bind(this);
-
-        try {
-          await window.ethereum
-            .request({
-              method: 'wallet_switchEthereumChain',
-              params: [{ chainId: network.chain.chainId }],
-            })
-            .then(
-              () => {
-                requestAccount();
-              },
-            );
-        } catch (switchError) {
-          // This error code indicates that the chain has not been added to MetaMask.
-          if (switchError.code === 4902) {
-            window.ethereum
-              .request({
-                method: 'wallet_addEthereumChain',
-                params: [network.chain],
-              })
-              .then(
-                () => {
-                  requestAccount();
-                },
-              )
-              .catch((e) => {
-                console.error(e);
-                reject(e);
+              const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+              return this._saveConnection(web3Provider, 'metamask').then(() => {
+                resolve(account);
               });
-          } else {
-            console.error(switchError);
-            reject(switchError);
-          }
+            })
+            .catch((e) => {
+              console.error(e);
+              reject(e);
+            });
+        }, 1000);
+      }.bind(this);
+
+      try {
+        await window.ethereum
+          .request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: network.chain.chainId }],
+          })
+          .then(() => {
+            requestAccount();
+          });
+      } catch (switchError) {
+        // This error code indicates that the chain has not been added to MetaMask.
+        if (switchError.code === 4902) {
+          window.ethereum
+            .request({
+              method: 'wallet_addEthereumChain',
+              params: [network.chain],
+            })
+            .then(() => {
+              requestAccount();
+            })
+            .catch((e) => {
+              console.error(e);
+              reject(e);
+            });
+        } else {
+          console.error(switchError);
+          reject(switchError);
         }
-      }),
-    );
+      }
+    });
   },
 };
 

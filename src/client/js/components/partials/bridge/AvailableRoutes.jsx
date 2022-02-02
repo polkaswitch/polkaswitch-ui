@@ -14,8 +14,7 @@ export default function AvailableRoutes(props) {
         token: {
           amount: 23.9744,
           name: 'AVAX',
-          logoURI:
-            'https://assets.coingecko.com/coins/images/12559/large/coin-round-red.png',
+          logoURI: 'https://assets.coingecko.com/coins/images/12559/large/coin-round-red.png',
         },
         network: {
           name: 'Polygon',
@@ -50,8 +49,7 @@ export default function AvailableRoutes(props) {
         token: {
           amount: 12775.271,
           name: 'UNI',
-          logoURI:
-            'https://cloudflare-ipfs.com/ipfs/QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg/',
+          logoURI: 'https://cloudflare-ipfs.com/ipfs/QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg/',
         },
         network: {
           name: 'Polygon',
@@ -69,8 +67,7 @@ export default function AvailableRoutes(props) {
         token: {
           amount: 23.9744,
           name: 'AVAX',
-          logoURI:
-            'https://assets.coingecko.com/coins/images/12559/large/coin-round-red.png',
+          logoURI: 'https://assets.coingecko.com/coins/images/12559/large/coin-round-red.png',
         },
         network: {
           name: 'Polygon',
@@ -105,8 +102,7 @@ export default function AvailableRoutes(props) {
         token: {
           amount: 12775.271,
           name: 'UNI',
-          logoURI:
-            'https://cloudflare-ipfs.com/ipfs/QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg/',
+          logoURI: 'https://cloudflare-ipfs.com/ipfs/QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg/',
         },
         network: {
           name: 'Polygon',
@@ -121,14 +117,8 @@ export default function AvailableRoutes(props) {
   ];
 
   return (
-    <div
-      className="token-dist-wrapper control"
-      aria-label="Available routes for the swap"
-    >
-      {routes.length > 0
-        && _.map(routes, (item, i) => (
-          <RouteItemWrapper key={i} data={item} index={i} />
-        ))}
+    <div className="token-dist-wrapper control" aria-label="Available routes for the swap">
+      {routes.length > 0 && _.map(routes, (item, i) => <RouteItemWrapper key={i} data={item} index={i} />)}
     </div>
   );
 }

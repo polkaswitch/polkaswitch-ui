@@ -1,6 +1,4 @@
-import React, {
-  useState, useEffect, useMemo, useRef
-} from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import classnames from 'classnames';
 
 // TODO WIP component, not used anywhere
@@ -49,8 +47,8 @@ export default function Search() {
 
   const handleClick = (e) => {
     if (
-      !(menuRef.current && menuRef.current.contains(e.target))
-      && !(wrapperRef.current && wrapperRef.current.contains(e.target))
+      !(menuRef.current && menuRef.current.contains(e.target)) &&
+      !(wrapperRef.current && wrapperRef.current.contains(e.target))
     ) {
       setPairsShown(3);
       setTokensShown(3);
@@ -100,11 +98,7 @@ export default function Search() {
           }}
         />
         {showMenu && (
-          <span
-            className="icon close-icon is-right"
-            style={{ cursor: 'pointer' }}
-            onClick={() => toggleMenu(false)}
-          >
+          <span className="icon close-icon is-right" style={{ cursor: 'pointer' }} onClick={() => toggleMenu(false)}>
             <ion-icon name="close-outline" class="close-icon" />
           </span>
         )}
@@ -124,12 +118,13 @@ export default function Search() {
               <div>No results</div>
             </div>
           )}
-          {filteredTokenList.slice(0, tokensShown).map((token) => <div className="menu-item" />)}
+          {filteredTokenList.slice(0, tokensShown).map((token) => (
+            <div className="menu-item" />
+          ))}
           <div
             className={classnames('header', {
               'is-hidden': !(
-                Object.keys(filteredTokenList).length > 3
-                && Object.keys(filteredTokenList).length >= tokensShown
+                Object.keys(filteredTokenList).length > 3 && Object.keys(filteredTokenList).length >= tokensShown
               ),
             })}
           >
@@ -152,13 +147,11 @@ export default function Search() {
               <div>No results</div>
             </div>
           )}
-          {filteredPairList
-            && filteredPairList.slice(0, pairsShown).map((pair) => <div className="menu-item" />)}
+          {filteredPairList && filteredPairList.slice(0, pairsShown).map((pair) => <div className="menu-item" />)}
           <div
             className={classnames('header', {
               'is-hidden': !(
-                Object.keys(filteredPairList).length > 3
-                && Object.keys(filteredPairList).length >= pairsShown
+                Object.keys(filteredPairList).length > 3 && Object.keys(filteredPairList).length >= pairsShown
               ),
             })}
           >

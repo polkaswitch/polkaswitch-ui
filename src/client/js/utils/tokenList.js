@@ -81,9 +81,13 @@ window.TokenListManager = {
       gasStats = await (await fetch(network.gasApi)).json();
     } else {
       const provider = new ethers.providers.JsonRpcProvider(network.nodeProviders[0]);
-      const defaultGasPrice = Math.ceil(Utils.formatUnits((await provider.getGasPrice()), 'gwei'));
+      const defaultGasPrice = Math.ceil(Utils.formatUnits(await provider.getGasPrice(), 'gwei'));
 
-      gasStats = { safeLow: defaultGasPrice, fast: defaultGasPrice, fastest: defaultGasPrice };
+      gasStats = {
+        safeLow: defaultGasPrice,
+        fast: defaultGasPrice,
+        fastest: defaultGasPrice,
+      };
     }
 
     // xDai GasAPI has different fields
@@ -99,10 +103,7 @@ window.TokenListManager = {
       }
     }
 
-    window.GAS_STATS = _.mapObject(
-      _.pick(gasStats, ['fast', 'fastest', 'safeLow']),
-      (v, k) => Math.ceil(v * 1.1),
-    );
+    window.GAS_STATS = _.mapObject(_.pick(gasStats, ['fast', 'fastest', 'safeLow']), (v, k) => Math.ceil(v * 1.1));
 
     window.TOKEN_LIST = tokenList;
     window.NATIVE_TOKEN = _.findWhere(tokenList, { native: true });
@@ -140,17 +141,13 @@ window.TokenListManager = {
       tokenList = this.getTokenListForNetwork(optionalNetwork);
     }
 
-    const foundToken = _.find(tokenList, (v) => (
-      v.address.toLowerCase() === tid.toLowerCase()
-        || v.symbol.toLowerCase() === tid.toLowerCase()
-    ));
+    const foundToken = _.find(
+      tokenList,
+      (v) => v.address.toLowerCase() === tid.toLowerCase() || v.symbol.toLowerCase() === tid.toLowerCase(),
+    );
 
     if (!foundToken) {
-      console.log(
-        'WARN: TokenListManager: Token ID Not Found:',
-        tid,
-        optionalNetwork?.name,
-      );
+      console.log('WARN: TokenListManager: Token ID Not Found:', tid, optionalNetwork?.name);
     }
     return foundToken;
   },
@@ -166,9 +163,9 @@ window.TokenListManager = {
       const addresses = customTokenAddresses[network.chainId] || [];
       if (addresses.length > 0) {
         if (this._tokenLists[network.chainId]) {
-          this._tokenLists[network.chainId] = this._tokenLists[
-            network.chainId
-          ].concat(customTokenAddresses[network.chainId]);
+          this._tokenLists[network.chainId] = this._tokenLists[network.chainId].concat(
+            customTokenAddresses[network.chainId],
+          );
         }
       }
     }
@@ -185,10 +182,7 @@ window.TokenListManager = {
       const customTokenAddresses = store.get('customTokenAddress') || {};
       let addresses = [];
 
-      if (
-        !_.isEmpty(customTokenAddresses)
-        && !_.isUndefined(customTokenAddresses[chainId])
-      ) {
+      if (!_.isEmpty(customTokenAddresses) && !_.isUndefined(customTokenAddresses[chainId])) {
         addresses = customTokenAddresses[chainId];
       }
 

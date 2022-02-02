@@ -43,12 +43,14 @@ export default function TxnHistory() {
     setQueue(TxQueue.getQueue());
   };
 
-  const filteredList = useMemo(() => (
-    queue
-      && Object.keys(queue)
+  const filteredList = useMemo(
+    () =>
+      queue &&
+      Object.keys(queue)
         .map((key) => queue[key])
-        .slice(itemMax * (page - 1), page * itemMax)
-  ), [queue, itemMax, page, refresh]);
+        .slice(itemMax * (page - 1), page * itemMax),
+    [queue, itemMax, page, refresh],
+  );
 
   return (
     <div>
@@ -56,8 +58,8 @@ export default function TxnHistory() {
         <div className="grid-table">
           <div className="title-bar">Trade History</div>
           <div className="body">
-            {filteredList
-              && _.map(filteredList, (item, i) => (
+            {filteredList &&
+              _.map(filteredList, (item, i) => (
                 <div key={i} className="row">
                   <TxStatusView key={i} data={item} />
                 </div>

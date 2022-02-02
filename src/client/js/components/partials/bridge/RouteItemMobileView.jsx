@@ -8,17 +8,11 @@ export default function RouteItemMobileView(props) {
 
   return (
     <div className="bridge-route-item-mobile">
-      {data.length > 0
-        && _.map(data, (item, index) => {
+      {data.length > 0 &&
+        _.map(data, (item, index) => {
           switch (item.type) {
             case 'token-network':
-              return (
-                <TokenIconImg
-                  key={index}
-                  size={28}
-                  imgSrc={item.token && item.token.logoURI}
-                />
-              );
+              return <TokenIconImg key={index} size={28} imgSrc={item.token && item.token.logoURI} />;
             case 'swap':
               return <Divider key={index} />;
             case 'bridge':

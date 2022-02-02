@@ -1,15 +1,8 @@
 import _ from 'underscore';
 import * as ethers from 'ethers';
 import BN from 'bignumber.js';
-import {
-  BigNumber, constants, Signer, utils
-} from 'ethers';
-import {
-  ActiveTransaction,
-  NxtpSdk,
-  NxtpSdkEvents,
-  HistoricalTransaction,
-} from '@connext/nxtp-sdk';
+import { BigNumber, constants, Signer, utils } from 'ethers';
+import { ActiveTransaction, NxtpSdk, NxtpSdkEvents, HistoricalTransaction } from '@connext/nxtp-sdk';
 import {
   AuctionResponse,
   ChainData,
@@ -65,7 +58,7 @@ window.NxtpUtils = {
 
         this._sdkConfig[e.chainId] = {
           providers: e.nodeProviders,
-          subgraph: connextData?.subgraph
+          subgraph: connextData?.subgraph,
         };
       }
     });
@@ -126,9 +119,7 @@ window.NxtpUtils = {
     }
     _sdk.attach(NxtpSdkEvents.SenderTransactionPrepared, (data) => {
       console.log('SenderTransactionPrepared:', data);
-      const {
-        amount, expiry, preparedBlockNumber, ...invariant
-      } = data.txData;
+      const { amount, expiry, preparedBlockNumber, ...invariant } = data.txData;
 
       const index = this._activeTxs.findIndex(
         (col) => col.crosschainTx.invariant.transactionId === invariant.transactionId,
@@ -162,36 +153,25 @@ window.NxtpUtils = {
         };
       }
 
-      EventManager.emitEvent(
-        'nxtpEventUpdated',
-        NxtpSdkEvents.SenderTransactionPrepared,
-      );
+      EventManager.emitEvent('nxtpEventUpdated', NxtpSdkEvents.SenderTransactionPrepared);
     });
 
     _sdk.attach(NxtpSdkEvents.SenderTransactionFulfilled, async (data) => {
       console.log('SenderTransactionFulfilled:', data);
       this.removeActiveTx(data.txData.transactionId);
-      EventManager.emitEvent(
-        'nxtpEventUpdated',
-        NxtpSdkEvents.SenderTransactionFulfilled,
-      );
+      EventManager.emitEvent('nxtpEventUpdated', NxtpSdkEvents.SenderTransactionFulfilled);
     });
 
     _sdk.attach(NxtpSdkEvents.SenderTransactionCancelled, async (data) => {
       console.log('SenderTransactionCancelled:', data);
       this.removeActiveTx(data.txData.transactionId);
       await this.fetchHistoricalTxs();
-      EventManager.emitEvent(
-        'nxtpEventUpdated',
-        NxtpSdkEvents.SenderTransactionCancelled,
-      );
+      EventManager.emitEvent('nxtpEventUpdated', NxtpSdkEvents.SenderTransactionCancelled);
     });
 
     _sdk.attach(NxtpSdkEvents.ReceiverTransactionPrepared, (data) => {
       console.log('ReceiverTransactionPrepared:', data);
-      const {
-        amount, expiry, preparedBlockNumber, ...invariant
-      } = data.txData;
+      const { amount, expiry, preparedBlockNumber, ...invariant } = data.txData;
       const index = this._activeTxs.findIndex(
         (col) => col.crosschainTx.invariant.transactionId === invariant.transactionId,
       );
@@ -221,54 +201,35 @@ window.NxtpUtils = {
         };
       }
 
-      EventManager.emitEvent(
-        'nxtpEventUpdated',
-        NxtpSdkEvents.ReceiverTransactionPrepared,
-      );
+      EventManager.emitEvent('nxtpEventUpdated', NxtpSdkEvents.ReceiverTransactionPrepared);
     });
 
     _sdk.attach(NxtpSdkEvents.ReceiverPrepareSigned, async (data) => {
       console.log('ReceiverPrepareSigned:', data);
-      this.updateActiveTx(
-        data.transactionId,
-        NxtpSdkEvents.ReceiverPrepareSigned,
-      );
-      EventManager.emitEvent(
-        'nxtpEventUpdated',
-        NxtpSdkEvents.ReceiverPrepareSigned,
-      );
+      this.updateActiveTx(data.transactionId, NxtpSdkEvents.ReceiverPrepareSigned);
+      EventManager.emitEvent('nxtpEventUpdated', NxtpSdkEvents.ReceiverPrepareSigned);
     });
 
     _sdk.attach(NxtpSdkEvents.ReceiverTransactionFulfilled, async (data) => {
       console.log('ReceiverTransactionFulfilled:', data);
-      this.updateActiveTx(
-        data.txData.transactionId,
-        NxtpSdkEvents.ReceiverTransactionFulfilled,
-        data,
-        { invariant: data.txData, receiving: data.txData },
-      );
+      this.updateActiveTx(data.txData.transactionId, NxtpSdkEvents.ReceiverTransactionFulfilled, data, {
+        invariant: data.txData,
+        receiving: data.txData,
+      });
       this.removeActiveTx(data.txData.transactionId);
       await this.fetchHistoricalTxs();
-      EventManager.emitEvent(
-        'nxtpEventUpdated',
-        NxtpSdkEvents.ReceiverTransactionFulfilled,
-      );
+      EventManager.emitEvent('nxtpEventUpdated', NxtpSdkEvents.ReceiverTransactionFulfilled);
     });
 
     _sdk.attach(NxtpSdkEvents.ReceiverTransactionCancelled, async (data) => {
       console.log('ReceiverTransactionCancelled:', data);
-      this.updateActiveTx(
-        data.txData.transactionId,
-        NxtpSdkEvents.ReceiverTransactionCancelled,
-        data,
-        { invariant: data.txData, receiving: data.txData },
-      );
+      this.updateActiveTx(data.txData.transactionId, NxtpSdkEvents.ReceiverTransactionCancelled, data, {
+        invariant: data.txData,
+        receiving: data.txData,
+      });
       this.removeActiveTx(data.txData.transactionId);
       await this.fetchHistoricalTxs();
-      EventManager.emitEvent(
-        'nxtpEventUpdated',
-        NxtpSdkEvents.ReceiverTransactionCancelled,
-      );
+      EventManager.emitEvent('nxtpEventUpdated', NxtpSdkEvents.ReceiverTransactionCancelled);
     });
 
     _sdk.attach(NxtpSdkEvents.SenderTokenApprovalMined, (data) => {
@@ -281,9 +242,7 @@ window.NxtpUtils = {
   },
 
   getHistoricalTx(transactionId) {
-    return this._historicalTxs.find(
-      (t) => t.crosschainTx.invariant.transactionId === transactionId,
-    );
+    return this._historicalTxs.find((t) => t.crosschainTx.invariant.transactionId === transactionId);
   },
 
   isActiveTxFinishable(transactionId) {
@@ -302,9 +261,7 @@ window.NxtpUtils = {
   },
 
   getActiveTx(transactionId) {
-    return this._activeTxs.find(
-      (t) => t.crosschainTx.invariant.transactionId === transactionId,
-    );
+    return this._activeTxs.find((t) => t.crosschainTx.invariant.transactionId === transactionId);
   },
 
   updateActiveTx(transactionId, status, event, crosschainTx) {
@@ -313,7 +270,6 @@ window.NxtpUtils = {
       if (item.crosschainTx.invariant.transactionId === transactionId) {
         if (crosschainTx) {
           item.crosschainTx = {
-
             ...item.crosschainTx,
             ...crosschainTx,
           };
@@ -356,15 +312,9 @@ window.NxtpUtils = {
 
     const sendingChain = TokenListManager.getNetworkById(sendingChain);
     const receivingChain = TokenListManager.getNetworkById(receivingChainId);
-    const receivingAsset = TokenListManager.findTokenById(
-      receivingAssetId,
-      receivingChain,
-    );
+    const receivingAsset = TokenListManager.findTokenById(receivingAssetId, receivingChain);
     const sendingAsset = TokenListManager.findTokenById(sendingAssetId);
-    const bridgeAsset = TokenListManager.findTokenById(
-      sendingAsset.symbol,
-      receivingChain,
-    );
+    const bridgeAsset = TokenListManager.findTokenById(sendingAsset.symbol, receivingChain);
 
     let callToAddr;
     let callData;
@@ -382,17 +332,9 @@ window.NxtpUtils = {
         .times(0.9995)
         .times(10 ** bridgeAsset.decimals)
         .toString();
-      const estimatedOutputBN = utils.parseUnits(
-        swapFn.validateEthValue(bridgeAsset, o1),
-        0,
-      );
+      const estimatedOutputBN = utils.parseUnits(swapFn.validateEthValue(bridgeAsset, o1), 0);
 
-      expectedReturn = await swapFn.getExpectedReturn(
-        bridgeAsset,
-        receivingAsset,
-        estimatedOutputBN,
-        receivingChainId,
-      );
+      expectedReturn = await swapFn.getExpectedReturn(bridgeAsset, receivingAsset, estimatedOutputBN, receivingChainId);
 
       const distBN = _.map(expectedReturn.distribution, (e) => window.ethers.utils.parseUnits(`${e}`, 'wei'));
 
@@ -429,9 +371,7 @@ window.NxtpUtils = {
     return {
       id: transactionId,
       transactionFee: 0.0, // TODO
-      returnAmount: expectedReturn
-        ? expectedReturn.returnAmount
-        : quote.bid.amountReceived,
+      returnAmount: expectedReturn ? expectedReturn.returnAmount : quote.bid.amountReceived,
     };
   },
 
@@ -465,12 +405,13 @@ window.NxtpUtils = {
       ...sending,
     };
 
-    const receivingTxData = typeof receiving === 'object'
-      ? {
-        ...invariant,
-        ...receiving,
-      }
-      : undefined;
+    const receivingTxData =
+      typeof receiving === 'object'
+        ? {
+            ...invariant,
+            ...receiving,
+          }
+        : undefined;
 
     const finish = await this._sdk.fulfillTransfer({
       bidSignature,
@@ -481,10 +422,7 @@ window.NxtpUtils = {
 
     console.log('finish: ', finish);
 
-    if (
-      finish.metaTxResponse?.transactionHash
-      || finish.metaTxResponse?.transactionHash === ''
-    ) {
+    if (finish.metaTxResponse?.transactionHash || finish.metaTxResponse?.transactionHash === '') {
       this.removeActiveTx(receivingTxData.transactionId);
     }
 

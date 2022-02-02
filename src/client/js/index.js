@@ -23,8 +23,7 @@ if (process.env.IS_PRODUCTION) {
     dsn: process.env.SENTRY_JS_DSN,
     environment: IS_MAIN_NETWORK ? 'production' : 'development',
     integrations: [new Integrations.BrowserTracing()],
-    release:
-      `${process.env.HEROKU_APP_NAME}-${process.env.HEROKU_RELEASE_VERSION}`,
+    release: `${process.env.HEROKU_APP_NAME}-${process.env.HEROKU_RELEASE_VERSION}`,
 
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
@@ -44,15 +43,11 @@ if (IS_MAIN_NETWORK) {
   console.log('Loading TEST config...');
 }
 
-const config = await fetch(
-  IS_MAIN_NETWORK ? '/config/main.config.json' : '/config/test.config.json',
-);
+const config = await fetch(IS_MAIN_NETWORK ? '/config/main.config.json' : '/config/test.config.json');
 window.NETWORK_CONFIGS = await config.json();
 
 // initialize TokenList
-window.COINGECKO_TOKEN_LIST = await (
-  await fetch('/tokens/coingecko.list.json')
-).json();
+window.COINGECKO_TOKEN_LIST = await (await fetch('/tokens/coingecko.list.json')).json();
 window.MAX_RETRIES = process.env.IS_PRODUCTION ? 3 : 1;
 
 await Storage.initialize();

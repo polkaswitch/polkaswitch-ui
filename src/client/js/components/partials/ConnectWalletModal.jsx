@@ -19,14 +19,8 @@ export default class ConnectWalletModal extends Component {
   }
 
   componentDidMount() {
-    this.subWalletChange = EventManager.listenFor(
-      'walletUpdated',
-      this.handleWalletChange,
-    );
-    this.subConnectPrompt = EventManager.listenFor(
-      'promptWalletConnect',
-      this.handleOpen,
-    );
+    this.subWalletChange = EventManager.listenFor('walletUpdated', this.handleWalletChange);
+    this.subConnectPrompt = EventManager.listenFor('promptWalletConnect', this.handleOpen);
   }
 
   componentWillUnmount() {
@@ -101,32 +95,22 @@ export default class ConnectWalletModal extends Component {
                   )}
                   {!Wallet.isMetamaskSupported() && (
                     <>
+                      <div className="error">Please install Metamask Plugin first!</div>
+                    </>
+                  )}
+                  {Wallet.isConnectedToAnyNetwork() && !Wallet.isMatchingConnectedNetwork() && (
+                    <>
                       <div className="error">
-                        Please install Metamask Plugin first!
+                        You are connected to the wrong network!
+                        <br />
+                        Click here to switch to the {currentNetworkName}
                       </div>
                     </>
                   )}
-                  {Wallet.isConnectedToAnyNetwork()
-                    && !Wallet.isMatchingConnectedNetwork() && (
-                      <>
-                        <div className="error">
-                          You are connected to the wrong network!
-                          <br />
-                          Click here to switch to the
-                          {' '}
-                          {currentNetworkName}
-                        </div>
-                      </>
-                  )}
-                  {Wallet.isMetamaskSupported()
-                    && !Wallet.isConnectedToAnyNetwork() && (
-                      <>
-                        <div className="has-text-info">
-                          Click here to connect to
-                          {' '}
-                          {currentNetworkName}
-                        </div>
-                      </>
+                  {Wallet.isMetamaskSupported() && !Wallet.isConnectedToAnyNetwork() && (
+                    <>
+                      <div className="has-text-info">Click here to connect to {currentNetworkName}</div>
+                    </>
                   )}
                 </div>
               </div>
@@ -183,32 +167,23 @@ export default class ConnectWalletModal extends Component {
             'is-hidden': !Wallet.isConnected(),
           })}
         >
-          <button
-            className="button is-danger is-outlined"
-            onClick={this.handleDisconnect}
-          >
+          <button className="button is-danger is-outlined" onClick={this.handleDisconnect}>
             Disconnect
           </button>
         </div>
 
         <div className="footnote">
           <div>
-            New to
-            {' '}
+            New to{' '}
             <a target="_blank" href="https://ethereum.org/wallets/">
               Ethereum
             </a>
-            ,
-            {' '}
+            ,{' '}
             <a target="_blank" href="https://polygon.technology/technology/">
               Polygon
             </a>
-            , or
-            {' '}
-            <a
-              target="_blank"
-              href="https://wiki.polkadot.network/docs/en/getting-started"
-            >
+            , or{' '}
+            <a target="_blank" href="https://wiki.polkadot.network/docs/en/getting-started">
               Polkadot
             </a>
             ?

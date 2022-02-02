@@ -9,10 +9,9 @@ export default function ChartRangeSelector(props) {
   return (
     <div className="chart-range-selector">
       {_.map(props.timeRangeList[props.selectedViewMode], (v, i) => {
-        const isActive = i
-          === props.timeRangeList[props.selectedViewMode].findIndex(
-            (item) => item.name === props.selectedTimeRange.name,
-          );
+        const isActive =
+          i ===
+          props.timeRangeList[props.selectedViewMode].findIndex((item) => item.name === props.selectedTimeRange.name);
         return (
           <div
             className={classnames('time-range-item', {

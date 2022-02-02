@@ -20,11 +20,11 @@ export default function AssetsTable({ tokenData, loading }) {
         </div>
       </div>
 
-      {tokenData.map((t, i) => <AssetTableRow key={i} data={t} />)}
+      {tokenData.map((t, i) => (
+        <AssetTableRow key={i} data={t} />
+      ))}
 
-      <div
-        className={classnames('wallets-page-loader', { 'is-hidden': !loading })}
-      >
+      <div className={classnames('wallets-page-loader', { 'is-hidden': !loading })}>
         <div className="loader-text">Loading balances</div>
         <div className="loader is-loading" />
       </div>

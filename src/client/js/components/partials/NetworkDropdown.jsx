@@ -47,30 +47,25 @@ export default class NetworkDropdown extends Component {
       filteredNetworks = _.filter(filteredNetworks, (v) => v.singleChainSupported);
     }
 
-    const networkList = _.map(
-      filteredNetworks,
-      (v, i) => (
-        <a
-          href="#"
-          key={i}
-          onClick={this.handleDropdownClick(v)}
-          className={classnames('dropdown-item level is-mobile option', {
-            disabled: !v.enabled,
-          })}
-        >
-          <span className="level-left my-2">
-            <span className="level-item">
-              <TokenIconImg size={30} imgSrc={v.logoURI} />
-            </span>
-            <span className="level-item">
-              {v.name}
-              {' '}
-              {!v.enabled && '(Coming Soon)'}
-            </span>
+    const networkList = _.map(filteredNetworks, (v, i) => (
+      <a
+        href="#"
+        key={i}
+        onClick={this.handleDropdownClick(v)}
+        className={classnames('dropdown-item level is-mobile option', {
+          disabled: !v.enabled,
+        })}
+      >
+        <span className="level-left my-2">
+          <span className="level-item">
+            <TokenIconImg size={30} imgSrc={v.logoURI} />
           </span>
-        </a>
-      ),
-    );
+          <span className="level-item">
+            {v.name} {!v.enabled && '(Coming Soon)'}
+          </span>
+        </span>
+      </a>
+    ));
 
     return (
       <div
@@ -105,11 +100,7 @@ export default class NetworkDropdown extends Component {
             </span>
           </button>
         </div>
-        <DropdownSelectModal
-          open={this.state.open}
-          title="Choose Network"
-          handleClose={this.handleClose}
-        >
+        <DropdownSelectModal open={this.state.open} title="Choose Network" handleClose={this.handleClose}>
           <>{networkList}</>
         </DropdownSelectModal>
       </div>

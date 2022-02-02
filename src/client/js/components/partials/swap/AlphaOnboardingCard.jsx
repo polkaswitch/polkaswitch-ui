@@ -17,10 +17,7 @@ export default class AlphaOnboardingCard extends Component {
   }
 
   componentDidMount() {
-    this.subNetworkChange = EventManager.listenFor(
-      'networkUpdated',
-      this.handleNetworkChange,
-    );
+    this.subNetworkChange = EventManager.listenFor('networkUpdated', this.handleNetworkChange);
   }
 
   componentWillUnmount() {
@@ -44,15 +41,13 @@ export default class AlphaOnboardingCard extends Component {
         () => {
           Promise.all(
             _.map(['METH', 'MUNI', 'MSUSHI', 'MBAL'], (sym) => SwapFn.mint(sym, window.ethers.utils.parseEther('100'))),
-          ).then(
-            (values) => {
-              this.setState({
-                minting: false,
-                success: true,
-              });
-              console.log('done');
-            },
-          );
+          ).then((values) => {
+            this.setState({
+              minting: false,
+              success: true,
+            });
+            console.log('done');
+          });
         },
       );
     }
@@ -69,17 +64,14 @@ export default class AlphaOnboardingCard extends Component {
               <b>Welcome to the Polkaswitch Alpha launch!</b>
             </p>
             <p>
-              As we work closely with our technology partners for the Mainnet
-              launch, you may experience intermittent issues.
+              As we work closely with our technology partners for the Mainnet launch, you may experience intermittent
+              issues.
             </p>
             <p>
-              To be able to perform swaps on the Polkaswitch Alpha, we have
-              built the following tool to conveniently mint test tokens into
-              your connected wallet.
+              To be able to perform swaps on the Polkaswitch Alpha, we have built the following tool to conveniently
+              mint test tokens into your connected wallet.
             </p>
-            <p className="is-italic">
-              100 Tokens will be added under METH, MUNI, MSUSHI and MBAL
-            </p>
+            <p className="is-italic">100 Tokens will be added under METH, MUNI, MSUSHI and MBAL</p>
             <div className="buttons">
               <button
                 disabled

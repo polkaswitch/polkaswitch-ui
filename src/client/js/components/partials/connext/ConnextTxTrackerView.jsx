@@ -21,10 +21,7 @@ export default class ConnextTxTrackerView extends Component {
   }
 
   componentDidMount() {
-    this.subUpdate = EventManager.listenFor(
-      'connextTxQueueUpdated',
-      this.handleUpdate,
-    );
+    this.subUpdate = EventManager.listenFor('connextTxQueueUpdated', this.handleUpdate);
   }
 
   componentWillUnmount() {
@@ -43,9 +40,7 @@ export default class ConnextTxTrackerView extends Component {
         {_.keys(queue).length < 1 && (
           <div className="empty-state">
             <div>
-              <div className="empty-text has-text-info">
-                No recent transactions
-              </div>
+              <div className="empty-text has-text-info">No recent transactions</div>
               <div className="icon has-text-info-light">
                 <ion-icon name="file-tray-outline" />
               </div>
@@ -53,7 +48,9 @@ export default class ConnextTxTrackerView extends Component {
           </div>
         )}
 
-        {_.map(queue, (item, i) => <TxStatusView key={i} data={item} />)}
+        {_.map(queue, (item, i) => (
+          <TxStatusView key={i} data={item} />
+        ))}
       </div>
     );
   }

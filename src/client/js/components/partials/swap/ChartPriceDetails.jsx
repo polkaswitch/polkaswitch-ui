@@ -6,29 +6,21 @@ export default function ChartPriceDetails(props) {
     if (isPair) {
       return <div className="price">{price}</div>;
     }
-    return (
-      <div className="price">
-        $
-        {price}
-      </div>
-    );
+    return <div className="price">${price}</div>;
   };
 
   const renderPercent = (percent) => {
     if (percent > 0) {
       return (
         <div className="percent" style={{ color: '#58B57E' }}>
-          +
-          {percent}
-          %
+          +{percent}%
         </div>
       );
     }
     if (percent < 0) {
       return (
         <div className="percent" style={{ color: '#E6007A' }}>
-          {percent}
-          %
+          {percent}%
         </div>
       );
     }

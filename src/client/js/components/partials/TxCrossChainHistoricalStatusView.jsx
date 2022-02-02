@@ -24,12 +24,8 @@ export default class TxCrossChainHistoricalStatusView extends Component {
       return <div />;
     }
 
-    const sendingChain = TokenListManager.getNetworkById(
-      txData.invariant.sendingChainId,
-    );
-    const receivingChain = TokenListManager.getNetworkById(
-      txData.invariant.receivingChainId,
-    );
+    const sendingChain = TokenListManager.getNetworkById(txData.invariant.sendingChainId);
+    const receivingChain = TokenListManager.getNetworkById(txData.invariant.receivingChainId);
     const sendingAsset = TokenListManager.findTokenById(
       Utils.getAddress(txData.invariant.sendingAssetId),
       sendingChain,
@@ -68,37 +64,18 @@ export default class TxCrossChainHistoricalStatusView extends Component {
         <div className="level-item tx-content">
           <div>
             <div>
-              {lang}
-              {' '}
-              {input}
-              {' '}
-              {sendingAsset.symbol}
-              {' '}
-              for
-              {' '}
-              {output}
-              {' '}
-              {receivingAsset.symbol}
+              {lang} {input} {sendingAsset.symbol} for {output} {receivingAsset.symbol}
             </div>
             <div>
-              {sendingChain.name}
-              {' '}
-              &gt;
+              {sendingChain.name} &gt;
               {receivingChain.name}
             </div>
             <div>
-              <TxExplorerLink
-                chainId={receivingChain.chainId}
-                hash={this.props.data.fulfilledTxHash}
-              >
-                View on Explorer
-                {' '}
-                <ion-icon name="open-outline" />
+              <TxExplorerLink chainId={receivingChain.chainId} hash={this.props.data.fulfilledTxHash}>
+                View on Explorer <ion-icon name="open-outline" />
               </TxExplorerLink>
             </div>
-            <div className="tx-meta">
-              {moment(this.props.data.preparedTimestamp * 1000).fromNow()}
-            </div>
+            <div className="tx-meta">{moment(this.props.data.preparedTimestamp * 1000).fromNow()}</div>
           </div>
         </div>
       </div>

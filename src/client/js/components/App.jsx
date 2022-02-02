@@ -1,12 +1,6 @@
 import React, { Component } from 'react';
 
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  Redirect,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link, Redirect } from 'react-router-dom';
 
 import classnames from 'classnames';
 import SwapHome from './pages/SwapHome';
@@ -34,14 +28,8 @@ export default class App extends Component {
   }
 
   componentWillUnmount() {
-    window.document.removeEventListener(
-      'fullScreenOn',
-      this.handleFullScreenOn,
-    );
-    window.document.removeEventListener(
-      'fullScreenOff',
-      this.handleFullScreenOff,
-    );
+    window.document.removeEventListener('fullScreenOn', this.handleFullScreenOn);
+    window.document.removeEventListener('fullScreenOff', this.handleFullScreenOff);
   }
 
   handleFullScreenOn() {

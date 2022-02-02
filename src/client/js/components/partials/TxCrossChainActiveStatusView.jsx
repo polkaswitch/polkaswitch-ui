@@ -31,12 +31,8 @@ export default class TxCrossChainActiveStatusView extends Component {
       return <div />;
     }
 
-    const sendingChain = TokenListManager.getNetworkById(
-      txData.invariant.sendingChainId,
-    );
-    const receivingChain = TokenListManager.getNetworkById(
-      txData.invariant.receivingChainId,
-    );
+    const sendingChain = TokenListManager.getNetworkById(txData.invariant.sendingChainId);
+    const receivingChain = TokenListManager.getNetworkById(txData.invariant.receivingChainId);
     const sendingAsset = TokenListManager.findTokenById(
       Utils.getAddress(txData.invariant.sendingAssetId),
       sendingChain,
@@ -47,13 +43,12 @@ export default class TxCrossChainActiveStatusView extends Component {
     );
 
     const input = txData.sending.amount
-      ? numeral(
-        Utils.formatUnits(txData.sending.amount, sendingAsset.decimals),
-      ).format('0.0000a')
+      ? numeral(Utils.formatUnits(txData.sending.amount, sendingAsset.decimals)).format('0.0000a')
       : '--';
 
-    let icon; let lang; let
-      clazz;
+    let icon;
+    let lang;
+    let clazz;
 
     const isActionNeeded = this.props.data.status === 'ReceiverTransactionPrepared';
 
@@ -75,25 +70,13 @@ export default class TxCrossChainActiveStatusView extends Component {
         <div className="level-item tx-content">
           <div>
             <div>
-              {lang}
-              {' '}
-              {input}
-              {' '}
-              {sendingAsset.symbol}
-              {' '}
-              to
-              {' '}
-              {receivingAsset.symbol}
+              {lang} {input} {sendingAsset.symbol} to {receivingAsset.symbol}
             </div>
             <div>
-              {sendingChain.name}
-              {' '}
-              &gt;
+              {sendingChain.name} &gt;
               {receivingChain.name}
             </div>
-            <div className="tx-meta">
-              {moment(this.props.data.preparedTimestamp * 1000).fromNow()}
-            </div>
+            <div className="tx-meta">{moment(this.props.data.preparedTimestamp * 1000).fromNow()}</div>
           </div>
         </div>
         {isActionNeeded && (

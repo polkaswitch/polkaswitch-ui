@@ -20,16 +20,14 @@ const app = express();
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
-  environment:
-    process.env.IS_MAIN_NETWORK === 'true' ? 'production' : 'development',
+  environment: process.env.IS_MAIN_NETWORK === 'true' ? 'production' : 'development',
   integrations: [
     // enable HTTP calls tracing
     new Sentry.Integrations.Http({ tracing: true }),
     // enable Express.js middleware tracing
     new Tracing.Integrations.Express({ app }),
   ],
-  release:
-    `${process.env.HEROKU_APP_NAME}-${process.env.HEROKU_RELEASE_VERSION}`,
+  release: `${process.env.HEROKU_APP_NAME}-${process.env.HEROKU_RELEASE_VERSION}`,
 
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
@@ -55,10 +53,7 @@ let defaultCsp;
 if (isProduction) {
   defaultCsp = helmet.contentSecurityPolicy.getDefaultDirectives();
 } else {
-  defaultCsp = _.omit(
-    helmet.contentSecurityPolicy.getDefaultDirectives(),
-    'upgrade-insecure-requests',
-  );
+  defaultCsp = _.omit(helmet.contentSecurityPolicy.getDefaultDirectives(), 'upgrade-insecure-requests');
 }
 
 app.use(
@@ -80,9 +75,7 @@ app.enable('trust proxy');
 if (process.env.FORCE_HTTPS) {
   app.use((request, response, next) => {
     if (isProduction && !request.secure) {
-      return response.redirect(
-        `https://${request.headers.host}${request.url}`
-      );
+      return response.redirect(`https://${request.headers.host}${request.url}`);
     }
 
     next();
@@ -100,7 +93,7 @@ app.get('/health', (req, res) => {
   const data = {
     uptime: process.uptime(),
     message: 'Ok',
-    date: new Date()
+    date: new Date(),
   };
 
   res.status(200).send(data);

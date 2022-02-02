@@ -18,9 +18,7 @@ export default class TxStatusNotificationView extends Component {
       return <div />;
     }
 
-    const output = numeral(
-      Utils.formatUnits(this.props.data.amount, this.props.data.from.decimals),
-    ).format('0.0000a');
+    const output = numeral(Utils.formatUnits(this.props.data.amount, this.props.data.from.decimals)).format('0.0000a');
 
     let icon;
     let lang;
@@ -48,31 +46,16 @@ export default class TxStatusNotificationView extends Component {
         <div className="level-item tx-content">
           <div>
             <div>
-              {lang}
-              {' '}
-              {output}
-              {' '}
-              {this.props.data.from.symbol}
-              {' '}
-              for
-              {' '}
-              {this.props.data.to.symbol}
+              {lang} {output} {this.props.data.from.symbol} for {this.props.data.to.symbol}
             </div>
             <div>
-              <TxExplorerLink
-                chainId={this.props.data.chainId}
-                hash={this.props.data.tx.hash}
-              >
-                View on Explorer
-                {' '}
-                <ion-icon name="open-outline" />
+              <TxExplorerLink chainId={this.props.data.chainId} hash={this.props.data.tx.hash}>
+                View on Explorer <ion-icon name="open-outline" />
               </TxExplorerLink>
             </div>
           </div>
         </div>
-        <div className="level-item tx-meta">
-          {moment(this.props.data.lastUpdated).format('LT')}
-        </div>
+        <div className="level-item tx-meta">{moment(this.props.data.lastUpdated).format('LT')}</div>
       </div>
     );
   }

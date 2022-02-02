@@ -1,9 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import React, { useEffect, useRef, useState } from 'react';
 import { createChart, CrosshairMode } from 'lightweight-charts';
-import {
-  ResponsiveContainer, AreaChart, Area, Tooltip
-} from 'recharts';
+import { ResponsiveContainer, AreaChart, Area, Tooltip } from 'recharts';
 import BN from 'bignumber.js';
 import moment from 'moment';
 import TokenPairSelector from './TokenPairSelector';
@@ -36,7 +34,7 @@ export default function TradingViewChart() {
     AVAX: '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7',
     xDai: '0xe91d153e0b41518a2ce8dd3d7944fa863463a97d',
     FTM: '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83',
-    MOVR: '0x98878B06940aE243284CA214f92Bb71a2b032B8A'
+    MOVR: '0x98878B06940aE243284CA214f92Bb71a2b032B8A',
   };
   const viewModes = ['candlestick', 'line'];
   const candleChartContainerRef = useRef();
@@ -63,7 +61,7 @@ export default function TradingViewChart() {
       toAddress,
       toTokenLogo,
       fromChain,
-      toChain
+      toChain,
     });
     list.push({
       name: `${toSymbol}/${fromSymbol}`,
@@ -74,7 +72,7 @@ export default function TradingViewChart() {
       toSymbol: fromSymbol,
       toAddress: fromAddress,
       toTokenLogo: fromTokenLogo,
-      toChain: fromChain
+      toChain: fromChain,
     });
     list.push({
       name: fromSymbol,
@@ -88,7 +86,7 @@ export default function TradingViewChart() {
       fromSymbol: toSymbol,
       fromAddress: toAddress,
       fromTokenLogo: toTokenLogo,
-      fromChain: toChain
+      fromChain: toChain,
     });
     return list;
   };
@@ -97,13 +95,9 @@ export default function TradingViewChart() {
   const initTokenPair = createTokenPairList();
   const [isLoading, setIsLoading] = useState(false);
   const [tokenPairs, setTokenPairs] = useState(initTokenPair);
-  const [selectedPair, setSelectedPair] = useState(
-    initTokenPair[0] || undefined,
-  );
+  const [selectedPair, setSelectedPair] = useState(initTokenPair[0] || undefined);
   const [selectedViewMode, setSelectedViewMode] = useState(viewModes[1]);
-  const [selectedTimeRange, setSelectedTimeRange] = useState(
-    timeRangeList.line[0],
-  );
+  const [selectedTimeRange, setSelectedTimeRange] = useState(timeRangeList.line[0]);
   const [isPair, setIsPair] = useState(true);
   const [priceDetails, setPriceDetails] = useState({
     price: 0,
@@ -113,10 +107,7 @@ export default function TradingViewChart() {
   const [tokenPriceData, setTokenPriceData] = useState([]);
 
   useEffect(() => {
-    const subSwapConfigChange = EventManager.listenFor(
-      'swapConfigUpdated',
-      handleSwapConfigChange,
-    );
+    const subSwapConfigChange = EventManager.listenFor('swapConfigUpdated', handleSwapConfigChange);
 
     return () => {
       subSwapConfigChange.unsubscribe();
@@ -138,10 +129,7 @@ export default function TradingViewChart() {
 
       if (candleChartContainerRef.current) {
         window.addEventListener('resize', () => {
-          handleResize(
-            candleChartContainerRef.current.clientWidth,
-            candleChartContainerRef.current.clientHeight,
-          );
+          handleResize(candleChartContainerRef.current.clientWidth, candleChartContainerRef.current.clientHeight);
         });
       }
       return () => {
@@ -156,11 +144,7 @@ export default function TradingViewChart() {
   }, [selectedPair, selectedTimeRange, selectedViewMode]);
 
   useEffect(() => {
-    if (
-      selectedViewMode === 'candlestick'
-      && candleChartContainerRef.current
-      && isValidCandleStickDataType
-    ) {
+    if (selectedViewMode === 'candlestick' && candleChartContainerRef.current && isValidCandleStickDataType) {
       initCandleStickChart();
       chart.current = createChart(candleChartContainerRef.current, {
         width: candleChartContainerRef.current.clientWidth,
@@ -247,67 +231,25 @@ export default function TradingViewChart() {
 
       if (selectedPair.fromSymbol && selectedPair.toSymbol) {
         const platformOfToChain = toChain.coingecko.platform;
-        const fromAddress = getContractAddress(
-          selectedPair.fromAddress,
-          selectedPair.fromSymbol,
-          platformOfFromChain,
-        );
-        const toAddress = getContractAddress(
-          selectedPair.toAddress,
-          selectedPair.toSymbol,
-          platformOfToChain,
-        );
+        const fromAddress = getContractAddress(selectedPair.fromAddress, selectedPair.fromSymbol, platformOfFromChain);
+        const toAddress = getContractAddress(selectedPair.toAddress, selectedPair.toSymbol, platformOfToChain);
 
-        fromTokenPrices = await fetchLinePrices(
-          platformOfFromChain,
-          fromAddress,
-          'usd',
-          fromTimestamp,
-          toTimestamp,
-        );
-        toTokenPrices = (await fetchLinePrices(
-          platformOfToChain,
-          toAddress,
-          'usd',
-          fromTimestamp,
-          toTimestamp,
-        )) || [];
+        fromTokenPrices = await fetchLinePrices(platformOfFromChain, fromAddress, 'usd', fromTimestamp, toTimestamp);
+        toTokenPrices = (await fetchLinePrices(platformOfToChain, toAddress, 'usd', fromTimestamp, toTimestamp)) || [];
         tokenPrices = mergeLinePrices(fromTokenPrices, toTokenPrices);
       } else {
-        const fromAddress = getContractAddress(
-          selectedPair.fromAddress,
-          selectedPair.fromSymbol,
-          platformOfFromChain,
-        );
+        const fromAddress = getContractAddress(selectedPair.fromAddress, selectedPair.fromSymbol, platformOfFromChain);
 
-        fromTokenPrices = await fetchLinePrices(
-          platformOfFromChain,
-          fromAddress,
-          'usd',
-          fromTimestamp,
-          toTimestamp,
-        );
+        fromTokenPrices = await fetchLinePrices(platformOfFromChain, fromAddress, 'usd', fromTimestamp, toTimestamp);
         tokenPrices = mergeLinePrices(fromTokenPrices, null);
       }
     } else if (selectedPair.fromSymbol && selectedPair.toSymbol) {
-      const fromCoin = TokenListManager.findTokenBySymbolFromCoinGecko(
-        selectedPair.fromSymbol.toLowerCase(),
-      );
-      const toCoin = TokenListManager.findTokenBySymbolFromCoinGecko(
-        selectedPair.toSymbol.toLowerCase(),
-      );
+      const fromCoin = TokenListManager.findTokenBySymbolFromCoinGecko(selectedPair.fromSymbol.toLowerCase());
+      const toCoin = TokenListManager.findTokenBySymbolFromCoinGecko(selectedPair.toSymbol.toLowerCase());
 
       if (fromCoin && toCoin) {
-        fromTokenPrices = (await fetchCandleStickPrices(
-          fromCoin.id,
-          'usd',
-          timeRange.value,
-        )) || [];
-        toTokenPrices = (await fetchCandleStickPrices(
-          toCoin.id,
-          'usd',
-          timeRange.value,
-        )) || [];
+        fromTokenPrices = (await fetchCandleStickPrices(fromCoin.id, 'usd', timeRange.value)) || [];
+        toTokenPrices = (await fetchCandleStickPrices(toCoin.id, 'usd', timeRange.value)) || [];
       }
 
       tokenPrices = mergeCandleStickPrices(fromTokenPrices, toTokenPrices);
@@ -322,10 +264,7 @@ export default function TradingViewChart() {
       setIsLoading(false);
       setTokenPriceData(tokenPrices);
       if (tokenPrices.length > 0) {
-        const { price, percent } = getPriceDetails(
-          tokenPrices,
-          selectedViewMode,
-        );
+        const { price, percent } = getPriceDetails(tokenPrices, selectedViewMode);
         setPriceDetails({ price, percent, from: selectedTimeRange.from });
       } else {
         setPriceDetails({ price: 0, percent: 0, from: selectedTimeRange.from });
@@ -341,18 +280,10 @@ export default function TradingViewChart() {
     const lastItem = prices[length - 1];
 
     if (viewMode === 'line') {
-      percent = new BN(lastItem.value)
-        .div(new BN(firstItem.value))
-        .times(100)
-        .minus(100)
-        .toFixed(2);
+      percent = new BN(lastItem.value).div(new BN(firstItem.value)).times(100).minus(100).toFixed(2);
       price = lastItem.value;
     } else {
-      percent = new BN(lastItem.open)
-        .div(new BN(firstItem.open))
-        .times(100)
-        .minus(100)
-        .toFixed(2);
+      percent = new BN(lastItem.open).div(new BN(firstItem.open)).times(100).minus(100).toFixed(2);
       price = lastItem.open;
     }
 
@@ -363,23 +294,14 @@ export default function TradingViewChart() {
     if (wrapTokens.hasOwnProperty(symbol)) {
       return wrapTokens[symbol];
     }
-    const coin = TokenListManager.findTokenBySymbolFromCoinGecko(
-      symbol.toLowerCase(),
-    );
+    const coin = TokenListManager.findTokenBySymbolFromCoinGecko(symbol.toLowerCase());
     if (coin && coin.platforms.hasOwnProperty(platform)) {
       return coin.platforms[platform];
     }
     return contract;
   };
 
-  const fetchLinePrices = async (
-    platform,
-    contract,
-    currency,
-    fromTimestamp,
-    toTimestamp,
-    attempt,
-  ) => {
+  const fetchLinePrices = async (platform, contract, currency, fromTimestamp, toTimestamp, attempt) => {
     let result = [];
     if (!attempt) {
       attempt = 0;
@@ -392,14 +314,7 @@ export default function TradingViewChart() {
       return result;
     } catch (err) {
       console.error('Failed to fetch price data', err);
-      await fetchLinePrices(
-        platform,
-        contract,
-        currency,
-        fromTimestamp,
-        toTimestamp,
-        attempt + 1,
-      );
+      await fetchLinePrices(platform, contract, currency, fromTimestamp, toTimestamp, attempt + 1);
     }
   };
 
@@ -422,19 +337,12 @@ export default function TradingViewChart() {
 
   const mergeLinePrices = (fromTokenPrices, toTokenPrices) => {
     const prices = [];
-    if (
-      fromTokenPrices
-      && toTokenPrices
-      && fromTokenPrices.length > 0
-      && toTokenPrices.length > 0
-    ) {
+    if (fromTokenPrices && toTokenPrices && fromTokenPrices.length > 0 && toTokenPrices.length > 0) {
       if (fromTokenPrices.length === toTokenPrices.length) {
         for (let i = 0; i < fromTokenPrices.length; i++) {
           prices.push({
             time: getFilteredTimestamp(fromTokenPrices[i][0]),
-            value: BN(fromTokenPrices[i][1])
-              .div(toTokenPrices[i][1])
-              .toFixed(DECIMAL_PLACES),
+            value: BN(fromTokenPrices[i][1]).div(toTokenPrices[i][1]).toFixed(DECIMAL_PLACES),
           });
         }
       } else {
@@ -449,9 +357,7 @@ export default function TradingViewChart() {
             const fromTokenItem = tempObj[timeStampOfTotoken];
             tempObj[timeStampOfTotoken] = {
               time: timeStampOfTotoken,
-              value: BN(fromTokenItem[1])
-                .div(toTokenPrices[j][1])
-                .toFixed(DECIMAL_PLACES),
+              value: BN(fromTokenItem[1]).div(toTokenPrices[j][1]).toFixed(DECIMAL_PLACES),
             };
           }
         }
@@ -462,11 +368,7 @@ export default function TradingViewChart() {
           }
         }
       }
-    } else if (
-      fromTokenPrices
-      && fromTokenPrices.length > 0
-      && toTokenPrices === null
-    ) {
+    } else if (fromTokenPrices && fromTokenPrices.length > 0 && toTokenPrices === null) {
       for (let i = 0; i < fromTokenPrices.length; i++) {
         prices.push({
           time: getFilteredTimestamp(fromTokenPrices[i][0]),
@@ -479,12 +381,7 @@ export default function TradingViewChart() {
 
   const mergeCandleStickPrices = (fromTokenPrices, toTokenPrices) => {
     const prices = [];
-    if (
-      fromTokenPrices
-      && toTokenPrices
-      && fromTokenPrices.length > 0
-      && toTokenPrices.length > 0
-    ) {
+    if (fromTokenPrices && toTokenPrices && fromTokenPrices.length > 0 && toTokenPrices.length > 0) {
       const tempObj = {};
       for (let i = 0; i < fromTokenPrices.length; i++) {
         tempObj[getFilteredTimestamp(fromTokenPrices[i][0])] = fromTokenPrices[i];
@@ -496,18 +393,10 @@ export default function TradingViewChart() {
           const fromTokenItem = tempObj[timeStampOfTotoken];
           tempObj[timeStampOfTotoken] = {
             time: timeStampOfTotoken,
-            open: BN(fromTokenItem[1])
-              .div(toTokenPrices[j][1])
-              .toFixed(DECIMAL_PLACES),
-            high: BN(fromTokenItem[2])
-              .div(toTokenPrices[j][2])
-              .toFixed(DECIMAL_PLACES),
-            low: BN(fromTokenItem[3])
-              .div(toTokenPrices[j][3])
-              .toFixed(DECIMAL_PLACES),
-            close: BN(fromTokenItem[4])
-              .div(toTokenPrices[j][4])
-              .toFixed(DECIMAL_PLACES),
+            open: BN(fromTokenItem[1]).div(toTokenPrices[j][1]).toFixed(DECIMAL_PLACES),
+            high: BN(fromTokenItem[2]).div(toTokenPrices[j][2]).toFixed(DECIMAL_PLACES),
+            low: BN(fromTokenItem[3]).div(toTokenPrices[j][3]).toFixed(DECIMAL_PLACES),
+            close: BN(fromTokenItem[4]).div(toTokenPrices[j][4]).toFixed(DECIMAL_PLACES),
           };
         }
       }
@@ -589,17 +478,11 @@ export default function TradingViewChart() {
     setSelectedTimeRange(timeRange);
   };
 
-  const handleMove = (
-    {
-      isTooltipActive, activePayload, activeTooltipIndex, activeLabel
-    },
-    e,
-  ) => {
+  const handleMove = ({ isTooltipActive, activePayload, activeTooltipIndex, activeLabel }, e) => {
     if (isTooltipActive && activePayload.length > 0) {
       setPriceDetails({
         ...priceDetails,
-        price:
-          (activePayload[0].payload && activePayload[0].payload.value) || 0,
+        price: (activePayload[0].payload && activePayload[0].payload.value) || 0,
       });
     }
   };
@@ -646,20 +529,14 @@ export default function TradingViewChart() {
             <img width={110} height={110} src="/images/no_data.svg" />
           </div>
           <div className="empty-primary-text">No Data</div>
-          <div className="empty-sub-text">
-            There's no historical data to display for this token.
-          </div>
+          <div className="empty-sub-text">There's no historical data to display for this token.</div>
         </div>
       );
     }
     if (viewMode === 'line') {
       return (
         <ResponsiveContainer width="100%" height={250}>
-          <AreaChart
-            data={priceData}
-            onMouseMove={handleMove}
-            onMouseLeave={handleLeave}
-          >
+          <AreaChart data={priceData} onMouseMove={handleMove} onMouseLeave={handleLeave}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="10%" stopColor="#45C581" stopOpacity="0.1" />
@@ -693,10 +570,7 @@ export default function TradingViewChart() {
         <ChartPriceDetails priceDetails={priceDetails} isPair={isPair} />
       </div>
       <div className="trading-view-body">
-        <ChartViewOption
-          selectedViewMode={selectedViewMode}
-          handleViewModeChange={handleViewModeChange}
-        />
+        <ChartViewOption selectedViewMode={selectedViewMode} handleViewModeChange={handleViewModeChange} />
         {renderTradingChatView(isLoading, selectedViewMode, tokenPriceData)}
         <ChartRangeSelector
           timeRangeList={timeRangeList}

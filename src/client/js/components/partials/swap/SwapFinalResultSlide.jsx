@@ -15,10 +15,7 @@ export default class SwapFinalResultSlide extends Component {
           <div className="level is-mobile">
             <div className="level-left">
               <div className="level-item">
-                <span
-                  className="icon ion-icon clickable"
-                  onClick={this.props.handleDismiss}
-                >
+                <span className="icon ion-icon clickable" onClick={this.props.handleDismiss}>
                   <ion-icon name="arrow-back-outline" />
                 </span>
               </div>
@@ -38,9 +35,7 @@ export default class SwapFinalResultSlide extends Component {
               )}
             </div>
             <div className="title">
-              {this.props.transactionSuccess
-                ? 'Transaction Submitted'
-                : 'Transaction Failed'}
+              {this.props.transactionSuccess ? 'Transaction Submitted' : 'Transaction Failed'}
             </div>
             <div className="details">
               <div>
@@ -53,13 +48,8 @@ export default class SwapFinalResultSlide extends Component {
                     </div>
 
                     <br />
-                    <TxExplorerLink
-                      network={this.props.toChain}
-                      hash={this.props.transactionHash}
-                    >
-                      View on Explorer
-                      {' '}
-                      <ion-icon name="open-outline" />
+                    <TxExplorerLink network={this.props.toChain} hash={this.props.transactionHash}>
+                      View on Explorer <ion-icon name="open-outline" />
                     </TxExplorerLink>
                   </div>
                 )}
@@ -69,10 +59,7 @@ export default class SwapFinalResultSlide extends Component {
           </div>
 
           <div>
-            <button
-              className="button is-primary is-fullwidth is-medium"
-              onClick={this.props.handleDismiss}
-            >
+            <button className="button is-primary is-fullwidth is-medium" onClick={this.props.handleDismiss}>
               Dismiss
             </button>
           </div>

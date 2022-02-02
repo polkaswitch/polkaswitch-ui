@@ -16,10 +16,7 @@ export default {
       }
       return result;
     } catch (err) {
-      console.log(
-        'Failed to get coin with contract address from coingecko service.',
-        err,
-      );
+      console.log('Failed to get coin with contract address from coingecko service.', err);
     }
   },
 

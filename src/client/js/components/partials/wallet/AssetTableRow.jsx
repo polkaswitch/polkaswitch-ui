@@ -1,9 +1,7 @@
 import React from 'react';
 import * as ethers from 'ethers';
 import BN from 'bignumber.js';
-import {
-  BigNumber, constants, providers, Signer, utils
-} from 'ethers';
+import { BigNumber, constants, providers, Signer, utils } from 'ethers';
 import TokenIconImg from '../TokenIconImg';
 import TokenListManager from '../../../utils/tokenList';
 
@@ -18,13 +16,9 @@ export default function AssetTableRow({ data }) {
       <div className="column is-half">
         <TokenIconImg network={network} size={35} token={data} />
         <div className="wallets-page-tokens-table__content">
-          <h4 className="wallets-page-tokens-table__title">
-            {data.name || data.symbol}
-          </h4>
+          <h4 className="wallets-page-tokens-table__title">{data.name || data.symbol}</h4>
           <span className="wallets-page-tokens-table__sub">
-            {data.symbol}
-            {' '}
-            &middot;
+            {data.symbol} &middot;
             <span>{network.name}</span>
           </span>
         </div>

@@ -33,9 +33,9 @@ export default class TokenSymbolBalance extends Component {
 
   componentDidUpdate(prevProps) {
     if (
-      this.props.token.address !== prevProps.token.address
-      || this.props.network?.chainId !== prevProps.network?.chainId
-      || this.props.refresh !== prevProps.refresh
+      this.props.token.address !== prevProps.token.address ||
+      this.props.network?.chainId !== prevProps.network?.chainId ||
+      this.props.refresh !== prevProps.refresh
     ) {
       this.setState(
         {
@@ -63,18 +63,20 @@ export default class TokenSymbolBalance extends Component {
 
     if (Wallet.isConnectedToAnyNetwork()) {
       Wallet.getBalance(this.props.token, this.props.network)
-        .then(function (_ts, bal) {
-          if (this.state.timestamp != _ts) {
-            return;
-          }
+        .then(
+          function (_ts, bal) {
+            if (this.state.timestamp != _ts) {
+              return;
+            }
 
-          // balance is in WEI and is a BigNumber
-          this.setState({
-            balance: bal,
-            errored: false,
-            loading: false,
-          });
-        }.bind(this, this.state.timestamp),)
+            // balance is in WEI and is a BigNumber
+            this.setState({
+              balance: bal,
+              errored: false,
+              loading: false,
+            });
+          }.bind(this, this.state.timestamp),
+        )
         .catch(
           function (_ts, e) {
             // try again
@@ -101,9 +103,7 @@ export default class TokenSymbolBalance extends Component {
     const Utils = window.ethers.utils;
 
     const renderBalFn = function () {
-      return numeral(
-        Utils.formatUnits(this.state.balance, this.props.token.decimals),
-      ).format('0.0000a');
+      return numeral(Utils.formatUnits(this.state.balance, this.props.token.decimals)).format('0.0000a');
     }.bind(this);
 
     if (this.state.loading) {
@@ -111,10 +111,7 @@ export default class TokenSymbolBalance extends Component {
       fullOutput = '';
     } else if (this.state.errored) {
       if (Wallet.isConnected() && this.state.balance) {
-        fullOutput = Utils.formatUnits(
-          this.state.balance,
-          this.props.token.decimals,
-        );
+        fullOutput = Utils.formatUnits(this.state.balance, this.props.token.decimals);
         balOutput = fullOutput;
       } else {
         balOutput = 'N/A';
@@ -124,21 +121,11 @@ export default class TokenSymbolBalance extends Component {
       if (this.state.balance.isZero()) {
         balOutput = '0.0';
         fullOutput = balOutput;
-      } else if (
-        this.state.balance.lt(
-          Utils.parseUnits('0.0001', this.props.token.decimals),
-        )
-      ) {
+      } else if (this.state.balance.lt(Utils.parseUnits('0.0001', this.props.token.decimals))) {
         balOutput = '< 0.0001';
-        fullOutput = Utils.formatUnits(
-          this.state.balance,
-          this.props.token.decimals,
-        );
+        fullOutput = Utils.formatUnits(this.state.balance, this.props.token.decimals);
       } else {
-        fullOutput = Utils.formatUnits(
-          this.state.balance,
-          this.props.token.decimals,
-        );
+        fullOutput = Utils.formatUnits(this.state.balance, this.props.token.decimals);
         balOutput = fullOutput;
       }
     } else {
@@ -149,9 +136,7 @@ export default class TokenSymbolBalance extends Component {
     return (
       <div
         className="token-symbol-wrapper hint--bottom"
-        aria-label={
-          fullOutput ? `Balance: ${fullOutput}` : 'Balance unavailable'
-        }
+        aria-label={fullOutput ? `Balance: ${fullOutput}` : 'Balance unavailable'}
       >
         <div className="symbol">{this.props.token.symbol}</div>
         <div className="balance truncate">{balOutput}</div>

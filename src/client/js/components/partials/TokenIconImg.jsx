@@ -37,10 +37,7 @@ export default function TokenIconImg(props) {
   const getLogoURL = async () => {
     const network = props.network || TokenListManager.getCurrentNetworkConfig();
     const assetPlatform = (network.coingecko && network.coingecko.platform) || '';
-    return await CoingeckoManager.getLogoURL(
-      assetPlatform,
-      props.token.address,
-    );
+    return await CoingeckoManager.getLogoURL(assetPlatform, props.token.address);
   };
 
   return (

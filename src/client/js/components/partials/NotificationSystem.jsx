@@ -58,10 +58,7 @@ export default class NotificationSystem extends Component {
               <TxStatusNotificationView data={data} success={data.success} />
             </div>
             <div className="level-item is-flex-grow-0">
-              <span
-                className="icon ion-icon clickable is-medium"
-                onClick={this.handleClose}
-              >
+              <span className="icon ion-icon clickable is-medium" onClick={this.handleClose}>
                 <ion-icon name="close-outline" />
               </span>
             </div>

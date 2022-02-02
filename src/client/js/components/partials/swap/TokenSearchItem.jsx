@@ -6,10 +6,7 @@ export default function TokenSearchItem(props) {
   const { token, balances, refresh } = props;
 
   useEffect(() => {
-    if (
-      !balances[token.symbol]
-      || (balances[token.symbol] && balances[token.symbol].refresh)
-    ) {
+    if (!balances[token.symbol] || (balances[token.symbol] && balances[token.symbol].refresh)) {
       props.fetchBalance(token);
     }
   }, [refresh]);

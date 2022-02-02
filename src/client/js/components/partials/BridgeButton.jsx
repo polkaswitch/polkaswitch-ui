@@ -13,10 +13,7 @@ export default class BridgeButton extends Component {
   }
 
   componentDidMount() {
-    this.subUpdates = EventManager.listenFor(
-      'walletUpdated',
-      this.handleUpdate,
-    );
+    this.subUpdates = EventManager.listenFor('walletUpdated', this.handleUpdate);
   }
 
   componentWillUnmount() {

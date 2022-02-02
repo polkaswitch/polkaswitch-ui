@@ -63,21 +63,10 @@ export default class SwapOrderWidget extends Component {
   }
 
   componentDidMount() {
-    this.subscribers.push(
-      EventManager.listenFor('walletUpdated', this.handleWalletChange),
-    );
-    this.subscribers.push(
-      EventManager.listenFor('networkUpdated', this.handleNetworkChange),
-    );
-    this.subscribers.push(
-      EventManager.listenFor(
-        'networkPendingUpdate',
-        this.handleNetworkPreUpdate,
-      ),
-    );
-    this.subscribers.push(
-      EventManager.listenFor('txQueueUpdated', this.handleWalletChange),
-    );
+    this.subscribers.push(EventManager.listenFor('walletUpdated', this.handleWalletChange));
+    this.subscribers.push(EventManager.listenFor('networkUpdated', this.handleNetworkChange));
+    this.subscribers.push(EventManager.listenFor('networkPendingUpdate', this.handleNetworkPreUpdate));
+    this.subscribers.push(EventManager.listenFor('txQueueUpdated', this.handleWalletChange));
     window.addEventListener('resize', this.updateBoxHeight);
     this.updateBoxHeight();
   }
@@ -120,15 +109,10 @@ export default class SwapOrderWidget extends Component {
 
   updateBoxHeight() {
     this.box.current.style.height = '';
-    _.defer(
-      () => {
-        console.log(
-          '## current offsetHeight ###',
-          this.box.current.offsetHeight,
-        );
-        this.box.current.style.height = `${this.box.current.offsetHeight}px`;
-      },
-    );
+    _.defer(() => {
+      console.log('## current offsetHeight ###', this.box.current.offsetHeight);
+      this.box.current.style.height = `${this.box.current.offsetHeight}px`;
+    });
   }
 
   triggerHeightResize(node, isAppearing) {
@@ -136,17 +120,11 @@ export default class SwapOrderWidget extends Component {
     this.box.current.style.height = `${node.offsetHeight}px`;
   }
 
-  onSwapEstimateComplete(
-    fromAmount,
-    toAmount,
-    dist,
-    availBalBN,
-    approveStatus,
-  ) {
+  onSwapEstimateComplete(fromAmount, toAmount, dist, availBalBN, approveStatus) {
     if (
-      this.state.fromAmount === fromAmount
-      && this.state.availableBalance === availBalBN
-      && this.state.toAmount === toAmount
+      this.state.fromAmount === fromAmount &&
+      this.state.availableBalance === availBalBN &&
+      this.state.toAmount === toAmount
     ) {
       return;
     }
@@ -161,13 +139,10 @@ export default class SwapOrderWidget extends Component {
         approveStatus,
       },
       () => {
-        _.delay(
-          () => {
-            // put back height after dist expand anim
-            this.updateBoxHeight();
-          },
-          301,
-        );
+        _.delay(() => {
+          // put back height after dist expand anim
+          this.updateBoxHeight();
+        }, 301);
       },
     );
   }
@@ -191,9 +166,7 @@ export default class SwapOrderWidget extends Component {
     this.setState(
       {
         to: this.state.from,
-        fromAmount: this.state.toAmount
-          ? SwapFn.validateEthValue(this.state.to, this.state.toAmount)
-          : undefined,
+        fromAmount: this.state.toAmount ? SwapFn.validateEthValue(this.state.to, this.state.toAmount) : undefined,
         from: this.state.to,
         toChain: this.state.fromChain,
         fromChain: this.state.toChain,
@@ -298,25 +271,22 @@ export default class SwapOrderWidget extends Component {
     }
 
     TokenListManager.updateSwapConfig({ [this.state.searchTarget]: token });
-    this.setState(
-      _s,
-      () => {
-        Metrics.track('swap-token-changed', {
-          changed: this.state.searchTarget,
-          from: this.state.from,
-          to: this.state.to,
-        });
-      },
-    );
+    this.setState(_s, () => {
+      Metrics.track('swap-token-changed', {
+        changed: this.state.searchTarget,
+        from: this.state.from,
+        to: this.state.to,
+      });
+    });
   }
 
   render() {
     const animTiming = 300;
     const isStack = !(
-      this.state.showSettings
-      || this.state.showConfirm
-      || this.state.showSearch
-      || this.state.showResults
+      this.state.showSettings ||
+      this.state.showConfirm ||
+      this.state.showSearch ||
+      this.state.showResults
     );
 
     return (
@@ -328,12 +298,7 @@ export default class SwapOrderWidget extends Component {
         >
           <div className="loader is-loading" />
         </div>
-        <CSSTransition
-          in={isStack}
-          timeout={animTiming}
-          onEntering={this.triggerHeightResize}
-          classNames="fade"
-        >
+        <CSSTransition in={isStack} timeout={animTiming} onEntering={this.triggerHeightResize} classNames="fade">
           <SwapOrderSlide
             ref={this.orderPage}
             toChain={this.state.toChain}
@@ -362,11 +327,7 @@ export default class SwapOrderWidget extends Component {
           <TokenSearchSlide
             isCrossChain={false}
             isFrom={this.state.searchTarget === 'from'}
-            network={
-              this.state.searchTarget === 'to'
-                ? this.state.toChain
-                : this.state.fromChain
-            }
+            network={this.state.searchTarget === 'to' ? this.state.toChain : this.state.fromChain}
             showSearch={this.state.showSearch}
             handleSearchToggle={this.handleSearchToggle}
             handleTokenChange={this.handleTokenChange}
@@ -378,9 +339,7 @@ export default class SwapOrderWidget extends Component {
           onEntering={this.triggerHeightResize}
           classNames="slidein"
         >
-          <AdvancedSettingsSlide
-            handleBackOnSettings={this.handleSettingsToggle}
-          />
+          <AdvancedSettingsSlide handleBackOnSettings={this.handleSettingsToggle} />
         </CSSTransition>
         <CSSTransition
           in={this.state.showConfirm || this.state.showResults}
@@ -388,11 +347,7 @@ export default class SwapOrderWidget extends Component {
           onEntering={this.triggerHeightResize}
           classNames="slidein"
         >
-          <CSSTransition
-            in={!this.state.showResults}
-            timeout={animTiming}
-            classNames="fade"
-          >
+          <CSSTransition in={!this.state.showResults} timeout={animTiming} classNames="fade">
             <SwapConfirmSlide
               to={this.state.to}
               from={this.state.from}

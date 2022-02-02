@@ -21,9 +21,7 @@ export default class AdvancedSettingsSlide extends Component {
     this.handleBridge = this.handleBridge.bind(this);
 
     this.subscribers = [];
-    this.subscribers.push(
-      EventManager.listenFor('swapSettingsUpdated', this.handleSettingsChange),
-    );
+    this.subscribers.push(EventManager.listenFor('swapSettingsUpdated', this.handleSettingsChange));
   }
 
   componentWillUnmount() {
@@ -66,10 +64,7 @@ export default class AdvancedSettingsSlide extends Component {
           <div className="level is-mobile">
             <div className="level-left">
               <div className="level-item">
-                <span
-                  className="icon ion-icon clickable"
-                  onClick={this.props.handleBackOnSettings}
-                >
+                <span className="icon ion-icon clickable" onClick={this.props.handleBackOnSettings}>
                   <ion-icon name="arrow-back-outline" />
                 </span>
               </div>
@@ -159,10 +154,7 @@ export default class AdvancedSettingsSlide extends Component {
             <div className="level-right">
               <div className="level-item">
                 <div className="select">
-                  <select
-                    onChange={this.handleBridge}
-                    value={this.state.bridgeOption}
-                  >
+                  <select onChange={this.handleBridge} value={this.state.bridgeOption}>
                     <option value="hop">Hop</option>
                     <option value="connext">Connext</option>
                   </select>
@@ -176,10 +168,7 @@ export default class AdvancedSettingsSlide extends Component {
               <div className="level-item">
                 <span>
                   <b>Custom Tokens</b>
-                  <span
-                    className="hint-icon hint--top"
-                    aria-label="Coming Soon"
-                  >
+                  <span className="hint-icon hint--top" aria-label="Coming Soon">
                     ?
                   </span>
                 </span>

@@ -24,12 +24,7 @@ export default class SwapNetworkToggle extends Component {
   }
 
   componentDidMount() {
-    this.subscribers.push(
-      EventManager.listenFor(
-        'networkHoverableUpdated',
-        this.handleNetworkHoverable,
-      ),
-    );
+    this.subscribers.push(EventManager.listenFor('networkHoverableUpdated', this.handleNetworkHoverable));
   }
 
   componentWillUnmount() {

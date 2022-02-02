@@ -22,9 +22,7 @@ export default class SwapTransactionDetails extends Component {
   }
 
   componentDidMount() {
-    this.subscribers.push(
-      EventManager.listenFor('walletUpdated', this.handleSettingsChange),
-    );
+    this.subscribers.push(EventManager.listenFor('walletUpdated', this.handleSettingsChange));
     this.updateValues();
   }
 
@@ -36,9 +34,9 @@ export default class SwapTransactionDetails extends Component {
 
   componentDidUpdate(prevProps) {
     if (
-      prevProps.fromAmount !== this.props.fromAmount
-      || prevProps.from.symbol !== this.props.from.symbol
-      || prevProps.to.symbol !== this.props.to.symbol
+      prevProps.fromAmount !== this.props.fromAmount ||
+      prevProps.from.symbol !== this.props.from.symbol ||
+      prevProps.to.symbol !== this.props.to.symbol
     ) {
       this.updateValues();
     }
@@ -54,62 +52,52 @@ export default class SwapTransactionDetails extends Component {
       minReturn: '--',
       priceImpact: '--',
       transactionEstimate: '--',
-      highSlippage: false
+      highSlippage: false,
     });
   }
 
   async updateValues() {
     if (Wallet.isConnected()) {
       console.log('## updateValues ### ', 'called');
-      const fromAmount = SwapFn.validateEthValue(
-        this.props.from,
-        this.props.fromAmount,
-      );
+      const fromAmount = SwapFn.validateEthValue(this.props.from, this.props.fromAmount);
 
       await SwapFn.calculateMinReturn(
         this.props.from,
         this.props.to,
-        Utils.parseUnits(fromAmount, this.props.from.decimals)
-      ).then(({ minReturn }) => {
-        _.defer(() => {
-          this.setState({ minReturn });
+        Utils.parseUnits(fromAmount, this.props.from.decimals),
+      )
+        .then(({ minReturn }) => {
+          _.defer(() => {
+            this.setState({ minReturn });
+          });
+        })
+        .catch((r) => {
+          _.defer(() => {
+            this.setState({ minReturn: '--' });
+          });
         });
-      }).catch((r) => {
-        _.defer(() => {
-          this.setState({ minReturn: '--' });
-        });
-      });
 
       await SwapFn.calculatePriceImpact(
         this.props.from,
         this.props.to,
         Utils.parseUnits(fromAmount, this.props.from.decimals),
       )
-        .then(
-          (priceImpact) => {
-            _.defer(
-              () => {
-                this.setState({
-                  highSlippage:
-                    priceImpact * 100.0 > SwapFn.getSetting().slippage,
-                  priceImpact: (priceImpact * 100.0).toFixed(5),
-                });
-              },
-            );
-          },
-        )
-        .catch(
-          (r) => {
-            _.defer(
-              () => {
-                this.setState({
-                  priceImpact: '--',
-                  highSlippage: false,
-                });
-              },
-            );
-          },
-        );
+        .then((priceImpact) => {
+          _.defer(() => {
+            this.setState({
+              highSlippage: priceImpact * 100.0 > SwapFn.getSetting().slippage,
+              priceImpact: (priceImpact * 100.0).toFixed(5),
+            });
+          });
+        })
+        .catch((r) => {
+          _.defer(() => {
+            this.setState({
+              priceImpact: '--',
+              highSlippage: false,
+            });
+          });
+        });
 
       const distBN = _.map(this.props.swapDistribution, (e) => window.ethers.utils.parseUnits(`${e}`, 'wei'));
 
@@ -119,24 +107,16 @@ export default class SwapTransactionDetails extends Component {
         Utils.parseUnits(fromAmount, this.props.from.decimals),
         distBN,
       )
-        .then(
-          (v) => {
-            _.defer(
-              () => {
-                this.setState({ transactionEstimate: v });
-              },
-            );
-          },
-        )
-        .catch(
-          (r) => {
-            _.defer(
-              () => {
-                this.setState({ transactionEstimate: '--' });
-              },
-            );
-          },
-        );
+        .then((v) => {
+          _.defer(() => {
+            this.setState({ transactionEstimate: v });
+          });
+        })
+        .catch((r) => {
+          _.defer(() => {
+            this.setState({ transactionEstimate: '--' });
+          });
+        });
     }
   }
 
@@ -159,25 +139,15 @@ export default class SwapTransactionDetails extends Component {
           <div className="level-right">
             <div className="level-item">
               <div className="detail-value">
-                1
-                {' '}
-                {this.props.from.symbol}
-                {' '}
-                &asymp;
-                {' '}
-                {numeral(this.props.toAmount / this.props.fromAmount).format(
-                  '0.0[0000000000000]',
-                )}
-                {' '}
+                1 {this.props.from.symbol} &asymp;{' '}
+                {numeral(this.props.toAmount / this.props.fromAmount).format('0.0[0000000000000]')}{' '}
                 {this.props.to.symbol}
               </div>
             </div>
           </div>
         </div>
         <div
-          className={classnames(
-            'level is-mobile is-narrow detail hint--bottom hint--medium',
-          )}
+          className={classnames('level is-mobile is-narrow detail hint--bottom hint--medium')}
           aria-label="Calculated based on the Slippage Tolerance. If the return amount is below this minimum threshold, the transaction is reverted"
         >
           <div className="level-left">
@@ -192,18 +162,15 @@ export default class SwapTransactionDetails extends Component {
           <div className="level-right">
             <div className="level-item">
               <div className="detail-value">
-                {this.state.minReturn}
-                {' '}
-                {this.props.to.symbol}
+                {this.state.minReturn} {this.props.to.symbol}
               </div>
             </div>
           </div>
         </div>
         <div
-          className={classnames(
-            'level is-mobile is-narrow detail hint--bottom hint--medium',
-            { 'is-danger': this.state.highSlippage },
-          )}
+          className={classnames('level is-mobile is-narrow detail hint--bottom hint--medium', {
+            'is-danger': this.state.highSlippage,
+          })}
           aria-label="Expected slippage in price on swap. The difference between the current market price and the price you will actually pay when performing this swap"
         >
           <div className="level-left">
@@ -230,20 +197,14 @@ export default class SwapTransactionDetails extends Component {
                     </span>
                     <span>High Slippage)&nbsp;&nbsp;</span>
                   </span>
-                  <span>
-                    -
-                    {this.state.priceImpact}
-                    %
-                  </span>
+                  <span>-{this.state.priceImpact}%</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div
-          className={classnames(
-            'level is-mobile is-narrow detail hint--bottom hint--medium',
-          )}
+          className={classnames('level is-mobile is-narrow detail hint--bottom hint--medium')}
           aria-label="Press back button and modify your slippage tolerance in the top-right settings on the main order form"
         >
           <div className="level-left">
@@ -259,10 +220,7 @@ export default class SwapTransactionDetails extends Component {
             <div className="level-item">
               <div>
                 <div className="detail-value">
-                  <span>
-                    {SwapFn.getSetting().slippage}
-                    %
-                  </span>
+                  <span>{SwapFn.getSetting().slippage}%</span>
                 </div>
               </div>
             </div>
@@ -284,9 +242,7 @@ export default class SwapTransactionDetails extends Component {
           <div className="level-right">
             <div className="level-item">
               <div className="detail-value">
-                {this.state.transactionEstimate}
-                {' '}
-                {window.NATIVE_TOKEN.symbol}
+                {this.state.transactionEstimate} {window.NATIVE_TOKEN.symbol}
               </div>
             </div>
           </div>

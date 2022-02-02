@@ -20,12 +20,10 @@ export default class TxStatusView extends Component {
       return <div />;
     }
 
-    const output = numeral(
-      Utils.formatUnits(data.amount, this.props.data.from.decimals),
-    ).format('0.0000a');
+    const output = numeral(Utils.formatUnits(data.amount, this.props.data.from.decimals)).format('0.0000a');
 
-    let lang; let
-      clazz;
+    let lang;
+    let clazz;
 
     if (!data.completed) {
       lang = 'Pending';
@@ -69,9 +67,7 @@ export default class TxStatusView extends Component {
           <div className="item-1">
             <span>{lang}</span>
           </div>
-          <div className="item-2">
-            {moment(data.lastUpdated).format('MM/DD/YYYY h:mm A')}
-          </div>
+          <div className="item-2">{moment(data.lastUpdated).format('MM/DD/YYYY h:mm A')}</div>
         </div>
       </div>
     );

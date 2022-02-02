@@ -25,10 +25,7 @@ export default {
             const provider = Wallet.getReadOnlyProvider();
             const { hash } = item.tx;
             await this.getTransactionReceipt(provider, hash);
-          } else if (
-            item.completed === true
-            && now - item.lastUpdated > this.compareTime
-          ) {
+          } else if (item.completed === true && now - item.lastUpdated > this.compareTime) {
             delete this._queue[keys[i]];
             delCount++;
           }
@@ -50,10 +47,7 @@ export default {
       if (length > 0) {
         for (let i = 0; i < length; i++) {
           const item = this._queue[keys[i]];
-          if (
-            item.completed === true
-            && now - item.lastUpdated > this.compareTime
-          ) {
+          if (item.completed === true && now - item.lastUpdated > this.compareTime) {
             delete this._queue[keys[i]];
             delCount++;
           }
@@ -99,16 +93,12 @@ export default {
 
     data.tx
       .wait(confirms || 1)
-      .then(
-        (txReceipt) => {
-          this.successTx(hash, txReceipt, data);
-        },
-      )
-      .catch(
-        (err) => {
-          this.failedTx(hash, data, err);
-        },
-      );
+      .then((txReceipt) => {
+        this.successTx(hash, txReceipt, data);
+      })
+      .catch((err) => {
+        this.failedTx(hash, data, err);
+      });
   },
 
   successTx(hash, txReceipt, data) {

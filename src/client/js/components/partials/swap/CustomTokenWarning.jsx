@@ -15,9 +15,8 @@ export default class CustomTokenWarning extends Component {
           <div>
             <div className="warning-text-bold">Warning!</div>
             <div className="warning-text">
-              This token is not whitelisted by swing. The Swing team makes no
-              representation about the quality or legal categorization of the
-              token.
+              This token is not whitelisted by swing. The Swing team makes no representation about the quality or legal
+              categorization of the token.
             </div>
           </div>
         </div>

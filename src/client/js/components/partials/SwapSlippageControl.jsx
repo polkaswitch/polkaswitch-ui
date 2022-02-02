@@ -58,22 +58,18 @@ export default class SwapSlippageControl extends Component {
   render() {
     return (
       <div className="slippage-control">
-        {tolerances.map(
-          (v) => (
-            <span
-              key={v}
-              onClick={this.handleClick(v)}
-              className={classnames('button', {
-                'is-info is-light is-outlined':
-                    !this.state.custom && +v === this.state.current,
-                disabled: this.state.custom,
-              })}
-            >
-              {v}
-              %
-            </span>
-          ),
-        )}
+        {tolerances.map((v) => (
+          <span
+            key={v}
+            onClick={this.handleClick(v)}
+            className={classnames('button', {
+              'is-info is-light is-outlined': !this.state.custom && +v === this.state.current,
+              disabled: this.state.custom,
+            })}
+          >
+            {v}%
+          </span>
+        ))}
         <div className="control has-icons-right">
           <input
             className={classnames('input', {

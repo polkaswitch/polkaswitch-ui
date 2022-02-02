@@ -18,10 +18,7 @@ export default class ConnectWalletButton extends Component {
       Metrics.identify(Wallet.currentAddress());
     }
 
-    this.subWalletChange = EventManager.listenFor(
-      'walletUpdated',
-      this.handleWalletChange,
-    );
+    this.subWalletChange = EventManager.listenFor('walletUpdated', this.handleWalletChange);
   }
 
   componentWillUnmount() {
@@ -53,12 +50,7 @@ export default class ConnectWalletButton extends Component {
       return (
         <>
           <span className="dot" />
-          <img
-            className="image-icon"
-            width={20}
-            height={18}
-            src="/images/metamask.png"
-          />
+          <img className="image-icon" width={20} height={18} src="/images/metamask.png" />
           <span className="wallet-address">{this.getTruncWalletAddress()}</span>
         </>
       );

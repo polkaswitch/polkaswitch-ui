@@ -33,13 +33,11 @@ export default class BridgeWidget extends Component {
       toChain,
       fromChain,
       to:
-        TokenListManager.findTokenById(
-          toChain.supportedCrossChainTokens[0],
-          toChain,
-        ) || TokenListManager.findTokenById(network.defaultPair.to, toChain),
+        TokenListManager.findTokenById(toChain.supportedCrossChainTokens[0], toChain) ||
+        TokenListManager.findTokenById(network.defaultPair.to, toChain),
       from:
-        TokenListManager.findTokenById(network.supportedCrossChainTokens[0])
-        || TokenListManager.findTokenById(network.defaultPair.from),
+        TokenListManager.findTokenById(network.supportedCrossChainTokens[0]) ||
+        TokenListManager.findTokenById(network.defaultPair.from),
     });
 
     this.state = _.extend(mergeState, {
@@ -81,21 +79,10 @@ export default class BridgeWidget extends Component {
   }
 
   componentDidMount() {
-    this.subscribers.push(
-      EventManager.listenFor('walletUpdated', this.handleWalletChange),
-    );
-    this.subscribers.push(
-      EventManager.listenFor('networkUpdated', this.handleNetworkChange),
-    );
-    this.subscribers.push(
-      EventManager.listenFor(
-        'networkPendingUpdate',
-        this.handleNetworkPreUpdate,
-      ),
-    );
-    this.subscribers.push(
-      EventManager.listenFor('txQueueUpdated', this.handleWalletChange),
-    );
+    this.subscribers.push(EventManager.listenFor('walletUpdated', this.handleWalletChange));
+    this.subscribers.push(EventManager.listenFor('networkUpdated', this.handleNetworkChange));
+    this.subscribers.push(EventManager.listenFor('networkPendingUpdate', this.handleNetworkPreUpdate));
+    this.subscribers.push(EventManager.listenFor('txQueueUpdated', this.handleWalletChange));
     window.addEventListener('resize', this.updateBoxHeight);
     this.updateBoxHeight();
   }
@@ -121,13 +108,8 @@ export default class BridgeWidget extends Component {
     this.setState({
       loading: false,
       crossChainEnabled: true,
-      to: TokenListManager.findTokenById(
-        toChain.supportedCrossChainTokens[0],
-        toChain,
-      ),
-      from: TokenListManager.findTokenById(
-        network.supportedCrossChainTokens[0],
-      ),
+      to: TokenListManager.findTokenById(toChain.supportedCrossChainTokens[0], toChain),
+      from: TokenListManager.findTokenById(network.supportedCrossChainTokens[0]),
       toChain,
       fromChain,
       availableBalance: undefined,
@@ -142,11 +124,9 @@ export default class BridgeWidget extends Component {
 
   updateBoxHeight() {
     this.box.current.style.height = '';
-    _.defer(
-      () => {
-        this.box.current.style.height = `${this.box.current.offsetHeight}px`;
-      },
-    );
+    _.defer(() => {
+      this.box.current.style.height = `${this.box.current.offsetHeight}px`;
+    });
   }
 
   triggerHeightResize(node, isAppearing) {
@@ -159,17 +139,11 @@ export default class BridgeWidget extends Component {
     });
   }
 
-  onSwapEstimateComplete(
-    fromAmount,
-    toAmount,
-    dist,
-    availBalBN,
-    approveStatus,
-  ) {
+  onSwapEstimateComplete(fromAmount, toAmount, dist, availBalBN, approveStatus) {
     if (
-      this.state.fromAmount === fromAmount
-      && this.state.availableBalance === availBalBN
-      && this.state.toAmount === toAmount
+      this.state.fromAmount === fromAmount &&
+      this.state.availableBalance === availBalBN &&
+      this.state.toAmount === toAmount
     ) {
       return;
     }
@@ -184,13 +158,10 @@ export default class BridgeWidget extends Component {
         approveStatus,
       },
       () => {
-        _.delay(
-          () => {
-            // put back height after dist expand anim
-            this.updateBoxHeight();
-          },
-          301,
-        );
+        _.delay(() => {
+          // put back height after dist expand anim
+          this.updateBoxHeight();
+        }, 301);
       },
     );
   }
@@ -214,9 +185,7 @@ export default class BridgeWidget extends Component {
     this.setState(
       {
         to: this.state.from,
-        fromAmount: this.state.toAmount
-          ? SwapFn.validateEthValue(this.state.to, this.state.toAmount)
-          : undefined,
+        fromAmount: this.state.toAmount ? SwapFn.validateEthValue(this.state.to, this.state.toAmount) : undefined,
         from: this.state.to,
         toChain: this.state.fromChain,
         fromChain: this.state.toChain,
@@ -250,19 +219,13 @@ export default class BridgeWidget extends Component {
     };
 
     // try to find the current token on the new network if available
-    const parallelToken = TokenListManager.findTokenById(
-      this.state[target].symbol,
-      network,
-    );
+    const parallelToken = TokenListManager.findTokenById(this.state[target].symbol, network);
 
     if (parallelToken) {
       _s[target] = parallelToken;
     } else {
       // default to any available token
-      _s[target] = TokenListManager.findTokenById(
-        network.supportedCrossChainTokens[0],
-        network,
-      );
+      _s[target] = TokenListManager.findTokenById(network.supportedCrossChainTokens[0], network);
     }
 
     _s[`${target}Chain`] = network;
@@ -368,25 +331,22 @@ export default class BridgeWidget extends Component {
     }
 
     TokenListManager.updateSwapConfig({ [this.state.searchTarget]: token });
-    this.setState(
-      _s,
-      () => {
-        Metrics.track('swap-token-changed', {
-          changed: this.state.searchTarget,
-          from: this.state.from,
-          to: this.state.to,
-        });
-      },
-    );
+    this.setState(_s, () => {
+      Metrics.track('swap-token-changed', {
+        changed: this.state.searchTarget,
+        from: this.state.from,
+        to: this.state.to,
+      });
+    });
   }
 
   render() {
     const animTiming = 300;
     const isStack = !(
-      this.state.showSettings
-      || this.state.showConfirm
-      || this.state.showSearch
-      || this.state.showResults
+      this.state.showSettings ||
+      this.state.showConfirm ||
+      this.state.showSearch ||
+      this.state.showResults
     );
 
     return (
@@ -398,12 +358,7 @@ export default class BridgeWidget extends Component {
         >
           <div className="loader is-loading" />
         </div>
-        <CSSTransition
-          in={isStack}
-          timeout={animTiming}
-          onEntering={this.triggerHeightResize}
-          classNames="fade"
-        >
+        <CSSTransition in={isStack} timeout={animTiming} onEntering={this.triggerHeightResize} classNames="fade">
           <BridgeOrderSlide
             ref={this.orderPage}
             toChain={this.state.toChain}
@@ -434,11 +389,7 @@ export default class BridgeWidget extends Component {
           <TokenSearchSlide
             isCrossChain
             isFrom={this.state.searchTarget === 'from'}
-            network={
-              this.state.searchTarget === 'to'
-                ? this.state.toChain
-                : this.state.fromChain
-            }
+            network={this.state.searchTarget === 'to' ? this.state.toChain : this.state.fromChain}
             showSearch={this.state.showSearch}
             handleSearchToggle={this.handleSearchToggle}
             handleTokenChange={this.handleTokenChange}
@@ -450,9 +401,7 @@ export default class BridgeWidget extends Component {
           onEntering={this.triggerHeightResize}
           classNames="slidein"
         >
-          <AdvancedSettingsSlide
-            handleBackOnSettings={this.handleSettingsToggle}
-          />
+          <AdvancedSettingsSlide handleBackOnSettings={this.handleSettingsToggle} />
         </CSSTransition>
         <CSSTransition
           in={this.state.showConfirm || this.state.showResults}
@@ -460,11 +409,7 @@ export default class BridgeWidget extends Component {
           onEntering={this.triggerHeightResize}
           classNames="slidein"
         >
-          <CSSTransition
-            in={!this.state.showResults}
-            timeout={animTiming}
-            classNames="fade"
-          >
+          <CSSTransition in={!this.state.showResults} timeout={animTiming} classNames="fade">
             <CrossSwapProcessSlide
               to={this.state.to}
               from={this.state.from}

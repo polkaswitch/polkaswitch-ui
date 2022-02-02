@@ -70,18 +70,15 @@ export default class GasPriceControl extends Component {
           <select value={gasSpeed} onChange={this.handleClick}>
             <option value="safeLow">
               Auto (~
-              {window.GAS_STATS.safeLow}
-              )
+              {window.GAS_STATS.safeLow})
             </option>
             <option value="fast">
               Fast (~
-              {window.GAS_STATS.fast}
-              )
+              {window.GAS_STATS.fast})
             </option>
             <option value="fastest">
               Fastest (~
-              {window.GAS_STATS.fastest}
-              )
+              {window.GAS_STATS.fastest})
             </option>
           </select>
         </div>

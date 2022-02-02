@@ -33,14 +33,10 @@ export default class BridgeOrderSlide extends Component {
 
   componentDidUpdate(prevProps) {
     if (
-      (this.props.from
-        && this.props.to
-        && prevProps.from
-        && this.props.from.address !== prevProps.from.address)
-      || this.props.to.address !== prevProps.to.address
-      || this.props.refresh !== prevProps.refresh
-      || (this.props.fromAmount !== prevProps.fromAmount
-        && !this.state.calculatingSwap)
+      (this.props.from && this.props.to && prevProps.from && this.props.from.address !== prevProps.from.address) ||
+      this.props.to.address !== prevProps.to.address ||
+      this.props.refresh !== prevProps.refresh ||
+      (this.props.fromAmount !== prevProps.fromAmount && !this.state.calculatingSwap)
     ) {
       if (this.props.fromAmount) {
         this.fetchSwapEstimate(this.props.fromAmount);
@@ -63,11 +59,7 @@ export default class BridgeOrderSlide extends Component {
       return;
     }
 
-    this.props.onSwapEstimateComplete(
-      origFromAmount,
-      this.props.toAmount,
-      this.props.swapDistribution,
-    );
+    this.props.onSwapEstimateComplete(origFromAmount, this.props.toAmount, this.props.swapDistribution);
 
     if (!fromAmount || fromAmount.length === 0) {
       fromAmount = '0';
@@ -87,10 +79,7 @@ export default class BridgeOrderSlide extends Component {
         calculatingSwap: true,
       },
       function (_timeNow, _attempt, _cb) {
-        const fromAmountBN = window.ethers.utils.parseUnits(
-          fromAmount,
-          this.props.from.decimals,
-        );
+        const fromAmountBN = window.ethers.utils.parseUnits(fromAmount, this.props.from.decimals);
 
         // add delay to slow down UI snappiness
         _.delay(
@@ -98,13 +87,7 @@ export default class BridgeOrderSlide extends Component {
             if (this.calculatingSwapTimestamp !== _timeNow2) {
               return;
             }
-            this.fetchCrossChainEstimate(
-              origFromAmount,
-              fromAmountBN,
-              _timeNow2,
-              _attempt2,
-              _cb2,
-            );
+            this.fetchCrossChainEstimate(origFromAmount, fromAmountBN, _timeNow2, _attempt2, _cb2);
           },
           500,
           _timeNow,
@@ -115,18 +98,10 @@ export default class BridgeOrderSlide extends Component {
     );
   }
 
-  fetchCrossChainEstimate(
-    origFromAmount,
-    fromAmountBN,
-    _timeNow2,
-    _attempt2,
-    _cb2,
-  ) {
+  fetchCrossChainEstimate(origFromAmount, fromAmountBN, _timeNow2, _attempt2, _cb2) {
     if (!Wallet.isConnected()) {
       // not supported in cross-chain mode
-      console.error(
-        'SwapOrderSlide: Wallet not connected, skipping crossChainEstimate',
-      );
+      console.error('SwapOrderSlide: Wallet not connected, skipping crossChainEstimate');
       return false;
     }
 
@@ -165,10 +140,7 @@ export default class BridgeOrderSlide extends Component {
             .then((bal) => {
               this.props.onSwapEstimateComplete(
                 origFromAmount,
-                window.ethers.utils.formatUnits(
-                  response?.returnAmount ?? constants.Zero,
-                  this.props.to.decimals,
-                ),
+                window.ethers.utils.formatUnits(response?.returnAmount ?? constants.Zero, this.props.to.decimals),
                 false,
                 window.ethers.utils.formatUnits(bal, this.props.from.decimals),
                 status,
@@ -209,12 +181,7 @@ export default class BridgeOrderSlide extends Component {
           }
 
           // try again
-          this.fetchSwapEstimate(
-            origFromAmount,
-            _timeNow3,
-            _attempt3 + 1,
-            _cb3,
-          );
+          this.fetchSwapEstimate(origFromAmount, _timeNow3, _attempt3 + 1, _cb3);
         }.bind(this, _timeNow2, _attempt2, _cb2),
       );
   }
@@ -251,23 +218,18 @@ export default class BridgeOrderSlide extends Component {
 
   validateOrderForm() {
     return (
-      this.props.from
-      && this.props.to
-      && this.props.fromAmount
-      && this.props.fromAmount.length > 0
-      && this.props.toAmount
-      && this.props.toAmount.length > 0
-      && !this.state.calculatingSwap
+      this.props.from &&
+      this.props.to &&
+      this.props.fromAmount &&
+      this.props.fromAmount.length > 0 &&
+      this.props.toAmount &&
+      this.props.toAmount.length > 0 &&
+      !this.state.calculatingSwap
     );
   }
 
   hasSufficientBalance() {
-    if (
-      Wallet.isConnected()
-      && this.props.availableBalance
-      && this.props.fromAmount
-      && this.props.from
-    ) {
+    if (Wallet.isConnected() && this.props.availableBalance && this.props.fromAmount && this.props.from) {
       const balBN = BN(this.props.availableBalance);
       const fromBN = BN(this.props.fromAmount);
       return fromBN.lte(balBN);
@@ -278,19 +240,9 @@ export default class BridgeOrderSlide extends Component {
   handleSubmit(e) {
     if (!Wallet.isConnected()) {
       EventManager.emitEvent('promptWalletConnect', 1);
-    } else if (
-      !SwapFn.isValidParseValue(this.props.from, this.props.fromAmount)
-    ) {
-      const correctAmt = SwapFn.validateEthValue(
-        this.props.from,
-        this.props.fromAmount,
-      );
-      this.fetchSwapEstimate(
-        correctAmt,
-        undefined,
-        undefined,
-        this.props.handleSubmit,
-      );
+    } else if (!SwapFn.isValidParseValue(this.props.from, this.props.fromAmount)) {
+      const correctAmt = SwapFn.validateEthValue(this.props.from, this.props.fromAmount);
+      this.fetchSwapEstimate(correctAmt, undefined, undefined, this.props.handleSubmit);
     } else if (this.validateOrderForm()) {
       EventManager.emitEvent('networkHoverableUpdated', { hoverable: false });
       this.props.handleSubmit();
@@ -318,28 +270,17 @@ export default class BridgeOrderSlide extends Component {
   handleMax() {
     if (Wallet.isConnected() && this.props.from.address) {
       Wallet.getBalance(this.props.from)
-        .then(
-          (bal) => {
-            _.defer(
-              () => {
-                // balance is in WEI and is a BigNumber
-                this.fetchSwapEstimate(
-                  window.ethers.utils.formatUnits(
-                    bal,
-                    this.props.from.decimals,
-                  ),
-                );
-              },
-            );
-          },
-        )
-        .catch(
-          (e) => {
-            console.error('Failed to get balance for MAX', e);
-            // try again
-            this.handleMax();
-          },
-        );
+        .then((bal) => {
+          _.defer(() => {
+            // balance is in WEI and is a BigNumber
+            this.fetchSwapEstimate(window.ethers.utils.formatUnits(bal, this.props.from.decimals));
+          });
+        })
+        .catch((e) => {
+          console.error('Failed to get balance for MAX', e);
+          // try again
+          this.handleMax();
+        });
     }
   }
 
@@ -357,9 +298,7 @@ export default class BridgeOrderSlide extends Component {
             crossChain
             selected={isFrom ? this.props.fromChain : this.props.toChain}
             className={classnames({ 'is-up': !isFrom })}
-            handleDropdownClick={this.handleNetworkDropdownChange(isFrom).bind(
-              this,
-            )}
+            handleDropdownClick={this.handleNetworkDropdownChange(isFrom).bind(this)}
             compact
           />
         </div>
@@ -374,11 +313,7 @@ export default class BridgeOrderSlide extends Component {
             >
               <input
                 onChange={this.handleTokenAmountChange}
-                value={
-                  !isFrom && this.state.errored
-                    ? ''
-                    : this.props[`${target}Amount`] || ''
-                }
+                value={!isFrom && this.state.errored ? '' : this.props[`${target}Amount`] || ''}
                 type="number"
                 min="0"
                 lang="en"
@@ -398,14 +333,10 @@ export default class BridgeOrderSlide extends Component {
                     Max
                   </div>
                 )}
-                {isFrom && !this.hasSufficientBalance() && (
-                  <div className="warning-funds">Insufficient funds</div>
-                )}
+                {isFrom && !this.hasSufficientBalance() && <div className="warning-funds">Insufficient funds</div>}
 
                 {!isFrom && this.state.errored && (
-                  <div className="warning-funds">
-                    {this.state.errorMsg || 'Estimate failed. Try again'}
-                  </div>
+                  <div className="warning-funds">{this.state.errorMsg || 'Estimate failed. Try again'}</div>
                 )}
                 <div
                   className="level is-mobile is-narrow my-0 token-dropdown"
@@ -439,10 +370,7 @@ export default class BridgeOrderSlide extends Component {
               <b className="widget-title">Bridge Assets</b>
             </div>
             <div className="level-item level-right">
-              <span
-                className="icon clickable settings-icon"
-                onClick={this.props.handleSettingsToggle}
-              >
+              <span className="icon clickable settings-icon" onClick={this.props.handleSettingsToggle}>
                 <img src="/images/bridge_setting_white.svg" />
               </span>
             </div>
@@ -460,10 +388,7 @@ export default class BridgeOrderSlide extends Component {
               <ion-icon name="swap-vertical-outline" />
             </div>
 
-            <div
-              className="bridge-icon is-hidden"
-              onClick={this.handleTokenSwap}
-            >
+            <div className="bridge-icon is-hidden" onClick={this.handleTokenSwap}>
               <i className="fas fa-long-arrow-alt-up" />
               <i className="fas fa-long-arrow-alt-down" />
             </div>
@@ -477,14 +402,10 @@ export default class BridgeOrderSlide extends Component {
           </div>
 
           <div
-            className={classnames(
-              'hint--large is-hidden',
-              'token-dist-expand-wrapper expand',
-              {
-                // "hint--top": this.props.swapDistribution,
-                // "expand": this.props.swapDistribution
-              },
-            )}
+            className={classnames('hint--large is-hidden', 'token-dist-expand-wrapper expand', {
+              // "hint--top": this.props.swapDistribution,
+              // "expand": this.props.swapDistribution
+            })}
           >
             <div
               className="token-dist-hint-text"
