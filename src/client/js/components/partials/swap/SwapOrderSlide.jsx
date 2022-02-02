@@ -25,8 +25,7 @@ export default class SwapOrderSlide extends Component {
     this.handleTokenAmountChange = this.handleTokenAmountChange.bind(this);
     this.validateOrderForm = this.validateOrderForm.bind(this);
     this.fetchSwapEstimate = this.fetchSwapEstimate.bind(this);
-    this.fetchSingleChainSwapEstimate =
-      this.fetchSingleChainSwapEstimate.bind(this);
+    this.fetchSingleChainSwapEstimate = this.fetchSingleChainSwapEstimate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleMax = this.handleMax.bind(this);
     this.handleTokenSwap = this.handleTokenSwap.bind(this);
@@ -36,10 +35,7 @@ export default class SwapOrderSlide extends Component {
     const { from, to, refresh, fromAmount } = this.props;
     const { calculatingSwap } = this.state;
     if (
-      (from &&
-        to &&
-        prevProps.from &&
-        from.address !== prevProps.from.address) ||
+      (from && to && prevProps.from && from.address !== prevProps.from.address) ||
       to.address !== prevProps.to.address ||
       refresh !== prevProps.refresh ||
       (fromAmount !== prevProps.fromAmount && !calculatingSwap)
@@ -129,9 +125,7 @@ export default class SwapOrderSlide extends Component {
         .then((bal) => {
           _.defer(() => {
             // balance is in WEI and is a BigNumber
-            this.fetchSwapEstimate(
-              window.ethers.utils.formatUnits(bal, from.decimals),
-            );
+            this.fetchSwapEstimate(window.ethers.utils.formatUnits(bal, from.decimals));
           });
         })
         .catch((e) => {
@@ -157,42 +151,24 @@ export default class SwapOrderSlide extends Component {
     const { from, to, fromAmount, toAmount } = this.props;
     const { calculatingSwap } = this.state;
 
-    return (
-      from &&
-      to &&
-      fromAmount &&
-      fromAmount.length > 0 &&
-      toAmount &&
-      toAmount.length > 0 &&
-      !calculatingSwap
-    );
+    return from && to && fromAmount && fromAmount.length > 0 && toAmount && toAmount.length > 0 && !calculatingSwap;
   }
 
-  fetchSingleChainSwapEstimate(
-    origFromAmount,
-    fromAmountBN,
-    _timeNow2,
-    _attempt2,
-    _cb2,
-  ) {
-    const { from, to, toAmount, swapDistribution, onSwapEstimateComplete } =
-      this.props;
+  fetchSingleChainSwapEstimate(origFromAmount, fromAmountBN, _timeNow2, _attempt2, _cb2) {
+    const { from, to, toAmount, swapDistribution, onSwapEstimateComplete } = this.props;
 
     return SwapFn.getExpectedReturn(from, to, fromAmountBN)
       .then((result) => {
         if (this.calculatingSwapTimestamp !== _timeNow2) return;
 
-        const dist = _.map(result.distribution, (e) => e.toNumber());
+        const dist = _.map(result.distribution, (e) => (Number.isNaN(e) ? e.toNumber() : e));
 
         Wallet.getBalance(from)
           .then((bal) =>
             SwapFn.getApproveStatus(from, fromAmountBN).then((status) => {
               onSwapEstimateComplete(
                 origFromAmount,
-                window.ethers.utils.formatUnits(
-                  result.returnAmount,
-                  to.decimals,
-                ),
+                window.ethers.utils.formatUnits(result.returnAmount, to.decimals),
                 dist,
                 window.ethers.utils.formatUnits(bal, from.decimals),
                 status,
@@ -233,8 +209,7 @@ export default class SwapOrderSlide extends Component {
   }
 
   fetchSwapEstimate(origFromAmount, timeNow = Date.now(), attempt = 0, cb) {
-    const { onSwapEstimateComplete, toAmount, swapDistribution, from } =
-      this.props;
+    const { onSwapEstimateComplete, toAmount, swapDistribution, from } = this.props;
     let fromAmount = origFromAmount;
 
     if (attempt > window.MAX_RETRIES) {
@@ -264,10 +239,7 @@ export default class SwapOrderSlide extends Component {
         calculatingSwap: true,
       },
       () => {
-        const fromAmountBN = window.ethers.utils.parseUnits(
-          fromAmount,
-          from.decimals,
-        );
+        const fromAmountBN = window.ethers.utils.parseUnits(fromAmount, from.decimals);
 
         // add delay to slow down UI snappiness
         _.delay(
@@ -275,13 +247,7 @@ export default class SwapOrderSlide extends Component {
             if (this.calculatingSwapTimestamp !== _timeNow2) {
               return;
             }
-            this.fetchSingleChainSwapEstimate(
-              origFromAmount,
-              fromAmountBN,
-              _timeNow2,
-              _attempt2,
-              _cb2,
-            );
+            this.fetchSingleChainSwapEstimate(origFromAmount, fromAmountBN, _timeNow2, _attempt2, _cb2);
           },
           500,
           timeNow,
@@ -297,14 +263,7 @@ export default class SwapOrderSlide extends Component {
       return <div />;
     }
 
-    const {
-      fromAmount,
-      toAmount,
-      refresh,
-      fromChain,
-      toChain,
-      handleSearchToggle,
-    } = this.props;
+    const { fromAmount, toAmount, refresh, fromChain, toChain, handleSearchToggle } = this.props;
     const { calculatingSwap, errored, errorMsg } = this.state;
     const isFrom = target === 'from';
     const targetAmount = target === 'from' ? fromAmount : toAmount;
@@ -316,11 +275,7 @@ export default class SwapOrderSlide extends Component {
           role="presentation"
           onClick={handleSearchToggle(target)}
         >
-          <TokenIconBalanceGroupView
-            network={isFrom ? fromChain : toChain}
-            token={token}
-            refresh={refresh}
-          />
+          <TokenIconBalanceGroupView network={isFrom ? fromChain : toChain} token={token} refresh={refresh} />
           <div className="level-item">
             <span className="icon-down">
               <ion-icon name="chevron-down" />
@@ -353,24 +308,14 @@ export default class SwapOrderSlide extends Component {
               />
 
               {isFrom && (
-                <div
-                  className="max-btn"
-                  role="presentation"
-                  onClick={this.handleMax}
-                >
+                <div className="max-btn" role="presentation" onClick={this.handleMax}>
                   Max
                 </div>
               )}
 
-              {isFrom && !this.hasSufficientBalance() && (
-                <div className="warning-funds">Insufficient funds</div>
-              )}
+              {isFrom && !this.hasSufficientBalance() && <div className="warning-funds">Insufficient funds</div>}
 
-              {!isFrom && errored && (
-                <div className="warning-funds">
-                  {errorMsg || 'Estimate failed. Try again'}
-                </div>
-              )}
+              {!isFrom && errored && <div className="warning-funds">{errorMsg || 'Estimate failed. Try again'}</div>}
             </div>
           </div>
         </div>
@@ -387,11 +332,7 @@ export default class SwapOrderSlide extends Component {
           <div className="level is-mobile">
             <div className="level-right">
               <div className="level-item">
-                <span
-                  className="icon clickable settings-icon"
-                  role="presentation"
-                  onClick={handleSettingsToggle}
-                >
+                <span className="icon clickable settings-icon" role="presentation" onClick={handleSettingsToggle}>
                   <ion-icon name="settings-outline" />
                 </span>
               </div>
@@ -406,19 +347,11 @@ export default class SwapOrderSlide extends Component {
           </div>
 
           <div className="swap-icon-wrapper">
-            <div
-              className="swap-icon-v2 icon"
-              role="presentation"
-              onClick={this.handleTokenSwap}
-            >
+            <div className="swap-icon-v2 icon" role="presentation" onClick={this.handleTokenSwap}>
               <ion-icon name="swap-vertical-outline" />
             </div>
 
-            <div
-              className="swap-icon is-hidden"
-              role="presentation"
-              onClick={this.handleTokenSwap}
-            >
+            <div className="swap-icon is-hidden" role="presentation" onClick={this.handleTokenSwap}>
               <i className="fas fa-long-arrow-alt-up" />
               <i className="fas fa-long-arrow-alt-down" />
             </div>
@@ -462,18 +395,18 @@ export default class SwapOrderSlide extends Component {
 }
 
 SwapOrderSlide.propTypes = {
-  handleCrossChainChange: PropTypes.func.isRequired,
+  handleCrossChainChange: PropTypes.func,
   handleSearchToggle: PropTypes.func.isRequired,
   handleSettingsToggle: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
-  swapDistribution: PropTypes.func.isRequired,
+  swapDistribution: PropTypes.array,
   onSwapTokens: PropTypes.func.isRequired,
   onSwapEstimateComplete: PropTypes.func.isRequired,
-  refresh: PropTypes.func.isRequired,
-  from: PropTypes.objectOf(PropTypes.object).isRequired,
-  to: PropTypes.objectOf(PropTypes.object).isRequired,
-  fromChain: PropTypes.objectOf(PropTypes.object).isRequired,
-  toChain: PropTypes.objectOf(PropTypes.object).isRequired,
+  refresh: PropTypes.number.isRequired,
+  from: PropTypes.objectOf(PropTypes.any).isRequired,
+  to: PropTypes.objectOf(PropTypes.any).isRequired,
+  fromChain: PropTypes.objectOf(PropTypes.any).isRequired,
+  toChain: PropTypes.objectOf(PropTypes.any).isRequired,
   fromAmount: PropTypes.string,
   toAmount: PropTypes.string,
   availableBalance: PropTypes.string,
@@ -483,4 +416,6 @@ SwapOrderSlide.defaultProps = {
   fromAmount: '0',
   toAmount: '0',
   availableBalance: undefined,
+  handleCrossChainChange: () => undefined,
+  swapDistribution: [],
 };

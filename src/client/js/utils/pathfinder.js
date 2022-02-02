@@ -1,14 +1,14 @@
 import Wallet from './wallet';
 
 export default {
-  baseUrl: 'https://api.swing.xyz',
+  baseUrl: 'http://192.168.3.199:3000',
 
   async sendGet(url, params = {}) {
     let result = null;
 
     try {
       const endpoint = new URL(`${this.baseUrl}/${url}`);
-      Object.keys(params).forEach((key) => endpoint.searchParams.append(key, params[key]),);
+      Object.keys(params).forEach((key) => endpoint.searchParams.append(key, params[key]));
       const response = await fetch(endpoint);
 
       if (response.ok) {
@@ -63,7 +63,10 @@ export default {
 
   async getAllowance(userAddress, tokenAddress, route, chainId) {
     const allowance = await this.sendGet('allowance', {
-      route, chainId, userAddress, tokenAddress
+      route,
+      chainId,
+      userAddress,
+      tokenAddress,
     });
 
     return allowance;
@@ -96,6 +99,11 @@ export default {
     const txHash = await this.sendTransaction(tx);
 
     return txHash;
+  },
+
+  async getPools(chainId) {
+    const pools = await this.sendGet('pools', { chainId });
+    return pools;
   },
 
   async sendTransaction(txObject) {
