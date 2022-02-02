@@ -302,16 +302,14 @@ window.SwapFn = {
   },
 
   async swap(fromToken, toToken, amountBN) {
+    console.log(`Calling SWAP() with ${fromToken.symbol} to ${toToken.symbol} of ${amountBN.toString()}`);
+    const { chainId, contract, recipient } = this.getContract();
     const pathRoute = localStorage.getItem('route');
-    const { chainId } = TokenListManager.getCurrentNetworkConfig();
 
     if (['oneinch', 'paraswap'].includes(pathRoute)) {
       const originAmount = new BN(amountBN.toString()).dividedBy(10 ** fromToken.decimals);
       return PathFinder.getSwap(fromToken.symbol, toToken.symbol, originAmount, pathRoute, chainId);
     }
-
-    console.log(`Calling SWAP() with ${fromToken.symbol} to ${toToken.symbol} of ${amountBN.toString()}`);
-    const { chainId, contract, recipient } = this.getContract();
 
     return this.calculateMinReturn(fromToken, toToken, amountBN).then(({ minReturn, distribution, expectedAmount }) => {
       /*

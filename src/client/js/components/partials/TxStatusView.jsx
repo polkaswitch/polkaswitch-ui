@@ -3,8 +3,6 @@ import classnames from 'classnames';
 import * as ethers from 'ethers';
 import numeral from 'numeral';
 import dayjs from 'dayjs';
-const BigNumber = ethers.BigNumber;
-const Utils = ethers.utils;
 import TxExplorerLink from './TxExplorerLink';
 import TokenIconImg from './TokenIconImg';
 

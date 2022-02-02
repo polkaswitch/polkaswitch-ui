@@ -4,7 +4,6 @@ import classnames from 'classnames';
 import * as ethers from 'ethers';
 import numeral from 'numeral';
 import dayjs from 'dayjs';
-const Utils = ethers.utils;
 import TxExplorerLink from './TxExplorerLink';
 
 const Utils = ethers.utils;
