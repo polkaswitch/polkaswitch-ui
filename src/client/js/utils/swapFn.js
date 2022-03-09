@@ -410,7 +410,7 @@ window.SwapFn = {
       .then((transaction) => this.returnSwapResult(transaction, fromToken, toToken, amountBN));
   },
 
-  swapWithPolygonAbi(contract, fromToken, toToken, amountBN, expectedAmount, minReturn, distribution) {
+  swapWithPolygonAbi(contract, fromToken, toToken, amountBN, expectedAmount, minReturn, recipient, distribution) {
     return contract
       .swap(
         fromToken.address,
@@ -418,8 +418,8 @@ window.SwapFn = {
         amountBN, // uint256 in wei
         Utils.parseUnits(expectedAmount, toToken.decimals), // expectedReturn
         Utils.parseUnits(minReturn, toToken.decimals), // minReturn
+        recipient,
         distribution,
-        0, // the flag to enable to disable certain exchange(can ignore for testnet and always use 0)
         this.getGasParams(fromToken, amountBN),
       )
       .then((transaction) => this.returnSwapResult(transaction, fromToken, toToken, amountBN));
