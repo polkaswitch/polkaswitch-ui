@@ -1,19 +1,20 @@
 import React from 'react';
-import _ from 'underscore';
 import classnames from 'classnames';
-import { BigNumber, constants, providers, Signer, utils } from 'ethers';
-import TokenListManager from '../../../utils/tokenList';
+import Wallet from '../../../utils/wallet';
 import RouteItemWrapper from './RouteItemWrapper';
 
 export default function AvailableRoutes(props) {
-  const network = TokenListManager.getCurrentNetworkConfig();
   const GENERIC_SUPPORTED_BRIDGE_TOKENS = ['USDC', 'USDT', 'DAI'];
 
-  const routes = _.map(props.routes, (v, i) => {
+  const routes = props.routes.map((v, i) => {
     let route = [];
 
-    const bridgeType = v.bridge;
+    const bridgeType = v.bridge.route[0].bridge;
     let targetBridgeToken = 'USDC';
+
+    // value being displayed to the users => return amount -  desinationTxFee - bridgeFee
+    const { estimatedReturnAmountDeductedByFees, totalFeeWithoutGas } =
+      Wallet.returnEstimatedReturnAmountDeductedByFees(v);
 
     route.push({
       type: 'token-network',
@@ -22,63 +23,34 @@ export default function AvailableRoutes(props) {
       network: props.fromChain,
     });
 
-    if (
-      bridgeType === 'connext' &&
-      !GENERIC_SUPPORTED_BRIDGE_TOKENS.includes(props.from.symbol.toUpperCase())
-    ) {
-      route = route.concat([
-        {
-          type: 'swap',
-          data: {
-            fee: 0.39,
-          },
-        },
-        {
-          type: 'token-network',
-          // DEFAULT to using USDC as a the bridge
-          token: TokenListManager.findTokenById('USDC', props.fromChain),
-          amount: props.fromAmount,
-          network: props.fromChain,
-        },
-      ]);
-    } else {
-      targetBridgeToken = props.from.symbol.toUpperCase();
-    }
-
     route.push({
       type: 'bridge',
       data: {
-        name: bridgeType[0].toUpperCase() + bridgeType.substring(1),
+        name: v.bridge.route[0].bridge,
         fee: 0.05,
       },
     });
 
-    if (
-      bridgeType === 'connext' &&
-      targetBridgeToken != props.to.symbol.toUpperCase()
-    ) {
-      route.push({
-        type: 'swap',
-        data: {
-          fee: 0.39,
-        },
-      });
-    }
+    // if (bridgeType === 'connext' && targetBridgeToken != props.to.symbol.toUpperCase()) {
+    //   route.push({
+    //     type: 'swap',
+    //     data: {
+    //       fee: bridgeFee,
+    //     },
+    //   });
+    // }
 
     route = route.concat([
       {
         type: 'token-network',
-        amount: utils.formatUnits(
-          v.estimate?.returnAmount ?? constants.Zero,
-          props.to.decimals,
-        ),
+        amount: estimatedReturnAmountDeductedByFees,
         token: props.to,
         network: props.toChain,
       },
       {
         type: 'additional',
-        fee: bridgeType === 'connext' ? 'High' : 'Low',
-        duration: bridgeType === 'connext' ? '~15 Minutes' : '~10 Minutes',
+        fee: totalFeeWithoutGas.toFixed(6),
+        duration: v.bridge?.duration ? v.bridge?.duration : 'high',
       },
     ]);
 
@@ -115,15 +87,9 @@ export default function AvailableRoutes(props) {
           <div className="details">No routes available at this time</div>
         </div>
       </div>
-      {routes.length > 0 &&
-        _.map(routes, (item, i) => (
-          <RouteItemWrapper
-            handleChange={props.handleChange}
-            key={i}
-            data={item}
-            index={i}
-          />
-        ))}
+      {routes?.map((item, i) => (
+        <RouteItemWrapper handleChange={props.handleChange} key={i} data={item} index={i} />
+      ))}
     </div>
   );
 }

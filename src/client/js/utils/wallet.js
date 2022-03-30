@@ -300,6 +300,31 @@ window.WalletJS = {
     await TokenListManager.updateTokenList();
   },
 
+  returnEstimatedReturnAmountDeductedByFees: function (estimateTx) {
+    let bridgeFee = window.ethers.utils.formatUnits(
+      estimateTx.bridge?.quote?.bridgeFee,
+      estimateTx.bridge?.quote?.decimals,
+    );
+    bridgeFee = Number.parseFloat(bridgeFee);
+
+    let destTxFee = estimateTx.bridge?.quote?.destinationTxFee
+      ? window.ethers.utils.formatUnits(estimateTx.bridge?.quote?.destinationTxFee, estimateTx.bridge?.quote?.decimals)
+      : 0;
+    destTxFee = Number.parseFloat(destTxFee);
+
+    let returnAmount = window.ethers.utils.formatUnits(
+      estimateTx.estimate.returnAmount,
+      estimateTx.bridge?.quote?.decimals,
+    );
+
+    const totalFeeWithoutGas = bridgeFee + destTxFee;
+
+    // value being displayed to the users => return amount -  destinationTxFee - bridgeFee
+    const estimatedReturnAmountDeductedByFees = Number.parseFloat(returnAmount) - totalFeeWithoutGas;
+
+    return { estimatedReturnAmountDeductedByFees, totalFeeWithoutGas };
+  },
+
   _connectWalletHandler: function (target) {
     if (target === 'metamask') {
       this._connectProviderMetamask();

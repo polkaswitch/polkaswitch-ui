@@ -13,6 +13,7 @@ import Metrics from '../../../utils/metrics';
 import EventManager from '../../../utils/events';
 import SwapFn from '../../../utils/swapFn';
 import AvailableRoutes from './AvailableRoutes';
+import { getRandomBytes32 } from '@connext/nxtp-utils';
 
 import TxBridgeManager from '../../../utils/txBridgeManager';
 
@@ -90,6 +91,7 @@ export default class BridgeOrderSlide extends Component {
 
     this.calculatingSwapTimestamp = timeNow;
 
+    // important to make the calculations
     this.setState(
       {
         errored: false,
@@ -146,91 +148,54 @@ export default class BridgeOrderSlide extends Component {
       return false;
     }
 
-    const allEstimatesFn = TxBridgeManager.getAllEstimates(
-      this.props.to,
-      this.props.toChain,
-      this.props.from,
-      this.props.fromChain,
+    const { to, toChain, from, fromChain } = this.props;
+
+    const successfullEstimatesNew = await TxBridgeManager.buildNewAllEstimates({
+      to,
+      toChain,
+      from,
+      fromChain,
+      fromUserAddress: Wallet.currentAddress(),
       fromAmountBN,
-      Wallet.currentAddress(),
-    );
+    });
 
+    //keep
+    Wallet.getBalance(this.props.from)
+      .then((bal) => {
+        this.props.onSwapEstimateComplete(
+          origFromAmount,
+          window.ethers.utils.formatUnits(
+            successfullEstimatesNew[0].estimate?.returnAmount ?? constants.Zero,
+            this.props.to.decimals,
+          ),
+          false,
+          window.ethers.utils.formatUnits(bal, this.props.from.decimals),
+        );
 
-    Promise.allSettled(allEstimatesFn)
-      .then(
-        function (_timeNow3, _cb3, results) {
-          if (this.calculatingSwapTimestamp !== _timeNow3) {
-            return;
-          }
+        const { estimatedReturnAmountDeductedByFees } = Wallet.returnEstimatedReturnAmountDeductedByFees(
+          successfullEstimatesNew[0],
+        );
 
-          const successfulEstimates = _.map(
-            _.where(results, { status: 'fulfilled' }),
-            (v) => v.value,
-          );
+        this.props.onCrossChainEstimateComplete(true, estimatedReturnAmountDeductedByFees.toFixed(6));
 
-          const successfulEstimatesValid = successfulEstimates.filter(Boolean);
-
-          const response = successfulEstimatesValid.find(
-            (item) => item?.bridge === 'connext' || item?.bridge === 'cbridge' || item?.bridge === 'hop',
-          ).estimate;
-
-          Wallet.getBalance(this.props.from)
-            .then((bal) => {
-              this.props.onSwapEstimateComplete(
-                origFromAmount,
-                window.ethers.utils.formatUnits(
-                  response?.returnAmount ?? constants.Zero,
-                  this.props.to.decimals,
-                ),
-                false,
-                window.ethers.utils.formatUnits(bal, this.props.from.decimals),
-              );
-
-              this.props.onCrossChainEstimateComplete(response.id);
-
-              this.setState(
-                {
-                  availableRoutes: successfulEstimatesValid,
-                  showRoutes: true,
-                  calculatingSwap: false,
-                },
-                () => {
-                  if (_cb3) {
-                    _cb3();
-                  }
-
-                  Metrics.track('bridge-estimate-result', {
-                    from: this.props.from,
-                    to: this.props.to,
-                    fromAmont: fromAmountBN.toString(),
-                    toAmount: this.props.toAmount,
-                    swapDistribution: this.props.swapDistribution,
-                  });
-                },
-              );
-            })
-            .catch((e) => {
-              console.error('Failed to get swap estimate: ', e);
-            });
-        }.bind(this, _timeNow2, _cb2),
-      )
-      .catch(
-        function (_timeNow3, _attempt3, _cb3, e) {
-          console.error('Failed to get swap estimate: ', e);
-
-          if (this.calculatingSwapTimestamp !== _timeNow3) {
-            return;
-          }
-
-          // try again
-          this.fetchSwapEstimate(
-            origFromAmount,
-            _timeNow3,
-            _attempt3 + 1,
-            _cb3,
-          );
-        }.bind(this, _timeNow2, _attempt2, _cb2),
-      );
+        this.setState(
+          {
+            availableRoutes: successfullEstimatesNew,
+            showRoutes: true,
+            calculatingSwap: false,
+          },
+          () => {
+            // if (_cb3) {
+            //   _cb3();
+            // }
+          },
+        );
+      })
+      .catch((e) => {
+        //refact this!!!
+        this.fetchSwapEstimate(origFromAmount, Date.now(), 5);
+        console.error('Failed to get swap estimate: ', e);
+      });
   }
 
   handleTokenAmountChange(e) {
@@ -252,12 +217,6 @@ export default class BridgeOrderSlide extends Component {
         // as it moves the cursor around. we correct the value at the Submit step,
         // in the higher-order component SwapWidget.jsx
       }
-
-      Metrics.track('bridge-token-value', {
-        value: targetAmount,
-        from: this.props.from,
-        to: this.props.to,
-      });
 
       this.fetchSwapEstimate(targetAmount);
     }
@@ -295,19 +254,9 @@ export default class BridgeOrderSlide extends Component {
   handleSubmit(e) {
     if (!Wallet.isConnected()) {
       EventManager.emitEvent('promptWalletConnect', 1);
-    } else if (
-      !SwapFn.isValidParseValue(this.props.from, this.props.fromAmount)
-    ) {
-      const correctAmt = SwapFn.validateEthValue(
-        this.props.from,
-        this.props.fromAmount,
-      );
-      this.fetchSwapEstimate(
-        correctAmt,
-        undefined,
-        undefined,
-        this.props.handleSubmit,
-      );
+    } else if (!SwapFn.isValidParseValue(this.props.from, this.props.fromAmount)) {
+      const correctAmt = SwapFn.validateEthValue(this.props.from, this.props.fromAmount);
+      this.fetchSwapEstimate(correctAmt, undefined, undefined, this.props.handleSubmit);
     } else if (this.validateOrderForm()) {
       EventManager.emitEvent('networkHoverableUpdated', { hoverable: false });
       this.props.handleSubmit();
@@ -353,7 +302,10 @@ export default class BridgeOrderSlide extends Component {
 
   handleRouteChange(e) {
     const transactionId = e.target.value;
-    const estimateTx = TxBridgeManager.getTx(transactionId).estimate;
+    const estimateTx = TxBridgeManager.getTx(transactionId);
+
+    // value being displayed to the users => return amount -  destinationTxFee - bridgeFee
+    const { estimatedReturnAmountDeductedByFees } = Wallet.returnEstimatedReturnAmountDeductedByFees(estimateTx);
 
     this.setState({
       selectedRouteId: transactionId,
@@ -361,15 +313,12 @@ export default class BridgeOrderSlide extends Component {
 
     this.props.onSwapEstimateComplete(
       this.props.fromAmount,
-      window.ethers.utils.formatUnits(
-        estimateTx.returnAmount ?? constants.Zero,
-        this.props.to.decimals,
-      ),
+      estimatedReturnAmountDeductedByFees.toFixed(6),
       false,
       this.props.availableBalance,
     );
 
-    this.props.onCrossChainEstimateComplete(transactionId);
+    this.props.onCrossChainEstimateComplete(transactionId, estimatedReturnAmountDeductedByFees.toFixed(6));
   }
 
   renderTokenInput(target, token) {
@@ -386,9 +335,7 @@ export default class BridgeOrderSlide extends Component {
             crossChain
             selected={isFrom ? this.props.fromChain : this.props.toChain}
             className={classnames({ 'is-up': !isFrom })}
-            handleDropdownClick={this.handleNetworkDropdownChange(isFrom).bind(
-              this,
-            )}
+            handleDropdownClick={this.handleNetworkDropdownChange(isFrom).bind(this)}
             compact
           />
         </div>
@@ -403,11 +350,7 @@ export default class BridgeOrderSlide extends Component {
             >
               <input
                 onChange={this.handleTokenAmountChange}
-                value={
-                  !isFrom && this.state.errored
-                    ? ''
-                    : this.props[`${target}Amount`] || ''
-                }
+                value={!isFrom && this.state.errored ? '' : this.props[`${target}Amount`] || ''}
                 type="number"
                 min="0"
                 lang="en"
@@ -427,14 +370,10 @@ export default class BridgeOrderSlide extends Component {
                     Max
                   </div>
                 )}
-                {isFrom && !this.hasSufficientBalance() && (
-                  <div className="warning-funds">Insufficient funds</div>
-                )}
+                {isFrom && !this.hasSufficientBalance() && <div className="warning-funds">Insufficient funds</div>}
 
                 {!isFrom && this.state.errored && (
-                  <div className="warning-funds">
-                    {this.state.errorMsg || 'Estimate failed. Try again'}
-                  </div>
+                  <div className="warning-funds">{this.state.errorMsg || 'Estimate failed. Try again'}</div>
                 )}
                 <div
                   className="level is-mobile is-narrow my-0 token-dropdown"
@@ -506,14 +445,10 @@ export default class BridgeOrderSlide extends Component {
           </div>
 
           <div
-            className={classnames(
-              'hint--large',
-              'available-routes-expand-wrapper',
-              {
-                'hint--top': this.state.showRoutes,
-                expand: this.state.showRoutes,
-              },
-            )}
+            className={classnames('hint--large', 'available-routes-expand-wrapper', {
+              'hint--top': this.state.showRoutes,
+              expand: this.state.showRoutes,
+            })}
             aria-label="We have queried multiple bridges to find the best possible routes for this swap. Choose a route that either favours speed or pricing"
           >
             <div className="hint-text">
