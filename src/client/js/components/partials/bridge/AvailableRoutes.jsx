@@ -87,9 +87,11 @@ export default function AvailableRoutes(props) {
           <div className="details">No routes available at this time</div>
         </div>
       </div>
-      {routes?.map((item, i) => (
-        <RouteItemWrapper handleChange={props.handleChange} key={i} data={item} index={i} />
-      ))}
+      {routes
+        ?.filter((item) => item.bridgeType === 'nxtp' || item.bridgeType === 'cbridge')
+        .map((item, i) => (
+          <RouteItemWrapper handleChange={props.handleChange} key={i} data={item} index={i} />
+        ))}
     </div>
   );
 }
