@@ -152,11 +152,11 @@ window.CBridgeUtils = {
 
     const response = await this._client.get('/v2/estimateAmt', config);
 
-    console.log(response.data);
     const { data } = response;
     const percFee = BigNumber.from(data.perc_fee);
     const baseFee = BigNumber.from(data.base_fee);
     const amountOut = BigNumber.from(data.estimated_receive_amt);
+
     return {
       id: transactionId,
       transactionFee: percFee.add(baseFee),
@@ -166,16 +166,12 @@ window.CBridgeUtils = {
     };
   },
 
-  async transferStepOne(
-    transactionId,
-    sendingChainId,
-    sendingAssetId,
-    receivingChainId,
-    receivingAssetId,
-    amountBN,
-    receivingAddress,
-    maxSlippage,
-  ) {
+  async transferStepOne(tx, transactionId) {
+    const { sendingChainId, sendingAssetId, receivingChainId, receivingAssetId, amountBN, receivingAddress, estimate } =
+      tx;
+
+    const { maxSlippage } = estimate;
+
     if (!Wallet.isConnected()) {
       console.error('CBridge: Wallet not connected');
       return false;

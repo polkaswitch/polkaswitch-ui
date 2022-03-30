@@ -2,12 +2,7 @@ import _ from 'underscore';
 import * as ethers from 'ethers';
 import BN from 'bignumber.js';
 import { BigNumber, constants, Signer, utils } from 'ethers';
-import {
-  ActiveTransaction,
-  NxtpSdk,
-  NxtpSdkEvents,
-  HistoricalTransaction,
-} from '@connext/nxtp-sdk';
+import { ActiveTransaction, NxtpSdk, NxtpSdkEvents, HistoricalTransaction } from '@connext/nxtp-sdk';
 import {
   AuctionResponse,
   ChainData,
@@ -19,7 +14,6 @@ import {
 } from '@connext/nxtp-utils';
 import EventManager from './events';
 import Wallet from './wallet';
-import TokenListManager from './tokenList';
 
 import swapFn from './swapFn';
 
@@ -124,8 +118,7 @@ window.NxtpUtils = {
       const { amount, expiry, preparedBlockNumber, ...invariant } = data.txData;
 
       const index = this._activeTxs.findIndex(
-        (col) =>
-          col.crosschainTx.invariant.transactionId === invariant.transactionId,
+        (col) => col.crosschainTx.invariant.transactionId === invariant.transactionId,
       );
 
       if (index === -1) {
@@ -274,30 +267,33 @@ window.NxtpUtils = {
   },
 
   getHistoricalTx(transactionId) {
-    return this._historicalTxs.find(
-      (t) => t.crosschainTx.invariant.transactionId === transactionId,
-    );
+    const tx = this._queue[transactionId];
+
+    const nxtpInternalTxID = tx?.bridge?.quote?.data?.bid?.transactionId;
+
+    return this._historicalTxs.find((t) => t.crosschainTx.invariant.transactionId === nxtpInternalTxID);
   },
 
   isActiveTxFinishable(transactionId) {
-    const tx = this.getActiveTx(transactionId);
+    const tx = this._queue[transactionId];
+
+    const nxtpInternalTx = this.getActiveTx(tx?.bridge?.quote?.data?.bid?.transactionId);
 
     if (!tx) {
       return false;
     }
-    return tx.status === NxtpSdkEvents.ReceiverTransactionPrepared;
+
+    return nxtpInternalTx.status === NxtpSdkEvents.ReceiverTransactionPrepared;
   },
 
   isActiveTxFinished(transactionId) {
-    const tx = this.getHistoricalTx(transactionId);
-    console.log('isActiveTxFinished: ', tx);
+    const tx = this._queue[transactionId];
+
     return !!tx;
   },
 
   getActiveTx(transactionId) {
-    return this._activeTxs.find(
-      (t) => t.crosschainTx.invariant.transactionId === transactionId,
-    );
+    return this._activeTxs.find((t) => t.crosschainTx.invariant.transactionId === transactionId);
   },
 
   updateActiveTx(transactionId, status, event, crosschainTx) {
@@ -325,133 +321,13 @@ window.NxtpUtils = {
   },
 
   removeActiveTx(transactionId) {
-    this._activeTxs = this._activeTxs.filter(
-      (t) => t.crosschainTx.invariant.transactionId !== transactionId,
-    );
+    this._activeTxs = this._activeTxs.filter((t) => t.crosschainTx.invariant.transactionId !== transactionId);
   },
 
-  async getEstimate(
-    transactionId,
-    sendingChainId,
-    sendingAssetId,
-    receivingChainId,
-    receivingAssetId,
-    amountBN,
-    receivingAddress,
-  ) {
-    if (!Wallet.isConnected()) {
-      console.error('Nxtp: Wallet not connected');
-      return false;
-    }
+  async transferStepOne(tx, transactionId) {
+    const transferQuote = tx.bridge?.quote?.data;
 
-    if (!this._sdk) {
-      this._sdk = await this.initalizeSdk();
-    }
-
-    const sendingChain = TokenListManager.getNetworkById(sendingChain);
-    const receivingChain = TokenListManager.getNetworkById(receivingChainId);
-    const receivingAsset = TokenListManager.findTokenById(
-      receivingAssetId,
-      receivingChain,
-    );
-    const sendingAsset = TokenListManager.findTokenById(sendingAssetId);
-    const bridgeAsset = TokenListManager.findTokenById(
-      sendingAsset.symbol,
-      receivingChain,
-    );
-
-    // if same token on both chains, don't include callTo or callData
-    if (bridgeAsset.address === receivingAsset.address) {
-      const quote = await this._sdk.getTransferQuote({
-        sendingAssetId,
-        sendingChainId,
-        receivingChainId,
-        receivingAssetId: bridgeAsset.address,
-        receivingAddress,
-        amount: amountBN.toString(),
-        transactionId,
-        expiry: Math.floor(Date.now() / 1000) + 3600 * 24 * 3 // 3 days
-      });
-
-      this._queue[transactionId] = {
-        quote,
-        expectedReturn,
-      };
-
-      return {
-        id: transactionId,
-        hasMinBridgeAmount: true,
-        transactionFee: 0.0, // TODO
-        returnAmount: expectedReturn
-          ? expectedReturn.returnAmount
-          : quote.bid.amountReceived,
-      };
-    }
-
-    let callToAddr; let callData; let expectedReturn;
-    callToAddr = receivingChain.aggregatorAddress;
-    const aggregator = new utils.Interface(window.ABIS.crossChainOneSplitAbi);
-
-    // NXTP has a 0.05% flat fee
-    const o1 = BN(utils.formatUnits(amountBN, sendingAsset.decimals))
-      .times(0.9995)
-      .times(10 ** bridgeAsset.decimals)
-      .toString();
-    const estimatedOutputBN = utils.parseUnits(
-      swapFn.validateEthValue(bridgeAsset, o1),
-      0,
-    );
-
-    expectedReturn = await swapFn.getExpectedReturn(
-      bridgeAsset,
-      receivingAsset,
-      estimatedOutputBN,
-      receivingChainId,
-    );
-
-    const distBN = _.map(expectedReturn.distribution, (e) => window.ethers.utils.parseUnits(`${e}`, 'wei'));
-
-    // TODO missing the options i.e { gasprice, value }
-    callData = aggregator.encodeFunctionData('swap', [
-      bridgeAsset.address,
-      receivingAssetId,
-      estimatedOutputBN,
-      BigNumber.from(0), // TODO: Add MinReturn/Slippage
-      receivingAddress,
-      distBN,
-      0,
-    ]);
-
-    const quote = await this._sdk.getTransferQuote({
-      callData,
-      sendingAssetId,
-      sendingChainId,
-      receivingChainId,
-      receivingAssetId: bridgeAsset.address,
-      receivingAddress,
-      amount: amountBN.toString(),
-      transactionId,
-      expiry: Math.floor(Date.now() / 1000) + 3600 * 24 * 3, // 3 days
-      callTo: callToAddr,
-    });
-
-    this._queue[transactionId] = {
-      quote,
-      expectedReturn,
-    };
-
-    return {
-      id: transactionId,
-      hasMinBridgeAmount: true,
-      transactionFee: 0.0, // TODO
-      returnAmount: expectedReturn
-        ? expectedReturn.returnAmount
-        : quote.bid.amountReceived,
-    };
-  },
-
-  async transferStepOne(transactionId) {
-    const transferQuote = this._queue[transactionId]?.quote;
+    this._queue[transactionId] = tx;
 
     if (!transferQuote) {
       throw new Error('Please request quote first');
@@ -470,10 +346,14 @@ window.NxtpUtils = {
   },
 
   async transferStepTwo(transactionId) {
-    const tx = this.getActiveTx(transactionId);
+    const tx = this._queue[transactionId];
 
-    const { bidSignature, encodedBid, encryptedCallData } = tx;
-    const { receiving, sending, invariant } = tx.crosschainTx;
+    const txId = tx?.bridge?.quote?.data?.bid?.transactionId || transactionId;
+
+    const nxtpInternalTx = this.getActiveTx(txId);
+
+    const { bidSignature, encodedBid, encryptedCallData } = nxtpInternalTx;
+    const { receiving, sending, invariant } = nxtpInternalTx.crosschainTx;
     const variant = receiving ?? sending;
     const sendingTxData = {
       ...invariant,
