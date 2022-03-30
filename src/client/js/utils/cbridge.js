@@ -13,10 +13,7 @@ import Wallet from './wallet';
 import TokenListManager from './tokenList';
 import { abi as BridgeABI } from '../../../contract/celer_contract/Bridge.json';
 
-import {
-  WithdrawReq,
-  WithdrawType,
-} from '../../../contract/celer_contract/factories/ts-proto/sgn/cbridge/v1/tx_pb';
+import { WithdrawReq, WithdrawType } from '../../../contract/celer_contract/factories/ts-proto/sgn/cbridge/v1/tx_pb';
 
 const TokenABI = require('../../../contract/ERC20.json');
 
@@ -41,22 +38,13 @@ window.CBridgeUtils = {
 
   async initializeClient() {
     // Test celer hostname: https://cbridge-v2-test.celer.network
-    const client = (this._client = HttpUtilis.initHttp(
-      'https://cbridge-prod2.celer.network',
-    ));
+    const client = (this._client = HttpUtilis.initHttp('https://cbridge-prod2.celer.network'));
     this._attachClientListeners(client);
     return client;
   },
 
   resetClient() {
     console.log('Celer Bridge grpc client reset');
-
-    if (this._client) {
-      // detach all listeners
-      // TODO
-      // this._sdk.removeAllListeners();
-      // this._sdk.detach();
-    }
 
     this._client = false;
     this._activeTxs = [];
@@ -79,9 +67,7 @@ window.CBridgeUtils = {
 
     const config = await this.getTransferConfig();
     const { chains } = JSON.parse(config);
-    return chains.some(
-      (e) => e.name.toLowerCase() === network.name.toLowerCase(),
-    );
+    return chains.some((e) => e.name.toLowerCase() === network.name.toLowerCase());
   },
 
   async getTransferConfig() {
@@ -94,76 +80,8 @@ window.CBridgeUtils = {
       this._client = await this.initializeClient();
     }
 
-    const transferConfig = await this._client.get(
-      '/v2/getTransferConfigs',
-      null,
-    );
+    const transferConfig = await this._client.get('/v2/getTransferConfigs', null);
     return transferConfig.data;
-  },
-
-  async getEstimate(
-    transactionId,
-    sendingChainId,
-    sendingAssetId,
-    receivingChainId,
-    receivingAssetId,
-    amountBN,
-    receivingAddress,
-  ) {
-    if (!Wallet.isConnected()) {
-      console.error('cbridge: Wallet not connected');
-      return false;
-    }
-
-    const sendingAsset = TokenListManager.findTokenById(sendingAssetId);
-
-    const minAmountAllowed = window.ethers.utils.parseUnits(
-      '21.0',
-      sendingAsset.decimals,
-    );
-
-    const hasMinBridgeAmount = amountBN.gt(minAmountAllowed);
-
-    if (!this._client) {
-      this._client = await this.initializeClient();
-    }
-
-    const receivingAsset = TokenListManager.findTokenById(
-      receivingAssetId,
-      receivingChainId,
-    );
-
-    const bridgeAsset = TokenListManager.findTokenById(
-      sendingAssetId,
-      receivingChainId,
-    );
-    const slippage = 500; // convert percent to int eg: 0.05% = 500; 0.1 = 1000
-
-    const config = {
-      params: {
-        src_chain_id: sendingChainId,
-        dst_chain_id: receivingChainId,
-        token_symbol: sendingAsset.symbol,
-        amt: amountBN.toString(),
-        usr_addr: Wallet.currentAddress(),
-        slippage_tolerance: slippage,
-      },
-    };
-
-    const response = await this._client.get('/v2/estimateAmt', config);
-
-    const { data } = response;
-    const percFee = BigNumber.from(data.perc_fee);
-    const baseFee = BigNumber.from(data.base_fee);
-    const amountOut = BigNumber.from(data.estimated_receive_amt);
-
-    return {
-      id: transactionId,
-      transactionFee: percFee.add(baseFee),
-      returnAmount: amountOut,
-      maxSlippage: data.max_slippage,
-      hasMinBridgeAmount,
-    };
   },
 
   async transferStepOne(tx, transactionId) {
@@ -187,26 +105,18 @@ window.CBridgeUtils = {
     const signer = Wallet.getProvider().getSigner();
 
     const tokenContract = new Contract(sendingAsset.address, TokenABI, signer);
-    const bridgeContractAddr = await this.findBridgeContractAddress(
-      sendingChainId,
-    );
+    const bridgeContractAddr = await this.findBridgeContractAddress(sendingChainId);
 
     console.debug('CBridge: start approving token');
     // STEP 1.1: Approve token
     const ownerAddress = await signer.getAddress();
 
-    const allowance = await tokenContract.allowance(
-      ownerAddress,
-      bridgeContractAddr,
-    );
+    const allowance = await tokenContract.allowance(ownerAddress, bridgeContractAddr);
 
     let approveTx;
 
     if (allowance.lt(amountBN)) {
-      approveTx = await tokenContract.approve(
-        bridgeContractAddr,
-        amountToApprove,
-      );
+      approveTx = await tokenContract.approve(bridgeContractAddr, amountToApprove);
     }
 
     console.log('Cbridge Approved TX: ', approveTx);
@@ -215,26 +125,11 @@ window.CBridgeUtils = {
 
     const nonce = Date.now();
 
-    await bridgeContract.send(
-      ownerAddress,
-      sendingAsset.address,
-      amountBN,
-      receivingChainId,
-      nonce,
-      maxSlippage,
-    );
+    await bridgeContract.send(ownerAddress, sendingAsset.address, amountBN, receivingChainId, nonce, maxSlippage);
 
     // ethereum generation hash with cBridge on-chain send tx params
     const transfer_id = window.ethers.utils.solidityKeccak256(
-      [
-        'address',
-        'address',
-        'address',
-        'uint256',
-        'uint64',
-        'uint64',
-        'uint64',
-      ],
+      ['address', 'address', 'address', 'uint256', 'uint64', 'uint64', 'uint64'],
       [
         Wallet.currentAddress(), /// User's wallet address,
         Wallet.currentAddress(), /// User's wallet address,
@@ -279,10 +174,7 @@ window.CBridgeUtils = {
   async findBridgeContractAddress(sendingChainId) {
     const transferConfig = await this.getTransferConfig();
     const chainInfos = transferConfig.chains;
-    const chainInfo = _.find(
-      chainInfos,
-      (c) => c.id === parseInt(sendingChainId),
-    );
+    const chainInfo = _.find(chainInfos, (c) => c.id === parseInt(sendingChainId));
     if (!chainInfo) {
       console.error('WARN: Cannot find celer bridge contract address');
     }
@@ -296,9 +188,7 @@ window.CBridgeUtils = {
     const withdrawReqProto = new WithdrawReq();
     withdrawReqProto.setReqId(nonce);
     withdrawReqProto.setXferId(transferId);
-    withdrawReqProto.setWithdrawType(
-      WithdrawType.WITHDRAW_TYPE_REFUND_TRANSFER,
-    );
+    withdrawReqProto.setWithdrawType(WithdrawType.WITHDRAW_TYPE_REFUND_TRANSFER);
 
     const bytes = await this.signForWithdrawTx(withdrawReqProto);
 
@@ -315,10 +205,7 @@ window.CBridgeUtils = {
       return false;
     }
 
-    this.cbridgePolling = window.setInterval(
-      () => this.handleCbridgeEventToRefund(transferId, sendingChainId),
-      40000,
-    );
+    this.cbridgePolling = window.setInterval(() => this.handleCbridgeEventToRefund(transferId, sendingChainId), 40000);
   },
 
   async signForWithdrawTx(withdrawReqProto) {
@@ -327,9 +214,7 @@ window.CBridgeUtils = {
     let sig;
     try {
       sig = await signer.signMessage(
-        window.ethers.utils.arrayify(
-          window.ethers.utils.keccak256(withdrawReqProto.serializeBinary()),
-        ),
+        window.ethers.utils.arrayify(window.ethers.utils.keccak256(withdrawReqProto.serializeBinary())),
       );
     } catch (error) {
       console.log(error);
@@ -347,13 +232,7 @@ window.CBridgeUtils = {
       transfer_id: transferId,
     });
 
-    const {
-      powers: _powers,
-      signers: _signers,
-      sorted_sigs,
-      wd_onchain,
-      status,
-    } = currentStatusResp.data;
+    const { powers: _powers, signers: _signers, sorted_sigs, wd_onchain, status } = currentStatusResp.data;
 
     const wdmsg = base64.decode(wd_onchain);
 
@@ -372,23 +251,11 @@ window.CBridgeUtils = {
     });
 
     if (status === 8) {
-      const bridgeContractAddr = await this.findBridgeContractAddress(
-        sendingChainId,
-      );
+      const bridgeContractAddr = await this.findBridgeContractAddress(sendingChainId);
 
-      const bridgeContract = new Contract(
-        bridgeContractAddr,
-        BridgeABI,
-        Wallet.getProvider().getSigner(),
-      );
+      const bridgeContract = new Contract(bridgeContractAddr, BridgeABI, Wallet.getProvider().getSigner());
 
-      const txWithdrawOnChain = await bridgeContract.withdraw(
-        wdmsg,
-        sigs,
-        signers,
-        powers,
-      );
-
+      const txWithdrawOnChain = await bridgeContract.withdraw(wdmsg, sigs, signers, powers);
 
       this.stopPollingCbridge();
 

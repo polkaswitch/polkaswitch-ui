@@ -9,7 +9,7 @@ import * as Sentry from '@sentry/react';
 import TokenIconBalanceGroupView from '../TokenIconBalanceGroupView';
 import NetworkDropdown from '../NetworkDropdown';
 import Wallet from '../../../utils/wallet';
-import Metrics from '../../../utils/metrics';
+import TokenListManager from '../../../utils/tokenList';
 import EventManager from '../../../utils/events';
 import SwapFn from '../../../utils/swapFn';
 import AvailableRoutes from './AvailableRoutes';
@@ -42,14 +42,10 @@ export default class BridgeOrderSlide extends Component {
 
   componentDidUpdate(prevProps) {
     if (
-      (this.props.from &&
-        this.props.to &&
-        prevProps.from &&
-        this.props.from.address !== prevProps.from.address) ||
+      (this.props.from && this.props.to && prevProps.from && this.props.from.address !== prevProps.from.address) ||
       this.props.to.address !== prevProps.to.address ||
       this.props.refresh !== prevProps.refresh ||
-      (this.props.fromAmount !== prevProps.fromAmount &&
-        !this.state.calculatingSwap)
+      (this.props.fromAmount !== prevProps.fromAmount && !this.state.calculatingSwap)
     ) {
       if (this.props.fromAmount) {
         this.fetchSwapEstimate(this.props.fromAmount);
@@ -73,11 +69,7 @@ export default class BridgeOrderSlide extends Component {
       return;
     }
 
-    this.props.onSwapEstimateComplete(
-      origFromAmount,
-      this.props.toAmount,
-      this.props.swapDistribution,
-    );
+    this.props.onSwapEstimateComplete(origFromAmount, this.props.toAmount, this.props.swapDistribution);
 
     if (!fromAmount || fromAmount.length === 0) {
       fromAmount = '0';
@@ -98,10 +90,7 @@ export default class BridgeOrderSlide extends Component {
         calculatingSwap: true,
       },
       function (_timeNow, _attempt, _cb) {
-        const fromAmountBN = window.ethers.utils.parseUnits(
-          fromAmount,
-          this.props.from.decimals,
-        );
+        const fromAmountBN = window.ethers.utils.parseUnits(fromAmount, this.props.from.decimals);
 
         // add delay to slow down UI snappiness
         _.delay(
@@ -109,13 +98,7 @@ export default class BridgeOrderSlide extends Component {
             if (this.calculatingSwapTimestamp !== _timeNow2) {
               return;
             }
-            this.fetchCrossChainEstimate(
-              origFromAmount,
-              fromAmountBN,
-              _timeNow2,
-              _attempt2,
-              _cb2,
-            );
+            this.fetchCrossChainEstimate(origFromAmount, fromAmountBN, _timeNow2, _attempt2, _cb2);
           },
           500,
           _timeNow,
@@ -126,18 +109,10 @@ export default class BridgeOrderSlide extends Component {
     );
   }
 
-  fetchCrossChainEstimate(
-    origFromAmount,
-    fromAmountBN,
-    _timeNow2,
-    _attempt2,
-    _cb2,
-  ) {
+  async fetchCrossChainEstimate(origFromAmount, fromAmountBN, _timeNow2, _attempt2, _cb2) {
     if (!Wallet.isConnected()) {
       // not supported in cross-chain mode
-      console.error(
-        'SwapOrderSlide: Wallet not connected, skipping crossChainEstimate',
-      );
+      console.error('SwapOrderSlide: Wallet not connected, skipping crossChainEstimate');
 
       this.setState({
         calculatingSwap: false,
@@ -238,12 +213,7 @@ export default class BridgeOrderSlide extends Component {
   }
 
   hasSufficientBalance() {
-    if (
-      Wallet.isConnected() &&
-      this.props.availableBalance &&
-      this.props.fromAmount &&
-      this.props.from
-    ) {
+    if (Wallet.isConnected() && this.props.availableBalance && this.props.fromAmount && this.props.from) {
       const balBN = BN(this.props.availableBalance);
       const fromBN = BN(this.props.fromAmount);
       return fromBN.lte(balBN);
@@ -287,9 +257,7 @@ export default class BridgeOrderSlide extends Component {
         .then((bal) => {
           _.defer(() => {
             // balance is in WEI and is a BigNumber
-            this.fetchSwapEstimate(
-              window.ethers.utils.formatUnits(bal, this.props.from.decimals),
-            );
+            this.fetchSwapEstimate(window.ethers.utils.formatUnits(bal, this.props.from.decimals));
           });
         })
         .catch((e) => {
@@ -407,10 +375,7 @@ export default class BridgeOrderSlide extends Component {
               <b className="widget-title">Bridge Assets</b>
             </div>
             <div className="level-item level-right">
-              <span
-                className="icon clickable settings-icon"
-                onClick={this.props.handleSettingsToggle}
-              >
+              <span className="icon clickable settings-icon" onClick={this.props.handleSettingsToggle}>
                 <img src="/images/bridge_setting_white.svg" />
               </span>
             </div>
@@ -428,10 +393,7 @@ export default class BridgeOrderSlide extends Component {
               <ion-icon name="swap-vertical-outline" />
             </div>
 
-            <div
-              className="bridge-icon is-hidden"
-              onClick={this.handleTokenSwap}
-            >
+            <div className="bridge-icon is-hidden" onClick={this.handleTokenSwap}>
               <i className="fas fa-long-arrow-alt-up" />
               <i className="fas fa-long-arrow-alt-down" />
             </div>

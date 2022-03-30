@@ -24,16 +24,11 @@ export default class CrossSwapProcessSlide extends Component {
   }
 
   componentDidMount() {
-    this.subNxtpUpdated = EventManager.listenFor(
-      'nxtpEventUpdated',
-      this.handleNxtpEvent.bind(this),
-    );
+    this.subNxtpUpdated = EventManager.listenFor('nxtpEventUpdated', this.handleNxtpEvent.bind(this));
   }
 
   componentDidUpdate(prevProps) {
-    if (
-      prevProps.crossChainTransactionId !== this.props.crossChainTransactionId
-    ) {
+    if (prevProps.crossChainTransactionId !== this.props.crossChainTransactionId) {
       this.setState({
         loading: false,
         finishable: false,
@@ -64,10 +59,7 @@ export default class CrossSwapProcessSlide extends Component {
       return;
     }
 
-    TxBridgeManager.transferStepTwo(
-      this.props.crossChainTransactionId,
-      transferId,
-    ).then((resp) => {
+    TxBridgeManager.transferStepTwo(this.props.crossChainTransactionId, transferId).then((resp) => {
       console.log('cBridge getTransferStatus polling', resp);
 
       const { data } = resp;
@@ -107,25 +99,13 @@ export default class CrossSwapProcessSlide extends Component {
       return;
     }
 
-    if (
-      status !== NxtpSdkEvents.ReceiverTransactionPrepared &&
-      status !== NxtpSdkEvents.ReceiverTransactionFulfilled
-    ) {
+    if (status !== NxtpSdkEvents.ReceiverTransactionPrepared && status !== NxtpSdkEvents.ReceiverTransactionFulfilled) {
       return;
     }
 
-    if (
-      this.state.finishable &&
-      Nxtp.isActiveTxFinished(this.props.crossChainTransactionId)
-    ) {
-      this.completeProcess(
-        Nxtp.getHistoricalTx(this.props.crossChainTransactionId)
-          .fulfilledTxHash,
-      );
-    } else if (
-      !this.state.finishable &&
-      Nxtp.isActiveTxFinishable(this.props.crossChainTransactionId)
-    ) {
+    if (this.state.finishable && Nxtp.isActiveTxFinished(this.props.crossChainTransactionId)) {
+      this.completeProcess(Nxtp.getHistoricalTx(this.props.crossChainTransactionId).fulfilledTxHash);
+    } else if (!this.state.finishable && Nxtp.isActiveTxFinishable(this.props.crossChainTransactionId)) {
       this.setState({
         loading: false,
         finishable: true,
@@ -149,16 +129,9 @@ export default class CrossSwapProcessSlide extends Component {
               fromAmont: this.props.fromAmount,
             });
 
-            if (
-              TxBridgeManager.twoStepTransferRequired(
-                this.props.crossChainTransactionId,
-              )
-            ) {
+            if (TxBridgeManager.twoStepTransferRequired(this.props.crossChainTransactionId)) {
               if (data.cbridge) {
-                this.cbridgePolling = window.setInterval(
-                  () => this.handleCbridgeEvent(data.transferId),
-                  60000,
-                );
+                this.cbridgePolling = window.setInterval(() => this.handleCbridgeEvent(data.transferId), 60000);
               }
               // do nothing.
               // Waiting for events to indicate ready for Step2
@@ -212,10 +185,6 @@ export default class CrossSwapProcessSlide extends Component {
     );
   }
 
-  displayValue(amount) {
-    return BN(BN(amount).toPrecision(18)).toString();
-  }
-
   hasSufficientBalance() {
     if (this.props.availableBalance) {
       const balBN = BN(this.props.availableBalance);
@@ -251,16 +220,11 @@ export default class CrossSwapProcessSlide extends Component {
           <div className="level-right">
             <div className="level-item">
               <div>
-                <div className="currency-text">
-                  {this.displayValue(this.props.from, this.props.fromAmount)}
-                </div>
+                <div className="currency-text">{this.props?.fromAmount}</div>
                 <div
-                  className={classnames(
-                    'fund-warning has-text-danger has-text-right',
-                    {
-                      'is-hidden': this.hasSufficientBalance(),
-                    },
-                  )}
+                  className={classnames('fund-warning has-text-danger has-text-right', {
+                    'is-hidden': this.hasSufficientBalance(),
+                  })}
                 >
                   <span className="icon">
                     <ion-icon name="warning-outline" />
@@ -308,9 +272,7 @@ export default class CrossSwapProcessSlide extends Component {
         <div className="icon">
           <ion-icon name="hourglass-outline" />
         </div>
-        <div className="title">
-          {this.state.finishable ? 'Finalizing Transfer' : 'Starting Transfer'}
-        </div>
+        <div className="title">{this.state.finishable ? 'Finalizing Transfer' : 'Starting Transfer'}</div>
         <div className="details">
           <div>
             {this.state.finishable
@@ -346,10 +308,7 @@ export default class CrossSwapProcessSlide extends Component {
             <div className="level-left">
               <div className="level-item">
                 <div className="level-item">
-                  <span
-                    className="icon ion-icon clickable"
-                    onClick={this.handleBack}
-                  >
+                  <span className="icon ion-icon clickable" onClick={this.handleBack}>
                     <ion-icon name="arrow-back-outline" />
                   </span>
                 </div>
@@ -367,16 +326,11 @@ export default class CrossSwapProcessSlide extends Component {
           <div>
             <button
               type="button"
-              className={classnames(
-                'button is-primary is-fullwidth is-medium',
-                {
-                  'is-loading': this.state.loading,
-                },
-              )}
+              className={classnames('button is-primary is-fullwidth is-medium', {
+                'is-loading': this.state.loading,
+              })}
               disabled={!this.allowSwap()}
-              onClick={
-                this.state.finishable ? this.handleFinish : this.handleTransfer
-              }
+              onClick={this.state.finishable ? this.handleFinish : this.handleTransfer}
             >
               {this.state.finishable ? 'Finish Transfer' : 'Start Transfer'}
             </button>
