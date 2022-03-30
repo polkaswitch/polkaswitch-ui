@@ -137,21 +137,32 @@ export default class BridgeOrderSlide extends Component {
     //keep
     Wallet.getBalance(this.props.from)
       .then((bal) => {
+        // temp hard check nxtp or cbridge until integrate the whole process
+        // after make available all the bridges use the values from the first index result to format
+
+        const tempPreSelectedBridge = successfullEstimatesNew.find(
+          (item) => item.bridge.route[0].bridge === 'nxtp' || item.bridge.route[0].bridge === 'cbridge',
+        );
+
+        //delete tempPreSelectedBridge after integration
+
+        const { estimatedReturnAmountDeductedByFees } =
+          Wallet.returnEstimatedReturnAmountDeductedByFees(tempPreSelectedBridge);
+
         this.props.onSwapEstimateComplete(
           origFromAmount,
           window.ethers.utils.formatUnits(
-            successfullEstimatesNew[0].estimate?.returnAmount ?? constants.Zero,
+            tempPreSelectedBridge.estimate?.returnAmount ?? constants.Zero,
             this.props.to.decimals,
           ),
           false,
           window.ethers.utils.formatUnits(bal, this.props.from.decimals),
         );
 
-        const { estimatedReturnAmountDeductedByFees } = Wallet.returnEstimatedReturnAmountDeductedByFees(
-          successfullEstimatesNew[0],
+        this.props.onCrossChainEstimateComplete(
+          tempPreSelectedBridge.estimate?.id,
+          estimatedReturnAmountDeductedByFees.toFixed(6),
         );
-
-        this.props.onCrossChainEstimateComplete(true, estimatedReturnAmountDeductedByFees.toFixed(6));
 
         this.setState(
           {
