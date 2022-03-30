@@ -212,7 +212,7 @@ export default class CrossSwapProcessSlide extends Component {
     );
   }
 
-  displayValue(token, amount) {
+  displayValue(amount) {
     return BN(BN(amount).toPrecision(18)).toString();
   }
 
@@ -292,9 +292,7 @@ export default class CrossSwapProcessSlide extends Component {
 
           <div className="level-right">
             <div className="level-item">
-              <div className="currency-text">
-                {this.displayValue(this.props.to, this.props.toAmount)}
-              </div>
+              <div className="currency-text">{this.props?.toAmount}</div>
             </div>
           </div>
         </div>

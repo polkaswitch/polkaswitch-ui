@@ -27,17 +27,6 @@ export default class BridgeWidget extends Component {
       (v) => v.enabled && v.crossChainSupported,
     );
 
-    /*
-    // Move ETH to last, it has too high of fees
-    this.CROSS_CHAIN_NETWORKS.push(
-      this.CROSS_CHAIN_NETWORKS.splice(
-        _.findIndex(this.CROSS_CHAIN_NETWORKS, (v) => {
-          return +v.chainId === 1;
-        }),
-        1
-      )[0]
-    );
-    */
     const localStorageBridgeConfig = GlobalStateManager.bridge;
 
     const { from, to, fromChain, toChain } = localStorageBridgeConfig;
@@ -183,9 +172,10 @@ export default class BridgeWidget extends Component {
     this.box.current.style.height = `${node.offsetHeight}px`;
   }
 
-  onCrossChainEstimateComplete(transactionId) {
+  onCrossChainEstimateComplete(transactionId, toAmount) {
     this.setState({
       crossChainTransactionId: transactionId,
+      toAmount,
     });
   }
 
