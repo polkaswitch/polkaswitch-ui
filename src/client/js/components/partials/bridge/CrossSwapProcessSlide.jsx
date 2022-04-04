@@ -180,7 +180,8 @@ export default class CrossSwapProcessSlide extends Component {
             this.setState({
               loading: false,
             });
-          });
+          })
+          .finally(() => this.props.handleFinishedResult(true));
       },
     );
   }

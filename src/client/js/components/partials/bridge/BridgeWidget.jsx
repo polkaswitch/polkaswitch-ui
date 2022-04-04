@@ -46,6 +46,7 @@ export default class BridgeWidget extends Component {
       showConfirm: false,
       showSearch: false,
       showResults: false,
+      finished: false,
       loading: false,
       transactionHash: '',
       crossChainTransactionId: false,
@@ -65,6 +66,7 @@ export default class BridgeWidget extends Component {
     this.updateBoxHeight = _.debounce(this.updateBoxHeight.bind(this), 20);
     this.handleWalletChange = this.handleWalletChange.bind(this);
     this.handleNetworkChange = this.handleNetworkChange.bind(this);
+    this.handleFinishedResult = this.handleFinishedResult.bind(this);
     this.handleNetworkPreUpdate = this.handleNetworkPreUpdate.bind(this);
     this.onCrossChainEstimateComplete =
       this.onCrossChainEstimateComplete.bind(this);
@@ -367,6 +369,7 @@ export default class BridgeWidget extends Component {
     this.setState({
       showConfirm: false,
       showResults: false,
+      finished: false,
       toAmount: '',
       fromAmount: '',
       swapDistribution: undefined,
@@ -411,6 +414,12 @@ export default class BridgeWidget extends Component {
         from: this.state.from,
         to: this.state.to,
       });
+    });
+  }
+
+  handleFinishedResult(finished) {
+    this.setState({
+      finished,
     });
   }
 
@@ -489,19 +498,16 @@ export default class BridgeWidget extends Component {
           />
         </CSSTransition>
         <CSSTransition
-          in={this.state.showConfirm || this.state.showResults}
+          in={this.state.showConfirm}
           timeout={animTiming}
           onEntering={this.triggerHeightResize}
           classNames="slidein"
         >
-          <CSSTransition
-            in={!this.state.showResults}
-            timeout={animTiming}
-            classNames="fade"
-          >
+          <CSSTransition in={!this.state.showResults && !this.state.finished} timeout={animTiming} classNames="fade">
             <CrossSwapProcessSlide
               to={this.state.to}
               from={this.state.from}
+              handleFinishedResult={this.handleFinishedResult}
               fromChain={this.state.fromChain}
               toChain={this.state.toChain}
               fromAmount={this.state.fromAmount}
