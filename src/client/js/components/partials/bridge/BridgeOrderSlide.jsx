@@ -49,6 +49,10 @@ export default class BridgeOrderSlide extends Component {
     ) {
       if (this.props.fromAmount) {
         this.fetchSwapEstimate(this.props.fromAmount);
+      } else {
+        this.setState({
+          showRoutes: false,
+        });
       }
     }
   }
@@ -141,7 +145,7 @@ export default class BridgeOrderSlide extends Component {
         // after make available all the bridges use the values from the first index result to format
 
         const tempPreSelectedBridge = successfullEstimatesNew.find(
-          (item) => item.bridge.route[0].bridge === 'nxtp' || item.bridge.route[0].bridge === 'cbridge',
+          (item) => item.bridge.route[0].bridge === 'nxtp' || item.bridge.route[0].bridge === 'celer',
         );
 
         //delete tempPreSelectedBridge after integration

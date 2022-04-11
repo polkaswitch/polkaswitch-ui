@@ -36,7 +36,7 @@ export default {
     if (bridgeOption === 'hop') {
       return HopUtils;
     }
-    if (bridgeOption === 'cbridge') {
+    if (bridgeOption === 'celer') {
       return CBridgeUtils;
     }
     return Nxtp;
@@ -82,7 +82,7 @@ export default {
           id: `${generatedTransactionId}`,
           transactionFee: route.quote?.destinationTxFee,
           returnAmount: route.quote?.amount,
-          maxSlippage: 7497 /*check out this value afterwards*/,
+          maxSlippage: route.route[0].maxSlippage || 7497 /*check out this value afterwards*/,
         },
         receivingAddress: fromUserAddress,
         receivingAssetId: toToken.address,
@@ -111,8 +111,8 @@ export default {
     const bridgeInterface = this.getBridgeInterface(transactionId);
     const tx = this.getTx(transactionId);
 
-    if (tx.bridge?.route[0]?.bridge === 'cbridge') {
-      return bridgeInterface.transferStepTwo(tx, txBridgeInternalId);
+    if (tx.bridge?.route[0]?.bridge === 'celer') {
+      return bridgeInterface.transferStepTwo(txBridgeInternalId);
     }
 
     return bridgeInterface.transferStepTwo(transactionId);
@@ -127,7 +127,7 @@ export default {
 
     const bridgeName = tx.bridge?.route[0]?.bridge;
 
-    return bridgeName === 'nxtp' || bridgeName === 'cbridge';
+    return bridgeName === 'nxtp' || bridgeName === 'celer';
   },
 
   getTx(nonce) {

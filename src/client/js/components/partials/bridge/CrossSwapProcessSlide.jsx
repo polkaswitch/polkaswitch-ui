@@ -75,6 +75,8 @@ export default class CrossSwapProcessSlide extends Component {
 
         this.completeProcess(dstChainTxHash[1]);
 
+        this.props.handleFinishedResult(true);
+
         this.stopPollingCbridge();
       }
 

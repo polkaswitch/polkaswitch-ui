@@ -64,7 +64,7 @@ export default function AvailableRoutes(props) {
   return (
     <div
       className={classnames('available-routes-wrapper control', {
-        'is-hidden': !props.showRoutes,
+        'is-hidden': !props.showRoutes && !props.fromAmount,
       })}
       aria-label="Available routes for the swap"
     >
@@ -88,7 +88,7 @@ export default function AvailableRoutes(props) {
         </div>
       </div>
       {routes
-        ?.filter((item) => item.bridgeType === 'nxtp' || item.bridgeType === 'cbridge')
+        ?.filter((item) => item.bridgeType === 'nxtp' || item.bridgeType === 'celer')
         .map((item, i) => (
           <RouteItemWrapper handleChange={props.handleChange} key={i} data={item} index={i} />
         ))}

@@ -370,8 +370,8 @@ export default class BridgeWidget extends Component {
       showConfirm: false,
       showResults: false,
       finished: false,
-      toAmount: '',
-      fromAmount: '',
+      toAmount: undefined,
+      fromAmount: undefined,
       swapDistribution: undefined,
       refresh: Date.now(), // refresh Balances
     });
@@ -420,6 +420,8 @@ export default class BridgeWidget extends Component {
   handleFinishedResult(finished) {
     this.setState({
       finished,
+      fromAmount: undefined,
+      toAmount: undefined,
     });
   }
 
