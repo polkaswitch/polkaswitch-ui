@@ -378,7 +378,9 @@ window.WalletJS = {
     return new Promise(
       async function (resolve, reject) {
         let network = TokenListManager.getCurrentNetworkConfig();
-
+        if (network.name == 'Solana') {
+          return;
+        }
         const requestAccount = function () {
           _.delay(
             function () {

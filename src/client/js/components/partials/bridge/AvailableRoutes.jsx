@@ -2,10 +2,9 @@ import React from 'react';
 import classnames from 'classnames';
 import Wallet from '../../../utils/wallet';
 import RouteItemWrapper from './RouteItemWrapper';
-
+import {ALLOWED_BRIDGES} from '../../../constants'
 export default function AvailableRoutes(props) {
   const GENERIC_SUPPORTED_BRIDGE_TOKENS = ['USDC', 'USDT', 'DAI'];
-
   const routes = props.routes.map((v, i) => {
     let route = [];
 
@@ -88,7 +87,7 @@ export default function AvailableRoutes(props) {
         </div>
       </div>
       {routes
-        ?.filter((item) => item.bridgeType === 'celer' || item.bridgeType === 'nxtp' || item.bridgeType === 'anyswap')
+        ?.filter((item) => ALLOWED_BRIDGES.includes(item.bridgeType))
         .map((item, i) => (
           <RouteItemWrapper handleChange={props.handleChange} key={i} data={item} index={i} />
         ))}

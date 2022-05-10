@@ -14,7 +14,8 @@ import SwapFn from '../../../utils/swapFn';
 import AvailableRoutes from './AvailableRoutes';
 
 import TxBridgeManager from '../../../utils/txBridgeManager';
-
+import {ALLOWED_BRIDGES} from '../../../constants'
+import SolWallet from '../../../utils/solanaWallet'
 const BridgeOrderSlide = (props) => {
   const [calculatingSwap, setCalculatingSwap] = useState(false);
   const [callDebounce, setCallDebounce] = useState(false);
@@ -49,9 +50,11 @@ const BridgeOrderSlide = (props) => {
   const fetchCrossChainEstimate = async (props) => {
     const origFromAmount = props.fromAmount;
 
-    const fromAmountBN = window.ethers.utils.parseUnits(props.fromAmount, props.from.decimals);
+    const fromAmountBN = window.ethers.utils.parseUnits(origFromAmount?? '0', props.from.decimals);
 
-    if (!Wallet.isConnected()) {
+    const { to, toChain, from, fromChain } = props;
+
+    if ( ([fromChain.name, toChain.name].includes('Solana') && !SolWallet.isConnected()) || !Wallet.isConnected()) {
       // not supported in cross-chain mode
       console.error('SwapOrderSlide: Wallet not connected, skipping crossChainEstimate');
 
@@ -62,27 +65,23 @@ const BridgeOrderSlide = (props) => {
       return false;
     }
 
-    const { to, toChain, from, fromChain } = props;
 
     const successfullEstimatesNew = await TxBridgeManager.buildNewAllEstimates({
       to,
       toChain,
       from,
       fromChain,
-      fromUserAddress: Wallet.currentAddress(),
+      fromUserAddress: fromChain.name == 'Solana' ? SolWallet.getWalletAddress() : Wallet.currentAddress(),
       fromAmountBN,
     });
-
+    console.log(successfullEstimatesNew);
     Wallet.getBalance(props.from)
       .then((bal) => {
         // temp hard check nxtp or cbridge until integrate the whole process
         // after make available all the bridges use the values from the first index result to format
 
         const tempPreSelectedBridge = successfullEstimatesNew.filter(
-          (item) =>
-            item.bridge.route[0].bridge === 'nxtp' ||
-            item.bridge.route[0].bridge === 'celer' ||
-            item.bridge.route[0].bridge === 'anyswap',
+          (item) => ALLOWED_BRIDGES.includes(item.bridge.route[0].bridge)
         );
 
         //delete tempPreSelectedBridge after integration

@@ -42,6 +42,46 @@
   },
   {
     "enabled": true,
+    "name": "Solana",
+    "aggregatorAddress": "0x689236A0C4A391FdD76dE5c6a759C7984166d166",
+    "logoURI": "https://cdn.jsdelivr.net/gh/trustwallet/assets@master/blockchains/solana/info/logo.png",
+    "bridgeURI": "https://portalbridge.com/",
+    "tokenList": "/tokens/sol.list.json",
+    "chainId": "0",
+    "nodeProviders": [
+      "https://solana-api.projectserum.com"
+    ],
+    "explorerBaseUrl": "https://solscan.io/tx/",
+    "gasApi": "https://ethgasstation.info/json/ethgasAPI.json",
+    "color": "#5C69B5",
+    "desiredParts": 3,
+    "abi": "oneSplitAbi",
+    "chain": {
+      "chainId": "0x0",
+      "chainName": "Solana"
+    },
+    "defaultPair": {
+      "to": "SOL",
+      "from": "USDC"
+    },
+    "topTokens": [
+      "SOL",
+      "USDT",
+      "USDC"
+    ],
+    "coingecko": {
+      "platform": "solana"
+    },
+    "singleChainSupported": true,
+    "crossChainSupported": true,
+    "supportedCrossChainTokens": [
+      "SOL",
+      "USDT",
+      "USDC"
+    ]
+  },
+  {
+    "enabled": true,
     "name": "Ropsten",
     "aggregatorAddress": "0x689236A0C4A391FdD76dE5c6a759C7984166d166",
     "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png",

@@ -6,6 +6,9 @@ import BridgeButton from '../BridgeButton';
 import Settings from '../Settings';
 
 export default class Navbar extends Component {
+  constructor(props) {
+    super(props);
+  }
   render() {
     return (
       <nav id="nav" className="level is-mobile">

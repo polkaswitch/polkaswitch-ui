@@ -2,6 +2,7 @@ import _ from 'underscore';
 import EventManager from './events';
 import * as ethers from 'ethers';
 import Storage from './storage';
+import {SOLANA_CHAIN_ID, isSolananAddress} from './solanaWallet';
 
 let store = require('store');
 const Utils = ethers.utils;
@@ -22,12 +23,13 @@ window.TokenListManager = {
       }).then((tokenList) => {
         tokenList = _.map(
           _.filter(tokenList, function (v) {
-            return v.native || (v.symbol && Utils.isAddress(v.address));
+            return (v.chainId != SOLANA_CHAIN_ID && (v.native || (v.symbol && Utils.isAddress(v.address)))) || 
+                  (v.chainId == SOLANA_CHAIN_ID && isSolananAddress(v.address));
           }),
           function (v) {
-            if (v.address) {
+            if (v.address && v.chainId != SOLANA_CHAIN_ID)
               v.address = Utils.getAddress(v.address);
-            }
+
             return v;
           },
         );
