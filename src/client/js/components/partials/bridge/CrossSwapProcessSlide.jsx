@@ -66,7 +66,7 @@ export default class CrossSwapProcessSlide extends Component {
   async handlePollingEvent(data, bridge) {
     const getStatusTransfer = await TxBridgeManager.getTransferStatus({
       id: data,
-      userAddress: Wallet.currentAddress(),
+      userAddress: TxBridgeManager.walletAddress(this.props.fromChain.name),
       toChain: this.props.toChain.name,
       fromChain: this.props.fromChain.name,
       to: this.props.to,
@@ -131,7 +131,8 @@ export default class CrossSwapProcessSlide extends Component {
             toChain: this.props.toChain.name,
             to: this.props.to,
             fromAmount: this.props.fromAmount,
-            fromAddress: Wallet.currentAddress(),
+            fromAddress: TxBridgeManager.walletAddress(this.props.fromChain.name),
+            toAddress: TxBridgeManager.walletAddress(this.props.toChain.name),
             route,
           });
 
@@ -182,7 +183,7 @@ export default class CrossSwapProcessSlide extends Component {
           const { claimTokensResp } = await TxBridgeManager.claimTokens({
             fromChain: { slug: fromChainSlug, chainId: this.props.fromChain.chainId },
             toChain: { slug: toChainSlug, chainId: this.props.toChain.chainId },
-            userAddress: Wallet.currentAddress(),
+            userAddress: TxBridgeManager.walletAddress(toChainSlug),
             txId,
             relayerFee,
             useNativeTokenToClaim,
@@ -311,7 +312,7 @@ export default class CrossSwapProcessSlide extends Component {
     const bridge = selectedTx?.bridge?.route[0].bridge || 'celer';
 
     const approvedToken = await TxBridgeManager.approveToken({
-      fromAddress: Wallet.currentAddress(),
+      fromAddress: TxBridgeManager.currentAddress(this.props.fromChain.name),
       fromChain: this.props.fromChain.name,
       from: this.props.from,
       toChain: this.props.toChain.name,

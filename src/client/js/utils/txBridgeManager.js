@@ -8,7 +8,8 @@ import CBridgeUtils from './cbridge';
 import Nxtp from './nxtp';
 import Storage from './storage';
 import { baseUrl, chainNameHandler, encodeQueryString } from './requests/utils';
-
+import SolWallet from './solanaWallet';
+import Wallet from './wallet';
 const BRIDGES = ['hop', 'cbridge', 'connext'];
 
 const SUPPORTED_BRIDGE_TOKENS = [
@@ -26,6 +27,14 @@ export default {
   _activeTxHistory: [],
 
   async initialize() {},
+
+  walletAddress(chainName) {
+    const chainSlug = chainNameHandler(chainName);
+    if (chainSlug == 'solana') {
+      return  SolWallet.currentAddress();
+    }
+    return  Wallet.currentAddress();
+  },
 
   // this is deprecated after API integration - step 2
   getBridgeInterface(nonce) {
@@ -73,7 +82,7 @@ export default {
       tokenSymbol: symbol,
       bridge,
       tokenAddress: address,
-      fromChain,
+      fromChain: chainNameHandler(fromChain),
       fromChainId: chainId,
       fromAddress,
     });
@@ -86,7 +95,7 @@ export default {
     return { allowanceFormatted, allowance };
   },
 
-  async sendTransfer({ fromAddress, fromChain, from, to, toChain, route, fromAmount }) {
+  async sendTransfer({ fromAddress, fromChain, from, toAddress, toChain, to,  route, fromAmount }) {
     const { chainId: fromChainId, address: fromTokenAddress, symbol, decimals } = from;
     const { chainId: toChainId } = to;
 
@@ -112,6 +121,8 @@ export default {
           fromUserAddress: fromAddress,
           toChain: toChainName,
           toChainId,
+          toUserAddress: toAddress,
+          decimals,
           route: [route],
         }),
       },

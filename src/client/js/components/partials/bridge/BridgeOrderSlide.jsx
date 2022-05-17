@@ -71,10 +71,10 @@ const BridgeOrderSlide = (props) => {
       toChain,
       from,
       fromChain,
-      fromUserAddress: fromChain.name == 'Solana' ? SolWallet.getWalletAddress() : Wallet.currentAddress(),
+      fromUserAddress: TxBridgeManager.walletAddress(fromChain.name),
       fromAmountBN,
     });
-    console.log(successfullEstimatesNew);
+
     Wallet.getBalance(props.from)
       .then((bal) => {
         // temp hard check nxtp or cbridge until integrate the whole process

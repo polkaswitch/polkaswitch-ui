@@ -52,7 +52,7 @@ window.SolanaWallet = {
   setWalletAddress: function(key) {
     this._walletKey = key;
   },
-  getWalletAddress: function() {
+  currentAddress: function() {
     return  this._walletKey;
   },
 

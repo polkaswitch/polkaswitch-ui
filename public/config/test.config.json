@@ -17,7 +17,12 @@
     "abi": "oneSplitAbi",
     "chain": {
       "chainId": "0x1",
-      "chainName": "Ethereum"
+      "chainName": "Ethereum",
+      "nativeCurrency": {
+        "name": "Ethereum",
+        "symbol": "ETH",
+        "decimals": 18
+      }
     },
     "defaultPair": {
       "to": "USDT",
@@ -58,7 +63,12 @@
     "abi": "oneSplitAbi",
     "chain": {
       "chainId": "0x0",
-      "chainName": "Solana"
+      "chainName": "Solana",
+      "nativeCurrency": {
+        "name": "Solana",
+        "symbol": "SOL",
+        "decimals": 9
+      }
     },
     "defaultPair": {
       "to": "SOL",
@@ -98,7 +108,12 @@
     "abi": "oneSplitAbi",
     "chain": {
       "chainId": "0x3",
-      "chainName": "Ropsten"
+      "chainName": "Ropsten",
+      "nativeCurrency": {
+        "name": "Ethereum",
+        "symbol": "ETH",
+        "decimals": 18
+      }
     },
     "defaultPair": {
       "to": "USDT",
