@@ -9,7 +9,9 @@ import Nxtp from './nxtp';
 import Storage from './storage';
 import { baseUrl, chainNameHandler, encodeQueryString } from './requests/utils';
 import SolWallet from './solanaWallet';
+
 import Wallet from './wallet';
+import { PublicKey } from '@solana/web3.js';
 const BRIDGES = ['hop', 'cbridge', 'connext'];
 
 const SUPPORTED_BRIDGE_TOKENS = [
@@ -35,6 +37,15 @@ export default {
     }
     return  Wallet.currentAddress();
   },
+
+  ataAddress(chainName, mintAddress) {
+    const chainSlug = chainNameHandler(chainName);
+    if (chainSlug == 'solana') {
+      return SolWallet.ataAddress(mintAddress);
+    }
+    return  '';
+  },
+
 
   // this is deprecated after API integration - step 2
   getBridgeInterface(nonce) {
@@ -95,8 +106,8 @@ export default {
     return { allowanceFormatted, allowance };
   },
 
-  async sendTransfer({ fromAddress, fromChain, from, toAddress, toChain, to,  route, fromAmount }) {
-    const { chainId: fromChainId, address: fromTokenAddress, symbol, decimals } = from;
+  async sendTransfer({ fromAddress, fromChain, from, toAddress, fromTokenAccountAddress, toChain, to, toTokenAccountAddress, route, fromAmount }) {
+    const { chainId: fromChainId, address: fromTokenAddress,  symbol, decimals } = from;
     const { chainId: toChainId } = to;
 
     const toChainName = chainNameHandler(toChain);
@@ -119,9 +130,11 @@ export default {
           fromChainId,
           fromTokenAddress,
           fromUserAddress: fromAddress,
+          fromTokenAccountAddress,
           toChain: toChainName,
           toChainId,
           toUserAddress: toAddress,
+          toTokenAccountAddress,
           decimals,
           route: [route],
         }),
@@ -240,7 +253,7 @@ export default {
     }
   },
 
-  async claimTokens({ fromChain, toChain, userAddress, txId, signature, bridge, relayerFee, useNativeTokenToClaim }) {
+  async claimTokens({ fromChain, toChain, userAddress, txId, signature, bridge, relayerFee, useNativeTokenToClaim }, callBack) {
     const claimTokensResp = await fetchWithRetry(
       `${baseUrl}/v0/transfer/claim`,
       {
@@ -261,8 +274,24 @@ export default {
       },
       3,
     );
-
-    return { claimTokensResp };
+    let txHash = null;
+    if(bridge == 'wormhole' && claimTokensResp) {
+      callBack();
+      const { data } = claimTokensResp.tx;
+      try {
+        if(toChain.slug == 'solana'){
+          txHash = await SolWallet.sendTransactionMessage(data);
+        } else {
+          txHash = await window.ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [{ data, to: toNxtpTemp, from: fromNxtpTemp }],
+          });
+        }
+      } catch (e) {
+        console.log('error', e);
+      }
+    }
+    return { claimTokensResp, txHash};
   },
 
   async buildNewAllEstimates({ to, toChain, from, fromChain, fromUserAddress, toUserAddress, fromAmountBN }) {

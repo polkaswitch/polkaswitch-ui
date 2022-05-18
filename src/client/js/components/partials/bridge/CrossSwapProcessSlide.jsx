@@ -125,14 +125,18 @@ export default class CrossSwapProcessSlide extends Component {
       },
       async () => {
         try {
+          const fromChainName = this.props.fromChain.name;
+          const toChainName = this.props.toChain.name;
           const { tx, txHash, fromNxtpTemp, toNxtpTemp } = await TxBridgeManager.sendTransfer({
-            fromChain: this.props.fromChain.name,
+            fromChain: fromChainName,
             from: this.props.from,
-            toChain: this.props.toChain.name,
+            toChain: toChainName,
             to: this.props.to,
             fromAmount: this.props.fromAmount,
-            fromAddress: TxBridgeManager.walletAddress(this.props.fromChain.name),
-            toAddress: TxBridgeManager.walletAddress(this.props.toChain.name),
+            fromAddress: TxBridgeManager.walletAddress(fromChainName),
+            fromTokenAccountAddress: TxBridgeManager.ataAddress(fromChainName, this.props.from.address),
+            toAddress: TxBridgeManager.walletAddress(toChainName),
+            toTokenAccountAddress: TxBridgeManager.ataAddress(toChainName, route.bridgeTokenAddress),
             route,
           });
 
@@ -159,19 +163,21 @@ export default class CrossSwapProcessSlide extends Component {
       },
       async () => {
         let signTransactionResp = {};
-        try {
-          const { hash, relayerFee, useNativeTokenToClaim, signature } = await TxBridgeManager.signTransaction({
-            txId,
-            userAddress: Wallet.currentAddress(),
-            bridge,
-            account,
-          });
-
-          console.log('signTransctionResp', { hash, relayerFee, useNativeTokenToClaim, signature });
-
-          signTransactionResp = { hash, relayerFee, useNativeTokenToClaim, signature };
-        } catch (e) {
-          this.handleTransactionFailure();
+        if (bridge != 'wormhole') {
+          try {
+            const { hash, relayerFee, useNativeTokenToClaim, signature } = await TxBridgeManager.signTransaction({
+              txId,
+              userAddress: Wallet.currentAddress(),
+              bridge,
+              account,
+            });
+  
+            console.log('signTransctionResp', { hash, relayerFee, useNativeTokenToClaim, signature });
+  
+            signTransactionResp = { hash, relayerFee, useNativeTokenToClaim, signature };
+          } catch (e) {
+            this.handleTransactionFailure();
+          }
         }
 
         const toChainSlug = chainNameHandler(this.props.toChain.name);
@@ -180,7 +186,7 @@ export default class CrossSwapProcessSlide extends Component {
         try {
           const { relayerFee, useNativeTokenToClaim, signature } = signTransactionResp;
 
-          const { claimTokensResp } = await TxBridgeManager.claimTokens({
+          const { claimTokensResp, txHash } = await TxBridgeManager.claimTokens({
             fromChain: { slug: fromChainSlug, chainId: this.props.fromChain.chainId },
             toChain: { slug: toChainSlug, chainId: this.props.toChain.chainId },
             userAddress: TxBridgeManager.walletAddress(toChainSlug),
@@ -189,12 +195,15 @@ export default class CrossSwapProcessSlide extends Component {
             useNativeTokenToClaim,
             signature: signature,
             bridge,
-          });
+          }, this.stopPollingStatus);
 
           if (!claimTokensResp) {
             this.setState({
               signed: false,
             });
+          }
+          else if(bridge == 'wormhole') {
+            this.completeProcess(txHash);
           }
         } catch (e) {
           console.log('error', e);
@@ -312,7 +321,7 @@ export default class CrossSwapProcessSlide extends Component {
     const bridge = selectedTx?.bridge?.route[0].bridge || 'celer';
 
     const approvedToken = await TxBridgeManager.approveToken({
-      fromAddress: TxBridgeManager.currentAddress(this.props.fromChain.name),
+      fromAddress: TxBridgeManager.walletAddress(this.props.fromChain.name),
       fromChain: this.props.fromChain.name,
       from: this.props.from,
       toChain: this.props.toChain.name,

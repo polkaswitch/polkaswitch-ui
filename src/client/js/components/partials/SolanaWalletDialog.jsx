@@ -5,7 +5,7 @@ import {
   makeStyles,
 } from '@material-ui/core';
 import { useWallet } from '@solana/wallet-adapter-react';
-import React, { useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import {WalletIcon} from '@solana/wallet-adapter-material-ui';
 
 const useStyles = makeStyles((theme) => ({
@@ -40,8 +40,8 @@ export const SolanaWalletDialog = ({
   ...props
 }) => {
   const styles = useStyles();
-  const { wallets, select, wallet, connect, connecting, connected, disconnect, disconnecting  } = useWallet();
-  
+  const { wallets, select, wallet, publicKey, connect, connecting, connected, disconnect, disconnecting  } = useWallet();
+  const [walletName, setWalletName] = useState('');
   useEffect(() => {
     if (connecting) console.log('Connecting ...');
     else if (connected) {
@@ -59,6 +59,7 @@ export const SolanaWalletDialog = ({
           await disconnect();
         }
         select(walletName);
+        setWalletName(walletName);
       },
       [select]
   );
@@ -69,21 +70,24 @@ export const SolanaWalletDialog = ({
       });
     }
     return () =>{
-      disconnect();
+      // disconnect();
     }
   }, [wallet]);
 
   return (
-    <List className={styles.root}>
-        {wallets.map((wallet) => (
-          <ListItem key={wallet.name}>
-            <Button onClick={(event) => handleWalletClick(event, wallet.name)} endIcon={<WalletIcon wallet={wallet} />}>
-                {wallet.name}
-            </Button>
-          </ListItem>
-        ))}
+    <>
+      <div>{publicKey?.toString()}</div>
+      <List className={styles.root}>
+          {wallets.map((wallet) => (
+            <ListItem key={wallet.name}>
+              <Button onClick={(event) => handleWalletClick(event, wallet.name)} endIcon={<WalletIcon wallet={wallet} />}>
+                  {wallet.name + (walletName == wallet.name ? connected ? ' - connected' : '- selected' : '')}
+              </Button>
+            </ListItem>
+          ))}
 
-    </List>
+      </List>
+    </>
   );
 };
 export default SolanaWalletDialog;

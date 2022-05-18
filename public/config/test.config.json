@@ -71,8 +71,8 @@
       }
     },
     "defaultPair": {
-      "to": "SOL",
-      "from": "USDC"
+      "to": "USDT",
+      "from": "SOL"
     },
     "topTokens": [
       "SOL",
