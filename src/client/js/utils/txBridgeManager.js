@@ -150,10 +150,22 @@ export default {
     } = sendTransferResp;
 
     try {
-      const txHash = await window.ethereum.request({
+      // TODO should use ethersJS and utils/Wallet.js
+      let txParams = { data, to: toNxtpTemp, from: fromNxtpTemp };
+
+      if (from.native) {
+        txParams.value = fromAmountBN.toHexString();
+      }
+
+      const [requestErr, txHash] = await window.ethereum.request({
         method: 'eth_sendTransaction',
-        params: [{ data, to: toNxtpTemp, from: fromNxtpTemp }],
-      });
+        params: [txParams],
+      }).then((v) => [null, v], (err) => [err, null]);
+
+      if (requestErr) {
+        throw requestErr;
+      }
+
       return { txHash, tx, fromNxtpTemp, toNxtpTemp, data };
     } catch (e) {
       console.error('error to send transfer', e);
@@ -180,9 +192,12 @@ export default {
     // this function gets polled, we don't need to fetchWithRetry
     const getTransferStatusRequest = await fetch(`${baseUrl}/v0/transfer/status${queryStrings}`, {});
 
-    let response = await getTransferStatusRequest.json();
-
-    return response;
+    if (getTransferStatusRequest?.ok) {
+      let response = await getTransferStatusRequest.json();
+      return response;
+    } else {
+      return undefined;
+    }
   },
 
   async approveToken({ bridge, fromAddress, to, toChain, fromChain, fromAmount, from }) {
@@ -211,6 +226,7 @@ export default {
     const { from: fromApprove, to: toApprove, data } = getApprove;
 
     try {
+      // TODO should use ethersJS and utils/Wallet.js
       const txHash = await window.ethereum.request({
         method: 'eth_sendTransaction',
         params: [{ data, to: toApprove, from: fromApprove }],
@@ -243,6 +259,7 @@ export default {
     const { hash, relayerFee, useNativeTokenToClaim } = signTransactionResp;
 
     try {
+      // TODO should use ethersJS and utils/Wallet.js
       const signature = await window.ethereum.request({
         method: 'personal_sign',
         params: [hash, userAddress],

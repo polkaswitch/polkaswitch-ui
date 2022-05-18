@@ -295,17 +295,35 @@ export default class CrossSwapProcessSlide extends Component {
   }
 
   renderLoading() {
+    const getLoadingTitle = () => {
+      if (this.props.requiresTokenApproval) {
+        return 'Approving Token';
+      } else if (this.state.finishable) {
+        return 'Finalizing Transfer';
+      } else {
+        return 'Starting Transfer';
+      }
+    }
+
+    const getLoadingBody = () => {
+      if (this.props.requiresTokenApproval) {
+        return 'We are processing your approval for moving your funds.';
+      } else if (this.state.finishable) {
+        return 'We are depositing funds into the receiving chain.';
+      } else {
+        return 'We are moving funds from the sending chain.';
+      }
+    }
+
     return (
       <div className={classnames('centered-view')}>
         <div className="icon">
           <ion-icon name="hourglass-outline" />
         </div>
-        <div className="title">{this.state.finishable ? 'Finalizing Transfer' : 'Starting Transfer'}</div>
+        <div className="title">{getLoadingTitle()}</div>
         <div className="details">
           <div>
-            {this.state.finishable
-              ? 'We are depositing funds into the receiving chain.'
-              : 'We are moving funds from the sending chain.'}
+            {getLoadingBody()}
             <br />
             This step normally takes 2-3 minutes.
             <br />
@@ -317,8 +335,13 @@ export default class CrossSwapProcessSlide extends Component {
   }
 
   async approveToken() {
+    this.setState({
+      loading: true
+    });
+
     const selectedTx = TxBridgeManager.getTx(this.props.crossChainTransactionId);
     const bridge = selectedTx?.bridge?.route[0].bridge || 'celer';
+
 
     const approvedToken = await TxBridgeManager.approveToken({
       fromAddress: TxBridgeManager.walletAddress(this.props.fromChain.name),
@@ -330,11 +353,15 @@ export default class CrossSwapProcessSlide extends Component {
       fromAmount: this.props.fromAmount,
     });
 
-    if (approvedToken) {
-      this.props.handleFinishedAllowance();
-    }
+    console.log('approvedtoken: ', approvedToken);
 
-    console.log('approvedtoken', approvedToken);
+    this.setState({
+      loading: false
+    }, () => {
+      if (approvedToken) {
+        this.props.handleFinishedAllowance();
+      }
+    });
   }
 
   buttonText() {
