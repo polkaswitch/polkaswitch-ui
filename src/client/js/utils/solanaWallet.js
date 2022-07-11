@@ -76,7 +76,7 @@ window.SolanaWallet = {
 
   setTokenAccounts: function(accounts) {
     this._tokens = accounts;
-    console.log('Updating Solana Wallet Balance');
+    console.log('Updating Solana Wallet Balance', accounts);
     EventManager.emitEvent('walletUpdated', 1);
   },
 

@@ -185,7 +185,6 @@ export default class CrossSwapProcessSlide extends Component {
 
         try {
           const { relayerFee, useNativeTokenToClaim, signature } = signTransactionResp;
-
           const { claimTokensResp, txHash } = await TxBridgeManager.claimTokens({
             fromChain: { slug: fromChainSlug, chainId: this.props.fromChain.chainId },
             toChain: { slug: toChainSlug, chainId: this.props.toChain.chainId },
@@ -195,6 +194,9 @@ export default class CrossSwapProcessSlide extends Component {
             useNativeTokenToClaim,
             signature: signature,
             bridge,
+            bridgeTokenAddress: route.bridgeTokenAddress,
+            toTokenAddress: this.props.to.address,
+            bridgeTokenAmount: this.props.fromAmount * 10 ** this.props.from.decimals,
           }, this.stopPollingStatus);
 
           if (!claimTokensResp) {

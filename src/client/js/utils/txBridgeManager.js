@@ -270,7 +270,7 @@ export default {
     }
   },
 
-  async claimTokens({ fromChain, toChain, userAddress, txId, signature, bridge, relayerFee, useNativeTokenToClaim }, callBack) {
+  async claimTokens({ fromChain, toChain, userAddress, txId, signature, bridge, relayerFee, useNativeTokenToClaim, bridgeTokenAddress, toTokenAddress, bridgeTokenAmount }, callBack) {
     const claimTokensResp = await fetchWithRetry(
       `${baseUrl}/v0/transfer/claim`,
       {
@@ -287,6 +287,9 @@ export default {
           relayerFee,
           useNativeTokenToClaim,
           bridge,
+          bridgeTokenAddress,
+          toTokenAddress,
+          bridgeTokenAmount
         }),
       },
       3,
