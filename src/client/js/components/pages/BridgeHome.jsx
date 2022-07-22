@@ -10,7 +10,7 @@ export default class Bridge extends Component {
   render() {
     return (
       <div className="container">
-        <Navbar />
+        <Navbar bridge = {true}/>
         <MobileMenu />
         <NotificationSystem />
         <ConnectWalletModal />

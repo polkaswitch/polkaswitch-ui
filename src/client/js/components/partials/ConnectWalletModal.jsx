@@ -6,7 +6,7 @@ import Wallet from '../../utils/wallet';
 import Metrics from '../../utils/metrics';
 import EventManager from '../../utils/events';
 import TokenListManager from '../../utils/tokenList';
-
+import SolanaWalletDialog from './SolanaWalletDialog';
 import BasicModal from './BasicModal';
 
 export default class ConnectWalletModal extends Component {
@@ -174,7 +174,7 @@ export default class ConnectWalletModal extends Component {
             </div>
           </div>
         </div>
-
+        <SolanaWalletDialog handleClose={this.handleClose}/>
         <div
           className={classnames('option bare', {
             'is-hidden': !Wallet.isConnected(),

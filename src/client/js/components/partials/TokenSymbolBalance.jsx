@@ -3,6 +3,8 @@ import _ from 'underscore';
 import Wallet from '../../utils/wallet';
 import numeral from 'numeral';
 
+import SolWallet from '../../utils/solanaWallet';
+
 export default class TokenSymbolBalance extends Component {
   constructor(props) {
     super(props);
@@ -60,9 +62,9 @@ export default class TokenSymbolBalance extends Component {
       this.log('Network Failure');
       return;
     }
-
-    if (Wallet.isConnectedToAnyNetwork()) {
-      Wallet.getBalance(this.props.token, this.props.network)
+    if(this.props.network.name != 'Solana'){
+      if (Wallet.isConnectedToAnyNetwork()) {
+        Wallet.getBalance(this.props.token, this.props.network)
         .then(function(_ts, bal) {
           if (this.state.timestamp != _ts) {
             return;
@@ -87,12 +89,26 @@ export default class TokenSymbolBalance extends Component {
             this.fetchBalance(attempt + 1);
           }.bind(this, this.state.timestamp),
         );
+      
+      } else {
+        this.log('Wallet not connected');
+        this.setState({
+          errored: true,
+          loading: false,
+        });
+      }
     } else {
-      this.log('Wallet not connected');
+      const tokenAccount = SolWallet.getAccountByMint(this.props.token?.address);
+      let balance = '0';
+      if(tokenAccount){
+        balance = tokenAccount.amount.toString();
+      }
       this.setState({
-        errored: true,
+        balance: BigNumber.from(balance),
+        errored: false,
         loading: false,
-      });
+      });  
+
     }
   }
 

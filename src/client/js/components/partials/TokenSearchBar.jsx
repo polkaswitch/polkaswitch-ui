@@ -10,7 +10,7 @@ import CustomTokenModal from './CustomTokenModal';
 import TokenSearchItem from './swap/TokenSearchItem';
 import numeral from 'numeral';
 import { filterCircle } from 'ionicons/icons';
-
+import SolWallet from '../../utils/solanaWallet';
 export default class TokenSearchBar extends Component {
   constructor(props) {
     super(props);
@@ -120,19 +120,32 @@ export default class TokenSearchBar extends Component {
   }
 
   fetchBalance(token, attempt) {
-    Wallet.getBalance(token)
-      .then(
-        function (bal) {
-          this.updateTokenBalances(token, bal, false);
-        }.bind(this),
-      )
-      .catch(
-        function (e) {
-          // try again
-          console.error('Failed to fetch balance', e);
-          this.updateTokenBalances(token, 0, false);
-        }.bind(this),
-      );
+    if(this.props.network.name != 'Solana'){
+      Wallet.getBalance(token)
+        .then(
+          function (bal) {
+            this.updateTokenBalances(token, bal, false);
+          }.bind(this),
+        )
+        .catch(
+          function (e) {
+            // try again
+            console.error('Failed to fetch balance', e);
+            this.updateTokenBalances(token, 0, false);
+          }.bind(this),
+        );
+    }
+    else
+    {
+      const tokenAccount = SolWallet.getAccountByMint(token.address);
+      let balance = '0';
+      if(tokenAccount){
+        balance = tokenAccount.amount.toString();
+      }
+      
+      this.updateTokenBalances(token, BigNumber.from(balance), false);
+
+    }
   }
 
   fetchBalances(tokenList) {

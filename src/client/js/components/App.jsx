@@ -19,6 +19,9 @@ import { keepTheme } from '../utils/theme';
 import { BalanceProvider } from '../context/balance';
 import useLoadBalances from './pages/useLoadBalance';
 
+import { SolanaWalletProvider } from '../context/SolanaWalletContext';
+import { SolanaAccountsProvider } from '../context/SolanaAccounts';
+import { SolanaConnectionProvider } from '../context/SolanaConnection';
 require('../../css/index.scss');
 
 const IS_CLAIM_DOMAIN = process.env.IS_CLAIM_DOMAIN === 'true';
@@ -48,55 +51,61 @@ const App = () => {
     useLoadBalances();
 
   return (
-    <BalanceProvider
-      value={{ ...myApplicationState, setMyApplicationState, loadBalances }}
-    >
-      {myApplicationState && (
-        <Router>
-          <div className={classnames({ fullscreen: isFullScreen })}>
-            {!IS_CLAIM_DOMAIN
-              ? <Switch>
-                  <Route exact path="/">
-                    <Redirect to="/swap" />
-                  </Route>
-                  <Route path="/swap">
-                    <SwapHome />
-                  </Route>
-                  <Route path="/bridge">
-                    <BridgeHome />
-                  </Route>
-                  <Route path="/stake">
-                    <StakeHome />
-                  </Route>
-                  <Route path="/wallet">
-                    <WalletHome />
-                  </Route>
-                  <Route path="/status">
-                    <StatusHome />
-                  </Route>
-                  <Route path="/claim">
-                    <TokenClaimHome />
-                  </Route>
-                  <Route>
-                    <Redirect to="/swap" />
-                  </Route>
-                </Switch>
-              : <Switch>
-                  <Route exact path="/">
-                    <Redirect to="/claim" />
-                  </Route>
-                  <Route path="/claim">
-                    <TokenClaimHome />
-                  </Route>
-                  <Route>
-                    <Redirect to="/claim" />
-                  </Route>
-                </Switch>}
-            <Footer />
-          </div>
-        </Router>
-      )}
-    </BalanceProvider>
+    <SolanaWalletProvider>
+      <SolanaConnectionProvider>
+        <SolanaAccountsProvider>
+          <BalanceProvider
+            value={{ ...myApplicationState, setMyApplicationState, loadBalances }}
+          >
+            {myApplicationState && (
+              <Router>
+                <div className={classnames({ fullscreen: isFullScreen })}>
+                  {!IS_CLAIM_DOMAIN
+                    ? <Switch>
+                        <Route exact path="/">
+                          <Redirect to="/swap" />
+                        </Route>
+                        <Route path="/swap">
+                          <SwapHome />
+                        </Route>
+                        <Route path="/bridge">
+                          <BridgeHome />
+                        </Route>
+                        <Route path="/stake">
+                          <StakeHome />
+                        </Route>
+                        <Route path="/wallet">
+                          <WalletHome />
+                        </Route>
+                        <Route path="/status">
+                          <StatusHome />
+                        </Route>
+                        <Route path="/claim">
+                          <TokenClaimHome />
+                        </Route>
+                        <Route>
+                          <Redirect to="/swap" />
+                        </Route>
+                      </Switch>
+                    : <Switch>
+                        <Route exact path="/">
+                          <Redirect to="/claim" />
+                        </Route>
+                        <Route path="/claim">
+                          <TokenClaimHome />
+                        </Route>
+                        <Route>
+                          <Redirect to="/claim" />
+                        </Route>
+                      </Switch>}
+                  <Footer />
+                </div>
+              </Router>
+            )}
+          </BalanceProvider>
+        </SolanaAccountsProvider>
+      </SolanaConnectionProvider>
+    </SolanaWalletProvider>
   );
 };
 

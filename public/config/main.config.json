@@ -17,7 +17,12 @@
     "abi": "oneSplitAbi",
     "chain": {
       "chainId": "0x1",
-      "chainName": "Ethereum"
+      "chainName": "Ethereum",
+      "nativeCurrency": {
+        "name": "Ethereum",
+        "symbol": "ETH",
+        "decimals": 18
+      }
     },
     "defaultPair": {
       "to": "ETH",
@@ -58,7 +63,12 @@
     "abi": "oneSplitAbi",
     "chain": {
       "chainId": "0x3",
-      "chainName": "Ropsten"
+      "chainName": "Ropsten",
+      "nativeCurrency": {
+        "name": "Ethereum",
+        "symbol": "ETH",
+        "decimals": 18
+      }
     },
     "defaultPair": {
       "to": "USDT",

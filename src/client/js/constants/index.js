@@ -32,3 +32,5 @@ export const wrapTokens = {
     1666600000: '0xcf664087a5bb0237a0bad6742852ec6c8d69a27a'
   }
 };
+
+export const ALLOWED_BRIDGES = ['celer', 'nxtp', 'anyswap', 'wormhole'];

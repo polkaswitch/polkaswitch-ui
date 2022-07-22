@@ -14,8 +14,10 @@ import {
 } from '@connext/nxtp-utils';
 import EventManager from './events';
 import Wallet from './wallet';
+import TokenListManager from './tokenList';
 
 import swapFn from './swapFn';
+import {SOLANA_CHAIN_ID} from './solanaWallet';
 
 // never exponent
 BN.config({ EXPONENTIAL_AT: 1e9 });
@@ -49,7 +51,7 @@ window.NxtpUtils = {
     this._sdkConfig = {};
 
     window.NETWORK_CONFIGS.forEach((e) => {
-      if (e.enabled && e.crossChainSupported) {
+      if (+e.chainId != SOLANA_CHAIN_ID && e.enabled && e.crossChainSupported) {
         const connextData = this._connextChainData.get(e.chainId);
 
         this._sdkConfig[e.chainId] = {
