@@ -1,12 +1,12 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import _ from 'underscore';
 import { ethers } from 'ethers';
 import BN from 'bignumber.js';
 import { Integrations } from '@sentry/tracing';
 
-const IS_MAIN_NETWORK = window.IS_MAIN_NETWORK = process.env.IS_MAIN_NETWORK === 'true';
+const IS_MAIN_NETWORK = (window.IS_MAIN_NETWORK = process.env.IS_MAIN_NETWORK === 'true');
 window.IS_PRODUCTION = process.env.IS_PRODUCTION;
 
 if (process.env.IS_PRODUCTION) {
@@ -34,9 +34,7 @@ if (IS_MAIN_NETWORK) {
   console.log('Loading TEST config...');
 }
 
-const config = await fetch(
-  IS_MAIN_NETWORK ? '/config/main.config.json' : '/config/test.config.json',
-);
+const config = await fetch(IS_MAIN_NETWORK ? '/config/main.config.json' : '/config/test.config.json');
 window.NETWORK_CONFIGS = await config.json();
 window.MAX_RETRIES = process.env.IS_PRODUCTION ? 3 : 1;
 
@@ -50,7 +48,7 @@ import Nxtp from './utils/nxtp';
 import HopUtils from './utils/hop';
 import TxQueue from './utils/txQueue';
 import Storage from './utils/storage';
-import App from "./components/App";
+import App from './components/App';
 
 // pre-load and collase/parallelize all our external JSON config loading
 // to reduce initial app load times
@@ -78,5 +76,6 @@ if (Wallet.isMetamaskSupported()) {
   console.error('Metamask not installed!');
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
-
+const container = document.getElementById('root');
+const root = createRoot(container); // createRoot(container!) if you use TypeScript
+root.render(<App />);
