@@ -16,6 +16,7 @@ import AvailableRoutes from './AvailableRoutes';
 import TxBridgeManager from '../../../utils/txBridgeManager';
 import {ALLOWED_BRIDGES} from '../../../constants'
 import SolWallet from '../../../utils/solanaWallet'
+import ConnectWalletButton from '../ConnectWalletButton';
 const BridgeOrderSlide = (props) => {
   const [calculatingSwap, setCalculatingSwap] = useState(false);
   const [callDebounce, setCallDebounce] = useState(false);
@@ -336,6 +337,7 @@ const BridgeOrderSlide = (props) => {
                     </span>
                   </div>
                 </div>
+                <ConnectWalletButton network={isFrom ? props.fromChain : props.toChain}/>
               </div>
             </div>
           </div>

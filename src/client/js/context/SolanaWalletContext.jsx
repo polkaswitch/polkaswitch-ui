@@ -17,14 +17,14 @@ export const SolanaWalletProvider = (props) => {
   const wallets = useMemo(() => {
     return [
       getPhantomWallet(),
-      getSolflareWallet(),
-      getTorusWallet({
-          options: { clientId: 'Go to https://developer.tor.us and create a client ID' }
-      }),
-      getLedgerWallet(),
-      getSolongWallet(),
-      getMathWallet(),
-      getSolletWallet(),
+      // getSolflareWallet(),
+      // getTorusWallet({
+      //     options: { clientId: 'Go to https://developer.tor.us and create a client ID' }
+      // }),
+      // getLedgerWallet(),
+      // getSolongWallet(),
+      // getMathWallet(),
+      // getSolletWallet(),
     ];
   }, []);
 
